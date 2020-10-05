@@ -1,7 +1,34 @@
-const express = require('express')
-const app = express()
+// The entry point to the backend
 
+const express = require('express')
+const bodyParser = require('body-parser');
+const cors = require('cors');
+const path = require('path')
+require('./database');
+
+const app = express();
+
+app.use(bodyParser.json())
+app.use(cors());
 app.use(express.json())
+
+// API
+const user = rquire('/api/users')
+
+app.use('/api/users', users)
+app.use(express.static(path.join(__dirname, '../build')))
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../build'))
+})
+
+const port = process.env.PORT || 5000;
+
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
+
+// old stuff
 
 let notes = [
     {
@@ -51,9 +78,4 @@ app.post('/api/notes', (request, response) => {
     console.log(note)
 
     response.json(note)
-})
-
-const PORT = 3002
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
 })
