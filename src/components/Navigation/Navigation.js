@@ -3,7 +3,7 @@ import {
   Navbar,
   Nav, } from 'react-bootstrap';
 
-const Navigation = (props, arrorw) => {
+const Navigation = () => {
 
   const logout = () => {
   }
