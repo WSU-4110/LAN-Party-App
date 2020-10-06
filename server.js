@@ -1,61 +1,117 @@
-// This the entry point to the entire backend
+//** This the entry point to the entire backend **//
 
-const express = require('express')
-//const bodyParser = require('body-parser');
-//const cors = require('cors');
-//const path = require('path')
-//require('./database');
+// Importing our npm packages
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors');
 
+// Starting our app
 const app = express();
 
-//app.use(bodyParser.json())
-//app.use(cors());
-app.use(express.json())
-
-// API
-//const user = require('/api/users')
-
-//app.use('/api/users', users)
-//app.use(express.static(path.join(__dirname, '../build')))
-
-// app.get('*', (req, res) => {
-//     res.sendFile(path.join(__dirname, '../build'))
-// })
-
+// This is our Express port
 const port = process.env.PORT || 5000;
 
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-});
+// Importing our modules
+const User = require('./models/note')
 
-// old stuff
+//
+app.use(cors());
+app.use(express.json())
+app.use('/api/users', users)
 
-let notes = [
-    {
-    id: 1,
-    content: "HTML is easy",
-    date: "2019-05-30T17:30:31.098Z",
-    important: true
-    },
-    {
-    id: 2,
-    content: "Browser can execute only Javascript",
-    date: "2019-05-30T18:39:34.091Z",
-    important: false
-    },
-    {
-    id: 3,
-    content: "GET and POST are the most important methods of HTTP protocol",
-    date: "2019-05-30T19:20:14.298Z",
-    important: true
-    }
-]
+//** Connecting to our MongoDB on AWS **//
+const url = process.env.MONGODB_URI
+
+console.log('connecting to', url)
+
+mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
+  .then(result => {
+    console.log('connected to MongoDB')
+  })
+  .catch((error) => {
+    console.log('error connecting to MongoDB:', error.message)
+  })
+
+
+
+
+
+if (process.argv.length < 3) {
+  console.log('Please provide the password as an argument: node mongo.js <password>')
+  process.exit(1)
+}
+
+const password = process.argv[2]
+const url = `mongodb+srv://logan:${password}@cluster0.pgumn.mongodb.net/test?retryWrites=true&w=majority`
+
+mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
+    .then(() => console.log("Database Connected Successfully"))
+    .catch(err => console.log(err))
+
+app.get('/api/users', (request, response) => {
+    User.find({}).then(users => {
+        response.json(users)
+    })
+})
+
+// const note = new Note({
+//   content: 'HTML is Easy',
+//   date: new Date(),
+//   important: true,
+// })
+
+// note.save().then(result => {
+//   console.log('note saved!')
+//   mongoose.connection.close()
+// })
+
+Note.find({}).then(result => {
+    result.forEach(note => {
+      console.log(note)
+    })
+    mongoose.connection.close()
+  })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 app.get('/', (req, res) => {
     res.send('<h1>Hello World!</h1>')
 })
 
-app.get('/api/notes/:id', (request, response) => {
+app.get('/api/users/:id', (request, response) => {
     const id = Number(request.params.id)
     const note = notes.find(note => note.id === id)
 
@@ -79,3 +135,13 @@ app.post('/api/notes', (request, response) => {
 
     response.json(note)
 })
+
+app.get('/api/notes', (request, response) => {
+    Note.find({}).then(notes => {
+      response.json(notes)
+    })
+})
+
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
