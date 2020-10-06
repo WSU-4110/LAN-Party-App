@@ -6,6 +6,10 @@ import {
   NavDropdown } from 'react-bootstrap';
 
 const Navigation = () => {
+
+  const logout = () => {
+  }
+
   return(
     <Navbar bg="primary" expand="lg">
       <Navbar.Brand href="/">React-Bootstrap</Navbar.Brand>
@@ -14,7 +18,7 @@ const Navigation = () => {
         <Nav className="mr-auto">
           <Nav.Link href="/signup">Signup</Nav.Link>
           <Nav.Link href="/login">Login</Nav.Link>
-          <Nav.Link href="/">Logout</Nav.Link>
+          <Nav.Link href="/" onClick={logout}>Logout</Nav.Link>
         </Nav>
       </Navbar.Collapse>
     </Navbar>
