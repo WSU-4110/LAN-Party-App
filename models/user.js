@@ -3,21 +3,18 @@
 const mongoose = require('mongoose')
 
 const url = process.env.MONGODB_URI
+
 console.log('Connecting to', url)
+
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
     .then(result => {
-        console.log('connected to MongoDB')
+        console.log('Established a connection to MongoDB')
     })
     .catch((error) => {
-        console.log('error connecting to MongoDB:', error.message)
+        console.log('Error connecting to MongoDB:', error.message)
     })
 
 const userSchema = new mongoose.Schema({
-    user_id: {
-        type: String,
-        maxlength: 50,
-        required: true
-    },
     first_name: {
         type: String,
         maxlength: 50,
@@ -44,7 +41,7 @@ userSchema.set('toJSON', {
     transform: (document, returnedObject) => {
         returnedObject.id = returnedObject._id.toString()
         delete returnedObject._id
-        delete returnedObject._v
+        delete returnedObject.__v
     }
 })
 
