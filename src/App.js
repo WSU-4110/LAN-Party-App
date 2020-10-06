@@ -7,6 +7,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         LAN Party App
+        this is a line to test the pull request
       </header>
     </div>
   );
