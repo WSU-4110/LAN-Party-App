@@ -16,12 +16,12 @@ const Signup = () => {
       password: data.password
     };
 
-    console.log("PAYLAOD", payload);
+    console.log("PAYLOAD", payload);
   }
 
   return(
     <Form onSubmit={handleSubmit(onSubmit)}>
-      <Form.Group controlId="formBasicName">
+      <Form.Group controlId="formFirstName">
         <Form.Label>First Name</Form.Label>
         <Form.Control 
           type="text" 
@@ -32,7 +32,7 @@ const Signup = () => {
         {errors.firstName && <Form.Text className="text-danger" id="firstNameReq">Required</Form.Text>}
       </Form.Group>
 
-      <Form.Group controlId="formBasicName">
+      <Form.Group controlId="formLastName">
         <Form.Label>Last Name</Form.Label>
         <Form.Control 
           type="text" 
@@ -43,7 +43,7 @@ const Signup = () => {
         {errors.lastName && <Form.Text className="text-danger" id="lastNameReq">Required</Form.Text>}
       </Form.Group>
 
-      <Form.Group controlId="formBasicEmail">
+      <Form.Group controlId="formEmail">
         <Form.Label>Email address</Form.Label>
         <Form.Control 
           type="email" 
@@ -57,7 +57,7 @@ const Signup = () => {
         {errors.email && <Form.Text className="text-danger" id="emailReq">Required</Form.Text>}
       </Form.Group>
 
-      <Form.Group controlId="formBasicAddress">
+      <Form.Group controlId="formAddress">
         <Form.Label>Address</Form.Label>
         <Form.Control 
           type="text" 
@@ -71,7 +71,7 @@ const Signup = () => {
           {errors.address && <Form.Text className="text-danger" id="addressReq">Required</Form.Text>}
       </Form.Group>
 
-      <Form.Group controlId="formBasicPassword">
+      <Form.Group controlId="formPassword">
         <Form.Label>Password</Form.Label>
         <Form.Control 
           type="password" 

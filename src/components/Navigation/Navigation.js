@@ -3,14 +3,14 @@ import {
   Navbar,
   Nav, } from 'react-bootstrap';
 
-const Navigation = () => {
+const Navigation = (props, arrorw) => {
 
   const logout = () => {
   }
 
   return(
     <Navbar bg="primary" expand="lg">
-      <Navbar.Brand href="/">React-Bootstrap</Navbar.Brand>
+      <Navbar.Brand href="/">OnlyLANs</Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="mr-auto">
