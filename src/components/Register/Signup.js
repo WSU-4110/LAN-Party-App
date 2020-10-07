@@ -19,7 +19,7 @@ const Signup = () => {
 
     const headers = {
       headers: {
-        "Content-Ttype": "application/json",
+        "Content-Type": "application/json",
       },
     };
     const link = 'https://v0vgb5ee8i.execute-api.us-east-2.amazonaws.com/test/sign_up';
