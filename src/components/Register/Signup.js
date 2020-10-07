@@ -1,6 +1,7 @@
 import React from 'react';
 import { useForm } from "react-hook-form";
 import { Form, Button } from 'react-bootstrap';
+import axios from 'axios';
 
 const Signup = () => {
   const { register, handleSubmit, errors } = useForm();
@@ -12,11 +13,22 @@ const Signup = () => {
     const payload = {
       first_name: data.firstName,
       last_name: data.lastName,
+      password: data.password,
       email: data.email,
-      password: data.password
     };
 
-    console.log("PAYLOAD", payload);
+    const headers = {
+      headers: {
+        "Content-Ttype": "application/json",
+      },
+    };
+    const link = 'https://v0vgb5ee8i.execute-api.us-east-2.amazonaws.com/test/sign_up';
+    axios
+      .post(link, payload, headers)
+      .then(res => {
+        console.log(res);
+      })
+      .catch((error) => console.log(error));
   }
 
   return(
@@ -25,7 +37,7 @@ const Signup = () => {
         <Form.Label>First Name</Form.Label>
         <Form.Control 
           type="text" 
-          placeholder="First Last"
+          placeholder="Spongebob"
           name="firstName"
           aria-describedby="firstNameReq"
           ref={register({ required: true })} />
@@ -36,7 +48,7 @@ const Signup = () => {
         <Form.Label>Last Name</Form.Label>
         <Form.Control 
           type="text" 
-          placeholder="First Last"
+          placeholder="Squarepants"
           name="lastName"
           aria-describedby="lastNameReq"
           ref={register({ required: true })} />
@@ -57,7 +69,7 @@ const Signup = () => {
         {errors.email && <Form.Text className="text-danger" id="emailReq">Required</Form.Text>}
       </Form.Group>
 
-      <Form.Group controlId="formAddress">
+      {/* <Form.Group controlId="formAddress">
         <Form.Label>Address</Form.Label>
         <Form.Control 
           type="text" 
@@ -69,7 +81,7 @@ const Signup = () => {
             We'll never share your address with anyone else.
           </Form.Text>
           {errors.address && <Form.Text className="text-danger" id="addressReq">Required</Form.Text>}
-      </Form.Group>
+      </Form.Group> */}
 
       <Form.Group controlId="formPassword">
         <Form.Label>Password</Form.Label>
