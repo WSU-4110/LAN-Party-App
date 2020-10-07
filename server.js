@@ -68,4 +68,3 @@ app.delete('/api/users/:email', (request, response) => {
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 })
-
