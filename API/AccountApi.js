@@ -73,11 +73,10 @@ module.exports = {
         TableName: "users",
   
         Item: { 
-          first_name: request_data.first_name,
-          last_name: request_data.last_name,
-          email: request_data.email.toLowerCase(),
-          password: request_data.password, // !! WORKING ON ENCRYPTION ATM !!
-          user_created: current_life_moment,
+          Username: request_data.username,
+          Email: request_data.email.toLowerCase(),
+          Password: request_data.password, // !! WORKING ON ENCRYPTION ATM !!
+          CreateDate: current_life_moment,
         },
       };
     
