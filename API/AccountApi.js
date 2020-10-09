@@ -42,18 +42,18 @@ module.exports = {
   
       request_data.email = request_data.email.toLowerCase()
   
-      //next we want to check if this user already has an account with us by using the email GSI we set up in the resources section for the users table (in the serverless.yml file)
+      // next we want to check if this user already has an account with us by using the email GSI we set up in the resources section for the users table (in the serverless.yml file)
       const confirm_non_exsisting_params = {
         TableName: "users", //table we want to query
         Key: {email : request_data.email}, //Key  want to query by
       };
 
-      //Run the query
+      // run the query
       const is_exsisting = await dynamoDB
         .get(confirm_non_exsisting_params)
         .promise();
 
-      //if a result was returned and there was atleast 1 record with this email,
+      // if a result was returned and there was atleast 1 record with this email,
       if (is_exsisting && is_exsisting.Item ) {
         return {
           statusCode: 403,
@@ -68,7 +68,7 @@ module.exports = {
       .tz("America/Detroit")
       .format("YYYY-MM-DD hh:mm a"); // <-- a for EDT
   
-      //if email is valid, then sign user up for our servive !
+      // if email is valid, then sign user up for our servive
       const parameters = {
         TableName: "users",
   
@@ -160,9 +160,5 @@ signin : async function (event) {
       body: JSON.stringify(error), //return error
     };
   }
-
-
 }
-
-
 };
