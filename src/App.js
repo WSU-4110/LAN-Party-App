@@ -11,7 +11,12 @@ function App() {
   return (
     <Router>
       <Navigation />
-      <div className="App">
+      <div 
+        className="App" 
+        style={{
+          minHeight: "100vh", 
+          backgroundColor: "#2e3136"
+        }}>
         <Switch>
 
           {/* Home is default */}
