@@ -9,15 +9,21 @@ const Navigation = () => {
   }
 
   return(
-    <Navbar bg="primary" expand="lg">
-      <Navbar.Brand href="/">OnlyLANs</Navbar.Brand>
+    <Navbar 
+      expand="lg" 
+      style={{
+        backgroundColor: "#1e2124", 
+        boxShadow: "0 2px 4px -1px rgba(0,0,0,0.25)",
+        // filter: "brightness(0.6)"
+      }}>
+      <Navbar.Brand href="/" style={{color:"#fff"}}>OnlyLANs</Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="mr-auto">
-          <Nav.Link href="/signup">Signup</Nav.Link>
-          <Nav.Link href="/login">Login</Nav.Link>
-          <Nav.Link href="/user">User</Nav.Link>
-          <Nav.Link href="/" onClick={logout}>Logout</Nav.Link>
+          <Nav.Link href="/signup"style={{color:"#fff"}}>Signup</Nav.Link>
+          <Nav.Link href="/login"style={{color:"#fff"}}>Login</Nav.Link>
+          <Nav.Link href="/user"style={{color:"#fff"}}>User</Nav.Link>
+          <Nav.Link href="/" style={{color:"#fff"}} onClick={logout}>Logout</Nav.Link>
         </Nav>
       </Navbar.Collapse>
     </Navbar>
