@@ -88,6 +88,9 @@ module.exports = {
             if (!request.Password) {
                 throw new Error("Account Password Required!");
             }
+
+            // change the email to lowercase
+            request.Email = request.Email.toLowerCase(); 
             
             // authenticate the account
             let account = await AccountAPI.AuthByEmailPassword(request.Email, request.Password);
