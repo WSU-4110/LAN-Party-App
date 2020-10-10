@@ -1,0 +1,94 @@
+# PROPERTY OF ONLY LANS
+
+# this file is the main config file for our service
+# for full config options, make sure to check the docs: docs.serverless.com
+
+service: only-lans
+# app and org for use with dashboard.serverless.com
+#app: your-app-name
+#org: your-org-name
+
+# we can pin our service to only deploy with a specific Serverless version
+frameworkVersion: '2'
+
+provider:
+  name: aws
+  logRetentionInDays: 30 # avoid meaningless bills
+  memorySize: 512
+  stage: test
+  versionFunctions: false
+  runtime: nodejs12.x
+  region: us-east-2
+
+  # giving users appropriate permissions to the database, parameters, and any other resources they may need for this service
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - "logs:*"
+      Resource: "*"
+    - Effect: "Allow"
+      Action:
+        - "dynamodb:*"
+      Resource: "*"
+    - Effect: "Allow"
+      Action: "ssm:GetParameters"
+      Resource: "*"
+    - Effect: "Allow"
+      Action: "kms:Decrypt"
+      Resource: "*"
+
+functions:
+  SignUp:
+    handler: handlers/account.signup
+    events:
+      - http:
+          method: POST
+          path: /SignUp
+          cors: true
+
+  SignIn:
+    handler: handlers/account.signin
+    events:
+      - http:
+          method: POST
+          path: /SignIn
+          cors: true
+
+  ViewParties:
+    handler: handlers/party.view
+    events:
+      - http:
+          method: GET
+          path: /Parties
+          cors: true
+
+resources:
+ Resources:
+    users:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: USERS-LAN
+        AttributeDefinitions:
+          - AttributeName: ID
+            AttributeType: S
+          - AttributeName: Username 
+            AttributeType: S
+          - AttributeName: Email 
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ID
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: Username
+            KeySchema:
+              - AttributeName: Username
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: Email
+            KeySchema:
+              - AttributeName: Email
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
