@@ -20,4 +20,4 @@ module.exports = {
     ViewAllGames: async function () {
 
     }
-  };
+};

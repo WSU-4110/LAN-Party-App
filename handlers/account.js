@@ -13,7 +13,7 @@ module.exports = {
             // if nothing was provided in the request, return a 204 HTTPS code (No content)
             if (!event)
                 return responseUtil.Build(204, { Message: "No information was provided with the request!" });
-            
+
             // next parse the request
             let request = JSON.parse(event.body);
             
@@ -90,7 +90,7 @@ module.exports = {
     },
 
     // VIEW AN ACCOUNT //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    ViewAccount: async function (event) {
+    View: async function (event) {
         try {
             // if nothing was provided in the request, return a 204 HTTPS code (No content)
             if (!event)
@@ -102,21 +102,18 @@ module.exports = {
             // we need to make sure that we were give an ID
             if (!request.ID)
                 throw new Error("Account ID Required!");
-            
+
             // return the account information
             let account = await AccountAPI.Get(request.ID);
             
             // if we returned with success, then create a result object
-            if (account.ID)
+            if (account.ID) {
                 let result = {
                     Message: "Returning the account!",
                     Account: account
                 };
-                
-            return responseUtil.Build(200, result); // send the result
-            
-            // else, return an error
-            return responseUtil.Build(500, { Message: "Account Login Error Detected." });
+                return responseUtil.Build(200, result); // send the result
+            } else return responseUtil.Build(500, { Message: "Account Login Error Detected." }); // else, return an error
         } catch (err) {
           console.error("Login Error:", err);
           return responseUtil.Build(500, { Message: err.message });
