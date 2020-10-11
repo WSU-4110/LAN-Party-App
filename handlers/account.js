@@ -10,30 +10,22 @@ module.exports = {
     // SIGN UP FOR AN ACCOUNT //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SignUp: async function (event) {
         try {
-
             // if nothing was provided in the request, return a 204 HTTPS code (No content)
-            if (!event) {
-                return {
-                    statusCode: 204,
-                    message: JSON.stringify("No information was provided with the request!"),
-                };
-            }
+            if (!event)
+                return responseUtil.Build(204, { Message: "No information was provided with the request!" });
             
             // next parse the request
             let request = JSON.parse(event.body);
             
             // they need to have entered an email, username, and a password
-            if (!request.Email) {
+            if (!request.Email)
                 throw new Error("Account Email Required!");
-            }
 
-            if (!request.Username) {
+            if (!request.Username)
                 throw new Error("Account Username Required!");
-            }
 
-            if (!request.Password) {
+            if (!request.Password)
                 throw new Error("Account Password Required!");
-            }
 
             // change the email to lowercase
             request.Email = request.Email.toLowerCase();            
@@ -55,9 +47,7 @@ module.exports = {
                 };
                 
                 return responseUtil.Build(200, result);
-            } else {
-                throw new Error("Email Already Exists!");
-            }
+            } else throw new Error("Email Already Exists!");
         } catch (err) {
             console.error("New Account Error:", err);
             return responseUtil.Build(500, { Message: err.message });
@@ -68,24 +58,18 @@ module.exports = {
     SignIn: async function (event) {
         try {
             // if nothing was provided in the request, return a 204 HTTPS code (No content)
-            if (!event) {
-                return {
-                    statusCode: 204,
-                    message: JSON.stringify("No information was provided with the request!"),
-                };
-            }
+            if (!event)
+                return responseUtil.Build(204, { Message: "No information was provided with the request!" });
             
             // next parse the request
             let request = JSON.parse(event.body);
 
             // we need to make sure that an email and password were inputted
-            if (!request.Email) {
+            if (!request.Email)
                 throw new Error("Account Email Required!");
-            }
 
-            if (!request.Password) {
+            if (!request.Password)
                 throw new Error("Account Password Required!");
-            }
 
             // change the email to lowercase
             request.Email = request.Email.toLowerCase(); 
@@ -99,7 +83,6 @@ module.exports = {
             
             // else, return an error
             return responseUtil.Build(500, { Message: "Account Login Error Detected." });
-
         } catch (err) {
           console.error("Login Error:", err);
           return responseUtil.Build(500, { Message: err.message });
@@ -110,20 +93,15 @@ module.exports = {
     ViewAccount: async function (event) {
         try {
             // if nothing was provided in the request, return a 204 HTTPS code (No content)
-            if (!event) {
-                return {
-                    statusCode: 204,
-                    message: JSON.stringify("No information was provided with the request!"),
-                };
-            }
+            if (!event)
+                return responseUtil.Build(204, { Message: "No information was provided with the request!" });
             
             // next parse the request
             let request = JSON.parse(event.body);
 
             // we need to make sure that we were give an ID
-            if (!request.ID) {
+            if (!request.ID)
                 throw new Error("Account ID Required!");
-            }
             
             // return the account information
             let account = await AccountAPI.Get(request.ID);
@@ -131,15 +109,14 @@ module.exports = {
             // if we returned with success, then create a result object
             if (account.ID)
                 let result = {
-                Message: "Returning the account!",
-                Account: account
-            };
+                    Message: "Returning the account!",
+                    Account: account
+                };
                 
             return responseUtil.Build(200, result); // send the result
             
             // else, return an error
             return responseUtil.Build(500, { Message: "Account Login Error Detected." });
-
         } catch (err) {
           console.error("Login Error:", err);
           return responseUtil.Build(500, { Message: err.message });

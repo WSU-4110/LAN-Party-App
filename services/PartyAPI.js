@@ -13,7 +13,6 @@ let tableName = 'USERS-LAN'; // the name of our account table in the AWS databas
 module.exports = {
 
   // X //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  GetByID: async function (ID, AccountInfo) {
+  X: async function (ID, AccountInfo) {
   }
 };
