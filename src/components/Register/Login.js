@@ -10,8 +10,8 @@ const Login = () => {
 
   const onSubmit = (data) => {
     const payload = {
-      email: data.email,
-      password: data.password,
+      Email: data.email,
+      Password: data.password,
     }
 
     const headers = {
