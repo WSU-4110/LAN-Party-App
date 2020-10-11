@@ -21,7 +21,7 @@ const Signup = () => {
         "Content-Type": "application/json",
       },
     };
-    const link = `${REACT_APP_URL}sign_up`;
+    const link = `${REACT_APP_URL}SignUp`;
     axios
       .post(link, payload, headers)
       .then(res => {
@@ -29,7 +29,7 @@ const Signup = () => {
       })
       .catch((error) => console.log(error));
   }
-
+  
   return(
     <div className="form-container">
       <div className="form-content">

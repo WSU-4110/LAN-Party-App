@@ -19,7 +19,7 @@ const Login = () => {
         "Content-Type": "application/json",
       },
     };
-    const link = `${REACT_APP_URL}sign_in`;
+    const link = `${REACT_APP_URL}SignIn`;
     axios
       .post(link, payload, headers)
       .then(res => {
