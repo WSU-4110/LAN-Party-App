@@ -7,9 +7,8 @@ const responseUtil = require("../utilities/response");
 
 module.exports = {
 
-    // SIGN UP //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    signup: async function (event) {
+    // SIGN UP FOR AN ACCOUNT //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SignUp: async function (event) {
         try {
 
             // if nothing was provided in the request, return a 204 HTTPS code (No content)
@@ -65,9 +64,8 @@ module.exports = {
         }
     },
 
-    // SIGN IN //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    signin: async function (event) {
+    // SIGN IN TO AN ACCOUNT //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    SignIn: async function (event) {
         try {
             // if nothing was provided in the request, return a 204 HTTPS code (No content)
             if (!event) {
@@ -98,6 +96,46 @@ module.exports = {
             // if we returned with success, then save
             if (account.ID)
                 return responseUtil.Build(200, account);
+            
+            // else, return an error
+            return responseUtil.Build(500, { Message: "Account Login Error Detected." });
+
+        } catch (err) {
+          console.error("Login Error:", err);
+          return responseUtil.Build(500, { Message: err.message });
+        }
+    },
+
+    // VIEW AN ACCOUNT //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ViewAccount: async function (event) {
+        try {
+            // if nothing was provided in the request, return a 204 HTTPS code (No content)
+            if (!event) {
+                return {
+                    statusCode: 204,
+                    message: JSON.stringify("No information was provided with the request!"),
+                };
+            }
+            
+            // next parse the request
+            let request = JSON.parse(event.body);
+
+            // we need to make sure that we were give an ID
+            if (!request.ID) {
+                throw new Error("Account ID Required!");
+            }
+            
+            // return the account information
+            let account = await AccountAPI.Get(request.ID);
+            
+            // if we returned with success, then create a result object
+            if (account.ID)
+                let result = {
+                Message: "Returning the account!",
+                Account: account
+            };
+                
+            return responseUtil.Build(200, result); // send the result
             
             // else, return an error
             return responseUtil.Build(500, { Message: "Account Login Error Detected." });

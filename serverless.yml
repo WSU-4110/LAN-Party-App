@@ -38,8 +38,10 @@ provider:
       Resource: "*"
 
 functions:
+
+  # account functions
   SignUp:
-    handler: handlers/account.signup
+    handler: handlers/account.SignUp
     events:
       - http:
           method: POST
@@ -47,20 +49,47 @@ functions:
           cors: true
 
   SignIn:
-    handler: handlers/account.signin
+    handler: handlers/account.SignIn
     events:
       - http:
           method: POST
           path: /SignIn
           cors: true
 
-  ViewParties:
-    handler: handlers/party.view
+  ViewAccount:
+    handler: handlers/account.View
     events:
       - http:
           method: GET
-          path: /Parties
+          path: /Account/{ID}
           cors: true
+
+  # game functions
+  ViewGame:
+    handler: handlers/game.ViewGame
+    events:
+      - http:
+          method: GET
+          path: /Game/{ID}
+          cors: true
+
+  ViewAllGames:
+    handler: handlers/game.ViewAllGames
+    events:
+      - http:
+          method: GET
+          path: /Games
+          cors: true
+
+  CreateGame:
+    handler: handlers/game.Create
+    events:
+      - http:
+          method: GET
+          path: /CreateGame
+          cors: true
+
+  # party functions
 
 resources:
  Resources:
@@ -88,6 +117,35 @@ resources:
           - IndexName: Email
             KeySchema:
               - AttributeName: Email
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+
+    games:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: GAMES-LAN
+        AttributeDefinitions:
+          - AttributeName: ID
+            AttributeType: S
+          - AttributeName: Name
+            AttributeType: S
+          - AttributeName: Genre
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ID
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: Name
+            KeySchema:
+              - AttributeName: Name
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: Genre
+            KeySchema:
+              - AttributeName: Genre
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
