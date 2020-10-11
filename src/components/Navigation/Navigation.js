@@ -23,7 +23,8 @@ const Navigation = () => {
           <Nav.Link href="/signup"style={{color:"#fff"}}>Signup</Nav.Link>
           <Nav.Link href="/login"style={{color:"#fff"}}>Login</Nav.Link>
           <Nav.Link href="/user"style={{color:"#fff"}}>User</Nav.Link>
-          <Nav.Link href="/" style={{color:"#fff"}} onClick={logout}>Logout</Nav.Link>
+          <Nav.Link href="/" style={{color:"#fff"}}
+           onClick={logout}>Logout</Nav.Link>
         </Nav>
       </Navbar.Collapse>
     </Navbar>

@@ -26,7 +26,34 @@ const User = () => {
         <thead>
           <tr>
             <th>#</th>
-            <th>Rank</th>
+            <th>Local Rank</th>
+            <th>Game</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>35</td>
+            <td>Tekken 7</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>50</td>
+            <td>Street Fighter V</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>300</td>
+            <td>Smash Bros. Melee</td>
+          </tr>
+        </tbody>
+      </Table>
+
+      <Table striped bordered hover variant="dark">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Global Rank</th>
             <th>Game</th>
           </tr>
         </thead>
