@@ -8,12 +8,11 @@ const AWS = require("aws-sdk");
 
 // Updating AWS settings
 AWS.config.update({ region: "us-east-2" }); // region
-let tableName = 'USERS-LAN'; // the name of our account table in the AWS database
+const tableName = 'USERS-LAN'; // the name of our account table in the AWS database
 
 module.exports = {
 
-  // Save A New Account //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+  // SAVE A NEW ACOUNT //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   Save: async function (ID, AccountInfo) {   
     try { 
       let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); // connect to the database
@@ -44,8 +43,7 @@ module.exports = {
     }
   },
 
-  // Get An Account By Their Email //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+  // GET AN ACCOUNT BY AN EMAIL //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   GetByEmail: async function (Email) {
     try {
       let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); // connect to the database
@@ -76,8 +74,28 @@ module.exports = {
     }
   },
 
-  // Authenticate The Account By An Email And Password  /////////////////////////////////////////////////////////////////////////////////////////////
-  
+  // GET AN ACCOUNT BY AN ID //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  Get: async function (ID) {
+    try {
+      let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); // connect to the database
+
+      // create the parameters for the query
+      let params = {
+        TableName: tableName,
+        Key: { ID: ID },
+      };
+
+      let result = await dynamoDB.get(params).promise(); // grab the user
+
+      if (result.Item) return result.Item;
+      else throw new Error("Account not found!");
+    } catch (err) {
+      console.error("Account Get Error:", err);
+      throw new Error("Account Get Error");
+    }
+  },
+
+  // AUTHENTICATE THE ACCOUNT USING AN EMAIL AND A PASSWORD /////////////////////////////////////////////////////////////////////////////////////////////
   AuthByEmailPassword: async function (Email, Password) {
     try {
       let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); // connect to the database

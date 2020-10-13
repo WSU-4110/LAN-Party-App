@@ -1,4 +1,8 @@
+'use strict';
+
 module.exports = {
+
+  // CREATE A RESPONSE //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   Build: function (status, message) {
     return {
       statusCode: status,
@@ -8,5 +12,5 @@ module.exports = {
       },
       body: JSON.stringify(message, null, 2),
     };
-  },
+  }
 };
