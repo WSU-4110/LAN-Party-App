@@ -64,6 +64,14 @@ functions:
           path: /Account/{ID}
           cors: true
 
+  ViewAllAccounts:
+    handler: handlers/account.ViewAll
+    events:
+      - http:
+          method: GET
+          path: /Accounts
+          cors: true
+
   # game functions
   ViewGame:
     handler: handlers/game.ViewGame
