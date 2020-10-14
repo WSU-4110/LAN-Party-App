@@ -14,7 +14,7 @@ function App() {
       <div 
         className="App" 
         style={{
-          minHeight: "100vh", 
+          minHeight: "calc(100vh - 56px)", 
           backgroundColor: "#2e3136"
         }}>
         <Switch>
