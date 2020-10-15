@@ -8,7 +8,7 @@ const AWS = require("aws-sdk");
 
 // Updating AWS settings
 AWS.config.update({ region: "us-east-2" }); // region
-let tableName = 'USERS-LAN'; // the name of our account table in the AWS database
+let tableName = 'GAMES-LAN'; // the name of our account table in the AWS database
 
 module.exports = {
 
