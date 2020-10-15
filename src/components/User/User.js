@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Button } from 'react-bootstrap';
+import { Table, Button, Accordion, Card } from 'react-bootstrap';
 import './User.css'
 
 const User = () => {
@@ -22,6 +22,13 @@ const User = () => {
         </div>
       </div>
       
+
+      <Accordion defaultActiveKey="0">
+  <Card>
+    <Accordion.Toggle as={Card.Header} eventKey="0">
+      Local 
+    </Accordion.Toggle>
+    <Accordion.Collapse eventKey="0">
       <Table striped bordered hover variant="dark">
         <thead>
           <tr>
@@ -48,7 +55,13 @@ const User = () => {
           </tr>
         </tbody>
       </Table>
-
+    </Accordion.Collapse>
+  </Card>
+  <Card>
+    <Accordion.Toggle as={Card.Header} eventKey="1">
+      Global
+    </Accordion.Toggle>
+    <Accordion.Collapse eventKey="1">
       <Table striped bordered hover variant="dark">
         <thead>
           <tr>
@@ -75,6 +88,10 @@ const User = () => {
           </tr>
         </tbody>
       </Table>
+
+      </Accordion.Collapse>
+  </Card>
+      </Accordion>
 
       <div className="userpage-buttons">
         <div className="settings-button-section">
