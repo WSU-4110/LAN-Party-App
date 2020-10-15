@@ -34,9 +34,7 @@ module.exports = {
       };
 
       await dynamoDB.put(parameters).promise(); // add the user to the database
-
       return NewAccount; // return this account as we leave
-
     } catch (err) {
       console.error("Account Save Error:", err.message);
       throw new Error("Account Save Error");
