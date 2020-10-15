@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Table, Button, Accordion, Card } from 'react-bootstrap';
+import cookies from 'js-cookie';
 import './User.css'
 
 const User = () => {
@@ -16,9 +17,9 @@ const User = () => {
           <img className="avatar" src="https://images.unsplash.com/photo-1602254872083-22caf4166bd7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60" />
         </div>
         <div className="desc-section">
-          {username}
+          {cookies.get("Username")}
           <br/>
-          {email}
+          {cookies.get("Email")}
         </div>
       </div>
       
