@@ -1,16 +1,18 @@
-import React from 'react';
+import React, {useContext} from 'react';
 import { useForm } from "react-hook-form";
 import { Form, Button } from 'react-bootstrap';
+import { UserContext } from '../../UserContext';
 import axios from 'axios';
 
 const Login = () => {
   const { REACT_APP_URL } = process.env;
+  const [user, setUser] = useContext(UserContext);
   const { register, handleSubmit, errors } = useForm();
 
   const onSubmit = (data) => {
     const payload = {
-      email: data.email,
-      password: data.password,
+      Email: data.email,
+      Password: data.password,
     }
 
     const headers = {
@@ -18,14 +20,20 @@ const Login = () => {
         "Content-Type": "application/json",
       },
     };
-    const link = `${REACT_APP_URL}sign_in`;
+    const link = `${REACT_APP_URL}SignIn`;
     axios
       .post(link, payload, headers)
       .then(res => {
         console.log(res);
+        setUser({
+          ...res.data,
+          Logged: true
+        })
       })
       .catch((error) => console.log(error));
   }
+
+
 
   return(
     <Form onSubmit={handleSubmit(onSubmit)}>
