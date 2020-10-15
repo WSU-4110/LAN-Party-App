@@ -4,11 +4,10 @@ import { Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 
 const Signup = () => {
+  const { REACT_APP_URL } = process.env;
   const { register, handleSubmit, errors } = useForm();
 
   const onSubmit = (data) => {
-    console.log("submitted", data);
-
     // This is the object we're sending through
     const payload = {
       first_name: data.firstName,
@@ -19,10 +18,10 @@ const Signup = () => {
 
     const headers = {
       headers: {
-        "Content-Ttype": "application/json",
+        "Content-Type": "application/json",
       },
     };
-    const link = 'https://v0vgb5ee8i.execute-api.us-east-2.amazonaws.com/test/sign_up';
+    const link = `${REACT_APP_URL}sign_up`;
     axios
       .post(link, payload, headers)
       .then(res => {
