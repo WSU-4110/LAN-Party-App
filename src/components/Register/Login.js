@@ -29,7 +29,7 @@ const Login = (props) => {
         console.log(res);
         setUser({
           ...res.data,
-          Logged: true
+          LoggedIn: true
         })
         let inAnHour = new Date(new Date().getTime() + 60 * 60 * 1000);
         cookies.set("Username", res.data.Username, {expires: inAnHour});

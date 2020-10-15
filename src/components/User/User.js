@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Table, Button, Accordion, Card } from 'react-bootstrap';
 import cookies from 'js-cookie';
 import './User.css'
+import { UserContext } from '../../UserContext'
 
 const User = () => {
+const [user, setUser] = useContext(UserContext);
 
   // username will be state
   // email will be state
@@ -17,9 +19,9 @@ const User = () => {
           <img className="avatar" src="https://images.unsplash.com/photo-1602254872083-22caf4166bd7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60" />
         </div>
         <div className="desc-section">
-          {cookies.get("Username")}
+          {user.Username}
           <br/>
-          {cookies.get("Email")}
+          {user.Email}
         </div>
       </div>
       

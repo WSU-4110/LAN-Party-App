@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Navigation from './components/Navigation/Navigation';
 import Home from './components/Home/Home';
@@ -7,7 +7,7 @@ import Login from './components/Register/Login';
 import User from './components/User/User';
 import Host from './components/HostParty/HostParty'
 import cookies from 'js-cookie';
-import { UserContext } from '../../UserContext';
+import { UserContext } from './UserContext';
 import './App.css';
 
 function App() {
@@ -20,7 +20,7 @@ function App() {
         Username: cookies.get("Username"),
         Email: cookies.get("Email"),
         ID: cookies.get("ID"),
-        Logged: true
+        LoggedIn: true
       })
     }
   }
