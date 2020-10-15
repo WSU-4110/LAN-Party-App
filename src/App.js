@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 import Navigation from './components/Navigation/Navigation';
 import Home from './components/Home/Home';
@@ -6,12 +6,30 @@ import Signup from './components/Register/Signup';
 import Login from './components/Register/Login';
 import User from './components/User/User';
 import Host from './components/HostParty/HostParty'
+import cookies from 'js-cookie';
+import { UserContext } from '../../UserContext';
 import './App.css';
 
 function App() {
+  const [user, setUser] = useContext(UserContext);
+  // set user
+  const updateUser = () => {
+    if(cookies.get("Logged") === "true") {
+      setUser({
+        ...user,
+        Username: cookies.get("Username"),
+        Email: cookies.get("Email"),
+        ID: cookies.get("ID"),
+        Logged: true
+      })
+    }
+  }
+  useEffect(()=>{
+    updateUser();
+  } , [])
   return (
     <Router>
-      <Navigation />
+      <Navigation user={user}/>
       <div 
         className="App" 
         style={{

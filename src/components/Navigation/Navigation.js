@@ -24,7 +24,7 @@ const Navigation = (props) => {
       ID: ''
     })
 
-    // props.history.push("/");
+    props.history.push("/");
   }
 
   return(
