@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
+import MapComponent from '../GoogleMap/GoogleMap';
+
+
 
 const Home = () => {
   return(
-    <>
-    Home
-    </>
+    <MapComponent />
   )
 }
 
