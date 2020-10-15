@@ -8,7 +8,7 @@ import cookies from 'js-cookie';
 import axios from 'axios';
 import "react-datepicker/dist/react-datepicker.css"
 
-const HostParty = () => {
+const HostParty = (props) => {
   const { REACT_APP_URL } = process.env;
   const { register, handleSubmit, errors } = useForm();
   // const [hours, setHours] = useState();
@@ -35,6 +35,8 @@ const HostParty = () => {
         console.log(res);
       })
       .catch((error) => console.log(error));
+
+    props.history.push("/");
   }
 
   return(

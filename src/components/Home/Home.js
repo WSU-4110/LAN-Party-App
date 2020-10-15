@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
+import { NavLink } from 'react-router-dom';
 import MapComponent from '../GoogleMap/GoogleMap';
+import cookies from 'js-cookie';
 import {Button} from 'react-bootstrap';
 
 const tempPartyList = [
@@ -18,21 +20,35 @@ const tempPartyList = [
 ]
 
 const Home = (props) => {
-
   const toHostParty = () => {
     props.history.push("/host");
+  }
+
+  const toLogin = () => {
+    props.history.push("/login");
   }
 
   return(
     <div>
       <MapComponent />
-      <div
+      {cookies.get("Logged") === "true"
+      ?
+        <div
+          style={{
+            padding: "15px",
+            textAlign: "center"
+          }}>
+          <Button variant="info" size="lg" onClick={toHostParty}>Host A Party</Button>
+        </div>
+      :
+        <div
         style={{
           padding: "15px",
           textAlign: "center"
         }}>
-        <Button variant="info" size="lg" onClick={toHostParty}>Host A Party</Button>
+        <Button variant="info" size="lg" onClick={toLogin}>Host A Party</Button>
       </div>
+      }
       <div>
         {tempPartyList.map((p) => (
           <div 

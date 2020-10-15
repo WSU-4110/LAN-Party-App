@@ -23,6 +23,8 @@ const Navigation = (props) => {
       Token: '',
       ID: ''
     })
+
+    // props.history.push("/");
   }
 
   return(
@@ -48,8 +50,8 @@ const Navigation = (props) => {
           <Nav.Link>
             <NavLink to="/user"style={{color:"#fff"}}>User</NavLink>
           </Nav.Link>
-          <Nav.Link>
-            <NavLink to="/" style={{color:"#fff"}} onClick={logout}>Logout</NavLink>
+          <Nav.Link href="/" style={{color:"#fff"}} onClick={logout}>
+            Logout
           </Nav.Link>
         </Nav>
       </Navbar.Collapse>
