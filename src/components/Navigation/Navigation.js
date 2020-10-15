@@ -34,7 +34,7 @@ const Navigation = (props) => {
         // filter: "brightness(0.6)"
       }}>
       <Navbar.Brand>
-        <NavLink to="/" style={{color:"#fff"}}>LANParty</NavLink>
+        <NavLink to="/" style={{color:"#fff", textDecoration:"none"}}>LANParty</NavLink>
       </Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
