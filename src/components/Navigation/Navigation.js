@@ -16,7 +16,7 @@ const Navigation = () => {
         boxShadow: "0 2px 4px -1px rgba(0,0,0,0.25)",
         // filter: "brightness(0.6)"
       }}>
-      <Navbar.Brand href="/" style={{color:"#fff"}}>OnlyLANs</Navbar.Brand>
+      <Navbar.Brand href="/" style={{color:"#fff"}}>LANParty</Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="mr-auto">
