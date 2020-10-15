@@ -6,7 +6,7 @@ import axios from 'axios';
 import cookies from 'js-cookie';
 import './Register.css'
 
-const Login = () => {
+const Login = (props) => {
   const { REACT_APP_URL } = process.env;
   const [user, setUser] = useContext(UserContext);
   const { register, handleSubmit, errors } = useForm();
@@ -40,6 +40,8 @@ const Login = () => {
 
       })
       .catch((error) => console.log(error));
+
+    props.history.push("/");
   }
 
 
