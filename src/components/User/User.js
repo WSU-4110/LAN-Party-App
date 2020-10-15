@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Button } from 'react-bootstrap';
+import { Table, Button, Accordion, Card } from 'react-bootstrap';
 import './User.css'
 
 const User = () => {
@@ -22,11 +22,18 @@ const User = () => {
         </div>
       </div>
       
+
+      <Accordion defaultActiveKey="0">
+  <Card>
+    <Accordion.Toggle as={Card.Header} eventKey="0">
+      Local 
+    </Accordion.Toggle>
+    <Accordion.Collapse eventKey="0">
       <Table striped bordered hover variant="dark">
         <thead>
           <tr>
             <th>#</th>
-            <th>Rank</th>
+            <th>Local Rank</th>
             <th>Game</th>
           </tr>
         </thead>
@@ -48,6 +55,43 @@ const User = () => {
           </tr>
         </tbody>
       </Table>
+    </Accordion.Collapse>
+  </Card>
+  <Card>
+    <Accordion.Toggle as={Card.Header} eventKey="1">
+      Global
+    </Accordion.Toggle>
+    <Accordion.Collapse eventKey="1">
+      <Table striped bordered hover variant="dark">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Global Rank</th>
+            <th>Game</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>35</td>
+            <td>Tekken 7</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>50</td>
+            <td>Street Fighter V</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>300</td>
+            <td>Smash Bros. Melee</td>
+          </tr>
+        </tbody>
+      </Table>
+
+      </Accordion.Collapse>
+  </Card>
+      </Accordion>
 
       <div className="userpage-buttons">
         <div className="settings-button-section">
