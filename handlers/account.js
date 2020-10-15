@@ -111,9 +111,24 @@ module.exports = {
                     Account: account
                 };
                 return responseUtil.Build(200, result); // send the result
-            } else return responseUtil.Build(500, { Message: "Account Login Error Detected." }); // else, return an error
+            } else return responseUtil.Build(500, { Message: "No Account With That ID." }); // else, return an error
         } catch (err) {
-            console.error("Login Error:", err);
+            console.error("View Account Error:", err);
+            return responseUtil.Build(500, { Message: err.message });
+        }
+    },
+
+    ViewAll: async function () {
+        try {
+            // return the account information
+            let accounts = await AccountAPI.GetAll();
+            
+            // if we returned with success
+            if (accounts) {
+                return responseUtil.Build(200, accounts); // then, send the result
+            } else return responseUtil.Build(500, { Message: "No Accounts Exist." }); // else, return an error
+        } catch (err) {
+            console.error("View Accounts Error:", err);
             return responseUtil.Build(500, { Message: err.message });
         }
     }
