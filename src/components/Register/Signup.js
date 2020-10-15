@@ -4,7 +4,7 @@ import { Form, Button } from 'react-bootstrap';
 import axios from 'axios';
 import './Register.css';
 
-const Signup = () => {
+const Signup = (props) => {
   const { REACT_APP_URL } = process.env;
   const { register, handleSubmit, errors } = useForm();
 
@@ -28,6 +28,8 @@ const Signup = () => {
         console.log(res);
       })
       .catch((error) => console.log(error));
+    
+      props.history.push("/login");
   }
   
   return(
