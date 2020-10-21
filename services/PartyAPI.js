@@ -4,6 +4,7 @@
 const shortid = require("shortid");
 const { v4: uuidv4 } = require("uuid");
 const AWS = require("aws-sdk");
+const { Get } = require("./AccountAPI");
 
 // Updating AWS settings
 AWS.config.update({ region: "us-east-2" }); // region
@@ -37,6 +38,35 @@ module.exports = {
     } catch (err) { 
         console.log(err);
         throw err;
+    }
+  },
+
+  Get: async function(ID){
+    try{
+      // connect to the database
+      let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); 
+
+      // create the parameters for the query
+      let params = {
+        TableName: tableName,
+        Key: { ID: ID },
+      };
+
+      //Try to get the party from the table
+      let result = await dynamoDB.get(params).promise();
+
+      //If the result isn't empty, return the item
+      if(result.Item !== undefined){
+        return result.Item;
+      }
+      //If it is empty, return false
+      else {
+        return false;
+      }
+
+    } catch(err){
+      console.log('Party get error:', err);
+      return false;
     }
   }
 };
