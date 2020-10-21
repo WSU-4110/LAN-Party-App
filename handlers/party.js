@@ -4,23 +4,24 @@
 const PartyAPI = require("../services/PartyAPI");
 const AccountAPI = require("../services/AccountAPI");
 const responseUtil = require("../utilities/response");
+const nameUtil = require("../utilities/nameCheck");
 const shortid = require("shortid");
 const moment = require("moment-timezone");
 
 module.exports = {
 
   // CREATE //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  Create: async function (event) {
+  Create: async function (events) {
     // ensure that there was information in the event
-    if(!event)
+    if(!events)
       return responseUtil.Build(204, "Event is empty");
 
-    let request = JSON.parse(event.body);
+    let request = JSON.parse(events.body);
     
-    // a party's name is valid if it has a number or letter
-    const nameChars = /\w/;
+    //Update the name to make sure it is valid
+    request.Name = nameUtil.isValidParty(request.Name);
 
-    if (typeof request.Name === undefined || !nameChars.test(request.Name))
+    if (typeof request.Name === undefined || !request.Name)
       return responseUtil.Build(403, "Party must have a name with letters or numbers");
 
     // ensure that the party has a location
@@ -46,7 +47,38 @@ module.exports = {
 
   // UPDATE A PARTY //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   Update: async function (events) {
+    if(!events) {
+      return responseUtil.Build(204, "Event is empty");
+    }
 
+    let request = JSON.parse(events.body);
+
+    //Get the party
+    let party = await PartyAPI.Get(request.ID).promise();
+
+    //If the party was not found
+    if(party === false){
+      return responseUtil.Build(403, "Cannot get party");
+    }
+
+    //If the user wants to update the name
+    if(request.Name !== undefined){
+      //Update the requested name to make it valid
+      request.Name = nameUtil.isValidParty(request.Name);
+      
+      //If the name was rejected, respond by rejecting the name
+      if (request.Name === false){
+        return responseUtil.Build(403, "Invalid party name");
+      }
+
+      //The name was accepted, put it into the party object
+      party.Name = request.Name;
+    } /*else if (){
+
+    } */ else{ 
+      //If there was no request
+      return responseUtil.Build(204, 'No request made');
+    }
   },
 
   // GET A PARTY BY AN ID //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
