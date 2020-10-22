@@ -68,5 +68,31 @@ module.exports = {
       console.log('Party get error:', err);
       return false;
     }
+  },
+  Update: async function(PartyInfo){
+    try{
+      let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); 
+
+      //Load the parameters into the object
+      let params = {
+        TableName: tableName,
+        Item: PartyInfo
+      }
+      //Update the item in the table
+      dynamoDB.updateItem(params, (err, data) =>{
+        //If there was an error
+        if (err){
+          //Log it, then return false
+          console.log('There was an error: ', err);
+          return false;
+        } else {
+          //return the data
+          return data;
+        }
+      })
+    } catch(err) {
+      console.log('There was an error: ', err);
+      return false;
+    }
   }
 };
