@@ -6,16 +6,20 @@ import {Button} from 'react-bootstrap';
 
 const tempPartyList = [
   {
-    Name: "Test Event 1",
     Host: "Thadd",
-    Location: "In the Desert",
-    Date: "Oct 21, 2020 05:30 PM (EST)"
+    Name: "Detroit LAN",
+    Location: "Detroit",
+    Latitude: 42.331427,
+    Longitude: -83.0457538,
+    Date: "Thu Oct 22 2020 00:58:34 GMT-0400"
   },
   {
-    Name: "Test Event 2",
-    Host: "Logan",
-    Location: "In the Jungle",
-    Date: "Oct 23, 2020 03:30 PM (EST)"
+    Host: "Thadd",
+    Name: "Paris LAN",
+    Location: "Paris",
+    Latitude: 48.856614,
+    Longitude: 2.3522219,
+    Date: "Thu Oct 22 2020 00:58:34 GMT-0400"
   }
 ]
 

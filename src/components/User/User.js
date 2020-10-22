@@ -1,25 +1,58 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { Table, Button, Accordion, Card } from 'react-bootstrap';
 import cookies from 'js-cookie';
 import './User.css'
+import { UserContext } from '../../UserContext'
+import axios from 'axios';
 
 const User = () => {
+  const { REACT_APP_URL } = process.env;
+  const [user, setUser] = useContext(UserContext);
+  const [imageUploading, setImageUploading] = useState(false);
 
-  // username will be state
-  // email will be state
-  let username = "TestUsername";
-  let email = "test@gmail.com";
+  // image upload function
+  let uploadButton;
+  const imageUpload = (event) => {
+    // uploads image to s3 bucket
+    event.preventDefault();
+    let file = uploadButton.files;
+    // split the filename to get the name type
+    let fileParts = uploadButton.files.name.split('.');
+    let fileName = fileParts[0];
+    let fileType = fileParts[1];
+    let requestData = {
+      fileName,
+      fileType
+    };
+    setImageUploading(true);
+    axios
+      .post(`${REACT_APP_URL}images/upload`, requestData)
+      .then((res) => {
+        console.log("axios response:", res);
+      })
+      .then((res) => {
+        
+      })
+  }
+
+  const editAvatar = () => {
+    // declare image var
+  }
 
   return(
     <div style={{backgroundColor: ""}}>
       <div className="userHeader">
-        <div className="avatar-section">
+        <div className="avatar-section" style={{textAlign:"center"}}>
           <img className="avatar" src="https://images.unsplash.com/photo-1602254872083-22caf4166bd7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60" />
+          <Button 
+            size="sm" 
+            style={{marginTop:"5px"}}
+            onClick={editAvatar}>Edit Avatar</Button>
         </div>
-        <div className="desc-section">
-          {cookies.get("Username")}
+        <div className="desc-section" style={{padding:"10px"}}>
+          {user.Username}
           <br/>
-          {cookies.get("Email")}
+          {user.Email}
         </div>
       </div>
       

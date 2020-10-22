@@ -8,6 +8,25 @@ import {
   Marker
 } from "react-google-maps";
 
+let tempList = [
+  {
+    Host: "Thadd",
+    Name: "Detroit LAN",
+    Location: "Detroit",
+    Latitude: 42.331427,
+    Longitude: -83.0457538,
+    Date: "Thu Oct 22 2020 00:58:34 GMT-0400"
+  },
+  {
+    Host: "Thadd",
+    Name: "Paris LAN",
+    Location: "Paris",
+    Latitude: 48.856614,
+    Longitude: 2.3522219,
+    Date: "Thu Oct 22 2020 00:58:34 GMT-0400"
+  }
+]
+
 const MapComponent = compose(
   withProps({
     /**
@@ -24,10 +43,24 @@ const MapComponent = compose(
   withScriptjs,
   withGoogleMap
 )(props => (
-  <GoogleMap defaultZoom={8} defaultCenter={{ lat: -34.397, lng: 150.644 }}>
-    {props.isMarkerShown && (
-      <Marker position={{ lat: -34.397, lng: 150.644 }} />
-    )}
+  <GoogleMap defaultZoom={8} defaultCenter={{ lat: 42.331429, lng: -83.045753 }}>
+    {/* {
+      // <Marker color="#cdcdcd" position={{ lat: 42.331429, lng: -83.045753 }} />
+    } */}
+    {tempList.map((host, i) => {
+        if (host.Latitude && host.Longitude) {
+          console.log("TEST", host.Latitude);
+         return(<Marker
+            key={i}
+            position={{
+              lat: host.Latitude,
+              lng: host.Longitude
+            }}
+            title={host.name}
+            pinColor={"#ffd1dc"}
+          />)
+        }
+      })}
   </GoogleMap>
 ));
 

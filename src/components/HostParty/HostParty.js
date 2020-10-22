@@ -6,7 +6,12 @@ import setHours from "date-fns/setHours";
 import setMinutes from "date-fns/setMinutes";
 import cookies from 'js-cookie';
 import axios from 'axios';
+import Geocode from 'react-geocode';
 import "react-datepicker/dist/react-datepicker.css"
+
+Geocode.setApiKey("AIzaSyAHoOsaxhFYc2fQlGdr-5Mdep3UVkfpfP4");
+Geocode.setLanguage("en");
+Geocode.enableDebug();
 
 const HostParty = (props) => {
   const { REACT_APP_URL } = process.env;
@@ -16,11 +21,26 @@ const HostParty = (props) => {
   // const [startDate, setStartDate] = useState(setHours(setMinutes(new Date(), 30), 16));
   const [startDate, setStartDate] = useState(new Date());
 
-  const onSubmit = (data) => {
+  const getLatitude = async (address) => {
+    let loc = await Geocode.fromAddress(address);
+    return loc.results[0].geometry.location.lat;
+  }
+  const getLongitude = async (address) => {
+    let loc = await Geocode.fromAddress(address);
+    return loc.results[0].geometry.location.lng;
+  }
+
+  const onSubmit = async (data) => {
+    
+    let latitude = await getLatitude(data.Location);
+    let longitude = await getLongitude(data.Location);
+
     const payload = {
       Host: cookies.get("ID"),
       Name: data.Title,
       Location: data.Location,
+      Latitude: latitude,
+      Longitude: longitude,
       Date: startDate
     };
     const headers = {
@@ -35,6 +55,8 @@ const HostParty = (props) => {
         console.log(res);
       })
       .catch((error) => console.log(error));
+
+    console.log(payload);
 
     props.history.push("/");
   }
