@@ -11,28 +11,8 @@ const User = () => {
   const [imageUploading, setImageUploading] = useState(false);
 
   // image upload function
-  let uploadButton;
   const imageUpload = (event) => {
     // uploads image to s3 bucket
-    event.preventDefault();
-    let file = uploadButton.files;
-    // split the filename to get the name type
-    let fileParts = uploadButton.files.name.split('.');
-    let fileName = fileParts[0];
-    let fileType = fileParts[1];
-    let requestData = {
-      fileName,
-      fileType
-    };
-    setImageUploading(true);
-    axios
-      .post(`${REACT_APP_URL}images/upload`, requestData)
-      .then((res) => {
-        console.log("axios response:", res);
-      })
-      .then((res) => {
-        
-      })
   }
 
   const editAvatar = () => {
