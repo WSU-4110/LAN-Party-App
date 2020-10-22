@@ -122,12 +122,12 @@ functions:
           path: /Parties
           cors: true
   
-  UpdatePartyName:
-    handler: handlers/party.UpdateName
+  Update:
+    handler: handlers/party.Update
     events:
       - http:
-          method: POST
-          path: /Party/{ID}/UpdateName
+          method: PATCH
+          path: /Party/{ID}/Update
           cors: true
 
 resources:
