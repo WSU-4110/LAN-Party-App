@@ -69,6 +69,7 @@ module.exports = {
       return false;
     }
   },
+  
   Update: async function(PartyInfo){
     try{
       let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); 
@@ -94,5 +95,26 @@ module.exports = {
       console.log('There was an error: ', err);
       return false;
     }
+  },
+
+  Get: async function(){
+    try{
+    let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); 
+    
+    //Grab all the items from the Parties table
+    let response = await dynamoDB.scan( {TableName: tableName }).promise();
+    
+    if(response){
+      return response;
+    } else {
+      console.log('Nothing retrieved from the table.');
+      return false;
+    }
+
+    } catch(err){
+      console.log('there was a fatal error: ', err);
+      return false;
+    };
+
   }
 };

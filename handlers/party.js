@@ -92,11 +92,28 @@ module.exports = {
 
   // GET A PARTY BY AN ID //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   Get: async function (events) {
+    //Ensure that the event is valid 
+    if(!events){
+      return responseUtil.Build(204, "Must send requested information");
+    }
+    
+    //Set the request equal to the event body
+    let request = events.body;
 
+    //
   },
 
   // GET ALL OF THE PARTIES //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   GetAll: async function (events) {
+    //Ensure that the event is not empty
+    if (!events){
+      return responseUtil.Build(204, 'No request made');
+    }
 
+    let response = PartyAPI.GetAll();
+
+    response.Message = 'Parties retrieved!';
+
+    return responseUtil.Build(200, response);
   }
 };
