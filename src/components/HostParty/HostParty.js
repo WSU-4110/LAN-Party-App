@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useForm } from "react-hook-form";
 import { Form, Button } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
@@ -7,6 +7,7 @@ import setMinutes from "date-fns/setMinutes";
 import cookies from 'js-cookie';
 import axios from 'axios';
 import Geocode from 'react-geocode';
+import { UserContext } from '../../UserContext'
 import "react-datepicker/dist/react-datepicker.css"
 
 Geocode.setApiKey("AIzaSyAHoOsaxhFYc2fQlGdr-5Mdep3UVkfpfP4");
@@ -15,6 +16,7 @@ Geocode.enableDebug();
 
 const HostParty = (props) => {
   const { REACT_APP_URL } = process.env;
+  const [user, setUser] = useContext(UserContext);
   const { register, handleSubmit, errors } = useForm();
   // const [hours, setHours] = useState();
   // const [minutes, setMinutes] = useState();
@@ -36,7 +38,8 @@ const HostParty = (props) => {
     let longitude = await getLongitude(data.Location);
 
     const payload = {
-      Host: cookies.get("ID"),
+      // Host: cookies.get("ID"),
+      Host: user.ID,
       Name: data.Title,
       Location: data.Location,
       Latitude: latitude,

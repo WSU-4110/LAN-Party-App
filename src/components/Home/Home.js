@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import MapComponent from '../GoogleMap/GoogleMap';
 import cookies from 'js-cookie';
 import {Button} from 'react-bootstrap';
+import { UserContext } from '../../UserContext'
 
 const tempPartyList = [
   {
@@ -24,6 +25,7 @@ const tempPartyList = [
 ]
 
 const Home = (props) => {
+  const [user, setUser] = useContext(UserContext);
   const toHostParty = () => {
     props.history.push("/host");
   }
@@ -35,7 +37,7 @@ const Home = (props) => {
   return(
     <div>
       <MapComponent />
-      {cookies.get("Logged") === "true"
+      {user.LoggedIn===true 
       ?
         <div
           style={{
