@@ -46,7 +46,7 @@ module.exports = {
   },
 
   // UPDATE A PARTY //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  Update: async function (events) {
+  UpdatePartyName: async function (events) {
     if(!events) {
       return responseUtil.Build(204, "Event is empty");
     }
@@ -61,24 +61,27 @@ module.exports = {
       return responseUtil.Build(403, "Cannot get party");
     }
 
-    //If the user wants to update the name
-    if(request.Name !== undefined){
-      //Update the requested name to make it valid
-      request.Name = nameUtil.isValidParty(request.Name);
-      
-      //If the name was rejected, respond by rejecting the name
-      if (request.Name === false){
-        return responseUtil.Build(403, "Invalid party name");
-      }
-
-      //The name was accepted, put it into the party object
-      party.Name = request.Name;
-    } /*else if (){
-
-    } */ else{ 
-      //If there was no request
-      return responseUtil.Build(204, 'No request made');
+    //Check that the name was recieved
+    if(request.Name === undefined){
+      return responseUtil.Build(403, 'Must include a name');
     }
+    
+    //Update the name to make it valid
+    let newName = nameUtil.isValidParty(request.Name);
+
+    //If the name wasn't valid
+    if (newName === false){
+      return responseUtil.Build(403, "Name is not valid");
+    }
+    
+    //Insert the name into the party
+    party.Name = newName;
+
+    //Save the party into the table 
+    let response = await PartyAPI.Save(party.ID, party).promise();
+
+    response.Message = "Party Created!";
+    return responseUtil.Build(200, response);
   },
 
   // GET A PARTY BY AN ID //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
