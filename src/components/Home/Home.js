@@ -34,6 +34,10 @@ const Home = (props) => {
     props.history.push("/login");
   }
 
+  const toViewParty = () => {
+    props.history.push("/ViewParty");
+  }
+
   return(
     <div>
       <MapComponent />
@@ -58,6 +62,7 @@ const Home = (props) => {
       <div>
         {tempPartyList.map((p) => (
           <div 
+          onClick={toViewParty}
             style={{
               padding: "10px 10px 5px",
               borderBottom:"2px solid #0C0C0D",

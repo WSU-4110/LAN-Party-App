@@ -6,6 +6,7 @@ import Signup from './components/Register/Signup';
 import Login from './components/Register/Login';
 import User from './components/User/User';
 import Host from './components/HostParty/HostParty'
+import ViewParty from './components/ViewParty/ViewParty';
 import cookies from 'js-cookie';
 import { UserContext } from './UserContext';
 import './App.css';
@@ -44,6 +45,7 @@ function App() {
           <Route path="/login" exact component={Login} />
           <Route path="/user" exact component={User} />
           <Route path="/host" exact component={Host} />
+          <Route path="/viewParty" exact component={ViewParty} />
         </Switch>
       </div>
     </Router>
