@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { useForm } from "react-hook-form";
 import { Form, Button } from 'react-bootstrap';
 import DatePicker from "react-datepicker";
@@ -6,21 +6,44 @@ import setHours from "date-fns/setHours";
 import setMinutes from "date-fns/setMinutes";
 import cookies from 'js-cookie';
 import axios from 'axios';
+import Geocode from 'react-geocode';
+import { UserContext } from '../../UserContext'
 import "react-datepicker/dist/react-datepicker.css"
+
+Geocode.setApiKey("AIzaSyAHoOsaxhFYc2fQlGdr-5Mdep3UVkfpfP4");
+Geocode.setLanguage("en");
+Geocode.enableDebug();
 
 const HostParty = (props) => {
   const { REACT_APP_URL } = process.env;
+  const [user, setUser] = useContext(UserContext);
   const { register, handleSubmit, errors } = useForm();
   // const [hours, setHours] = useState();
   // const [minutes, setMinutes] = useState();
   // const [startDate, setStartDate] = useState(setHours(setMinutes(new Date(), 30), 16));
   const [startDate, setStartDate] = useState(new Date());
 
-  const onSubmit = (data) => {
+  const getLatitude = async (address) => {
+    let loc = await Geocode.fromAddress(address);
+    return loc.results[0].geometry.location.lat;
+  }
+  const getLongitude = async (address) => {
+    let loc = await Geocode.fromAddress(address);
+    return loc.results[0].geometry.location.lng;
+  }
+
+  const onSubmit = async (data) => {
+    
+    let latitude = await getLatitude(data.Location);
+    let longitude = await getLongitude(data.Location);
+
     const payload = {
-      Host: cookies.get("ID"),
+      // Host: cookies.get("ID"),
+      Host: user.ID,
       Name: data.Title,
       Location: data.Location,
+      Latitude: latitude,
+      Longitude: longitude,
       Date: startDate
     };
     const headers = {
@@ -35,6 +58,8 @@ const HostParty = (props) => {
         console.log(res);
       })
       .catch((error) => console.log(error));
+
+    console.log(payload);
 
     props.history.push("/");
   }
