@@ -19,13 +19,13 @@ module.exports = {
     let request = JSON.parse(events.body);
     
     //Must have a name
-    if (typeof request.Name === undefined)
+    if (typeof request.PartyName === undefined)
       return responseUtil.Build(403, "Party must have a name");
 
     //Update the name to make sure it is valid
-    request.Name = nameUtil.isValidParty(request.Name);
+    request.PartyName = nameUtil.isValidParty(request.PartyName);
 
-    if(request.Name === false){
+    if(request.PartyName === false){
       return responseUtil.Build(403, "Party name not valid");
     }
 
@@ -44,6 +44,9 @@ module.exports = {
     if (!AccountAPI.Get(request.Host))
       return responseUtil.Build(403, "Host doesn't exist!");
     
+    request.Attendees = [{}];
+
+
     let response = await PartyAPI.Save(shortid.generate(), request);
 
     response.Message = "Party Created!";
@@ -59,7 +62,7 @@ module.exports = {
 
 
     let request = {
-      body: events.body,
+      body: JSON.parse(events.body),
       ID: events.pathParameters.ID
     }
 
@@ -69,31 +72,34 @@ module.exports = {
 
     let curExpressions = [];
     
+    let updateValues = {};
 
     //Check if the name is exists
-    if(request.body.Name !== undefined){
+    if(request.body.hasOwnProperty('PartyName')){
       //Update the name to make sure it's valid
-      request.body.Name = nameUtil.isValidParty(request.body.Name);
+      request.body.PartyName = nameUtil.isValidParty(request.body.PartyName);
 
       //Check if the name is valid 
-      if(request.body.Name === false){
+      if(request.body.PartyName === false){
         responseUtil.Build(403, "Party name not valid");
       }
 
       //Update the expressions
-      curExpressions = curExpressions.concat('Name = :n');
+      curExpressions = curExpressions.concat('PartyName = :n');
+      updateValues[':n'] = request.body.PartyName;
     }
 
     // ensure that the party has a location
-    if (typeof request.body.Location !== undefined 
+    if (request.body.hasOwnProperty('Location')
       && request.body.Location !== ""){
       //Update the expressions
       curExpressions = curExpressions.concat('Location = :l')
+      updateValues[':l'] = request.body.Location;
     }
 
     /*
     // ensure that there is a host
-    if (typeof request.body.Host !== undefined){
+    if (request.body.hasOwnProperty('Host')){
       // check that the host exists
       let test = await AccountAPI.Get(request.body.Host);
       if (!test){
@@ -102,26 +108,29 @@ module.exports = {
   
       //Update the expressions
       updateExpression = updateExpression + ' Host = :h'
+      updateValues[':h'] = request.body.Host;
     }
     */
 
     //Check times
-    if (typeof request.body.Time !== undefined){
+    if (request.body.hasOwnProperty('Time')){
       //Update the expressions
       curExpressions = curExpressions.concat('Time = :t')
+      updateValues[':t'] = request.body.Time;
     }
 
     //Check attendees
-    if (typeof request.body.Attendees !== undefined){
+    if (request.body.hasOwnProperty('Attendees')){
       //Update the expressions
       curExpressions = curExpressions.concat('Attendees = :a')
+      updateValues[':a'] = request.body.Attendees;
     }
 
     
     curExpressions = curExpressions.join(', ');
-    console.log(curExpressions)
+    updateExpression = updateExpression.concat(curExpressions);
     
-    let response = await PartyAPI.Update(request.ID, updateExpression, request.body);
+    let response = await PartyAPI.Update(request.ID, updateValues, updateExpression);
 
     if(!response){
       return responseUtil.Build(403, 'Party creation failed ');
