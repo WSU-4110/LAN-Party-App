@@ -93,9 +93,10 @@ module.exports = {
     // ensure that the party has a location
     if (request.body.hasOwnProperty('PartyLocation')
       && request.body.PartyLocation !== ""){
+        
       //Update the expressions
       curExpressions = curExpressions.concat('PartyLocation = :l')
-      updateValues[':l'] = request.body.Location;
+      updateValues[':l'] = request.body.PartyLocation;
     }
 
     /*
