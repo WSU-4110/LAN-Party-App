@@ -50,6 +50,7 @@ module.exports = {
     return responseUtil.Build(200, response);
   },
 
+  /*
   // UPDATE A PARTY //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   Update: async function (events) {
     //Check if the event exists
@@ -57,34 +58,77 @@ module.exports = {
       return responseUtil.Build(204, 'event is empty');
     }
 
-    let request = JSON.parse(events.body);
+    console.log(JSON.stringify(events.body));
+
+    let request = {
+      body: JSON.parse(events.body),
+      ID: events.pathParameters.ID
+    }
+
+    //A string for the updates
+    let updateExpression = 'set ';
+
+    let curExpressions = [];
+    //An object for all the values
+    let updateValues = {};
 
     //Check if the name is exists
-    if(request.Name === undefined){
-      return responseUtil.Build(403, "Party must have a name");
+    if(request.body.Name !== undefined){
+      //Update the name to make sure it's valid
+      request.body.Name = nameUtil.isValidParty(request.body.Name);
+
+      //Check if the name is valid 
+      if(request.body.Name === false){
+        responseUtil.Build(403, "Party name not valid");
+      }
+
+      //Update the expressions
+      curExpressions.concat('Name = :n')
+      updateValues[':n'] = request.body.Name;
     }
 
-    //Update the name to make sure it's valid
-    request.Name = nameUtil.isValidParty(request.Name);
-
-    //Check if the name is valid 
-    if(request.Name === false){
-      responseUtil.Build(403, "Party name not valid");
-    }
-
+    console.log("Past names");
     // ensure that the party has a location
-    if (typeof request.Location === undefined || request.Location === "")
-    return responseUtil.Build(403, "Party must have a location");
- 
+    if (typeof request.body.Location !== undefined 
+      && request.body.Location !== ""){
+      //Update the expressions
+      curExpressions.concat(' Location = :l')
+      updateValues[':l'] = request.body.Location;
+    }
+    console.log("Past location");
+    /*
     // ensure that there is a host
-    if (typeof request.Host === undefined)
-      return responseUtil.Build(403, "Please send a host ID!");
+    if (typeof request.body.Host !== undefined){
+      // check that the host exists
+      let test = await AccountAPI.Get(request.body.Host);
+      if (!test){
+        return responseUtil.Build(403, "Host doesn't exist!");
+      }
+  
+      //Update the expressions
+      updateExpression = updateExpression + ' Host = :h'
+      updateValues[':h'] = request.body.Host;
+    }
+    * /
+    console.log("Past host");
+    //Check times
+    if (typeof request.body.Time !== undefined){
+      //Update the expressions
+      curExpressions.concat(' Time = :t')
+      updateValues[':t'] = request.body.Time;
+    }
+    console.log("Past time");
+    //Check attendees
+    if (typeof request.body.Attendees !== undefined){
+      //Update the expressions
+      curExpressions.concat(' Attendees = :a')
+      updateValues[':a'] = request.body.Attendees;
+    }
+    console.log("Past attendees");
+    updateExpression = updateExpression.concat(curExpressions.join(', '));
 
-    // check that the host exists
-    if (!AccountAPI.Get(request.Host))
-      return responseUtil.Build(403, "Host doesn't exist!");
-
-    let response = await PartyAPI.Update(request);
+    console.log(updateExpression.toString());
+    let response = await PartyAPI.Update(request.ID, updateExpression, updateValues);
 
     response.Message = "Party Created!";
     return responseUtil.Build(200, response);
@@ -127,7 +171,7 @@ module.exports = {
 
     //
   },
-
+ */
   // GET ALL OF THE PARTIES //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   GetAll: async function (events) {
     //Ensure that the event is not empty
