@@ -7,7 +7,7 @@ module.exports = {
     //Check if a name is valid
     isValidParty: function (name){
         //Check if there are any non-whitespace characters in the start
-        nonWhitespace = /\S/;
+        let nonWhitespace = /\S/;
         if(nonWhitespace.test(name) === null){
             //Name is all whitespace. Not valid
             return false;
