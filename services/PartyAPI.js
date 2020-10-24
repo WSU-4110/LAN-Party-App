@@ -5,6 +5,7 @@ const shortid = require("shortid");
 const { v4: uuidv4 } = require("uuid");
 const AWS = require("aws-sdk");
 const { Get } = require("./AccountAPI");
+const response = require("../utilities/response");
 
 // Updating AWS settings
 AWS.config.update({ region: "us-east-2" }); // region
@@ -58,7 +59,7 @@ module.exports = {
       //Try to get the party from the table
       let result = await dynamoDB.get(params).promise();
       
-      return result ? result : false;
+      return result ? result.Item : false;
 
     } catch(err){
       console.log('Party get error:', err);
@@ -66,27 +67,24 @@ module.exports = {
     }
   },
   
-  Update: async function(PartyInfo){
+  Update: async function(ID, updateExpression, updateValues){
     try{
       let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); 
 
       //Load the parameters into the object
       let params = {
         TableName: tableName,
-        Item: PartyInfo
+        Key: {ID: ID},
+        UpdateExpression: updateExpression,
+        ExpressionAttributeValues: updateValues,
+        ReturnValues:"Updated!"
       }
-      //Update the item in the table
-      dynamoDB.updateItem(params, (err, data) =>{
-        //If there was an error
-        if (err){
-          //Log it, then return false
-          console.log('There was an error: ', err);
-          return false;
-        } else {
-          //return the data
-          return data;
-        }
-      })
+
+      let response = await dynamoDB.update(params).promise();
+      
+      console.log(response);
+
+      return response ? response : false;
     } catch(err) {
       console.log('There was an error: ', err);
       return false;
