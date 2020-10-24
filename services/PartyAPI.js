@@ -97,7 +97,7 @@ module.exports = {
     }
   },
 
-  Get: async function(){
+  GetAll: async function(){
     try{
     let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); 
     
