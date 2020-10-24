@@ -86,10 +86,10 @@ module.exports = {
       let result = await dynamoDB.get(params).promise(); // grab the user
 
       if (result.Item) return result.Item;
-      else throw new Error("Account not found!");
+      else return false;
     } catch (err) {
       console.error("Account Get Error:", err);
-      throw new Error("Account Get Error");
+      return false;
     }
   },
 
