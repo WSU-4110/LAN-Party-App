@@ -67,24 +67,20 @@ module.exports = {
     }
   },
   
-  Update: async function(ID, updateExpression, updateValues){
+  Update: async function(ID, Values, updateExpression){
     try{
       let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); 
 
+      console.log(Values);
       //Load the parameters into the object
       let params = {
         TableName: tableName,
         Key: {ID: ID},
         UpdateExpression: updateExpression,
-        ExpressionAttributeValues: {
-          ":n": updateValues.Name,
-          ":l": updateValues.Location,
-          ":h": updateValues.Host,
-          ":t": updateValues.Time,
-          ":a": updateValues.Attendees
-        },
+        ExpressionAttributeValues: Values,
         ReturnValues:"UPDATED_NEW"
       }
+      console.log(params);
 
       let response = await dynamoDB.update(params).promise();
       
