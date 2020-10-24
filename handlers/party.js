@@ -19,7 +19,7 @@ module.exports = {
     let request = JSON.parse(events.body);
     
     //Must have a name
-    if (!request.hasOwnProperty(Name))
+    if (!request.hasOwnProperty("PartyName"))
       return responseUtil.Build(403, "Party must have a name");
 
     //Update the name to make sure it is valid
@@ -30,14 +30,15 @@ module.exports = {
     }
 
     // ensure that the party has a location
-    if (!request.hasOwnProperty(Location) || request.PartyLocation === "")
+    if (!request.hasOwnProperty("PartyLocation") 
+    || request.PartyLocation === "")
       return responseUtil.Build(403, "Party must have a location");
 
     // add a time that the party was created
     request.CreateDate = moment().toISOString();
 
     // ensure that there is a host
-    if (!request.hasOwnProperty(Host))
+    if (!request.hasOwnProperty("Host"))
       return responseUtil.Build(403, "Please send a host ID!");
 
     // check that the host exists
