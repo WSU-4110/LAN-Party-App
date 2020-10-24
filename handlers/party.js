@@ -50,7 +50,6 @@ module.exports = {
     return responseUtil.Build(200, response);
   },
 
-  /*
   // UPDATE A PARTY //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   Update: async function (events) {
     //Check if the event exists
@@ -58,19 +57,18 @@ module.exports = {
       return responseUtil.Build(204, 'event is empty');
     }
 
-    console.log(JSON.stringify(events.body));
 
     let request = {
-      body: JSON.parse(events.body),
+      body: events.body,
       ID: events.pathParameters.ID
     }
 
+    console.log(request.body);
     //A string for the updates
     let updateExpression = 'set ';
 
     let curExpressions = [];
-    //An object for all the values
-    let updateValues = {};
+    
 
     //Check if the name is exists
     if(request.body.Name !== undefined){
@@ -83,19 +81,16 @@ module.exports = {
       }
 
       //Update the expressions
-      curExpressions.concat('Name = :n')
-      updateValues[':n'] = request.body.Name;
+      curExpressions = curExpressions.concat('Name = :n');
     }
 
-    console.log("Past names");
     // ensure that the party has a location
     if (typeof request.body.Location !== undefined 
       && request.body.Location !== ""){
       //Update the expressions
-      curExpressions.concat(' Location = :l')
-      updateValues[':l'] = request.body.Location;
+      curExpressions = curExpressions.concat('Location = :l')
     }
-    console.log("Past location");
+
     /*
     // ensure that there is a host
     if (typeof request.body.Host !== undefined){
@@ -107,31 +102,33 @@ module.exports = {
   
       //Update the expressions
       updateExpression = updateExpression + ' Host = :h'
-      updateValues[':h'] = request.body.Host;
     }
-    * /
-    console.log("Past host");
+    */
+
     //Check times
     if (typeof request.body.Time !== undefined){
       //Update the expressions
-      curExpressions.concat(' Time = :t')
-      updateValues[':t'] = request.body.Time;
+      curExpressions = curExpressions.concat('Time = :t')
     }
-    console.log("Past time");
+
     //Check attendees
     if (typeof request.body.Attendees !== undefined){
       //Update the expressions
-      curExpressions.concat(' Attendees = :a')
-      updateValues[':a'] = request.body.Attendees;
+      curExpressions = curExpressions.concat('Attendees = :a')
     }
-    console.log("Past attendees");
-    updateExpression = updateExpression.concat(curExpressions.join(', '));
 
-    console.log(updateExpression.toString());
-    let response = await PartyAPI.Update(request.ID, updateExpression, updateValues);
+    
+    curExpressions = curExpressions.join(', ');
+    console.log(curExpressions)
+    
+    let response = await PartyAPI.Update(request.ID, updateExpression, request.body);
 
-    response.Message = "Party Created!";
-    return responseUtil.Build(200, response);
+    if(!response){
+      return responseUtil.Build(403, 'Party creation failed ');
+    } else {
+      response.Message = "Party Created";
+      return responseUtil.Build(200, response);
+    }
   },
 
   // GET A PARTY BY AN ID //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -171,7 +168,7 @@ module.exports = {
 
     //
   },
- */
+
   // GET ALL OF THE PARTIES //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   GetAll: async function (events) {
     //Ensure that the event is not empty

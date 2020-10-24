@@ -76,7 +76,13 @@ module.exports = {
         TableName: tableName,
         Key: {ID: ID},
         UpdateExpression: updateExpression,
-        ExpressionAttributeValues: updateValues,
+        ExpressionAttributeValues: {
+          ":n": updateValues.Name,
+          ":l": updateValues.Location,
+          ":h": updateValues.Host,
+          ":t": updateValues.Time,
+          ":a": updateValues.Attendees
+        },
         ReturnValues:"UPDATED_NEW"
       }
 
