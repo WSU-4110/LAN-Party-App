@@ -30,7 +30,7 @@ module.exports = {
     }
 
     // ensure that the party has a location
-    if (typeof request.Location === undefined || request.Location === "")
+    if (typeof request.PartyLocation === undefined || request.PartyLocation === "")
       return responseUtil.Build(403, "Party must have a location");
 
     // add a time that the party was created
@@ -90,10 +90,10 @@ module.exports = {
     }
 
     // ensure that the party has a location
-    if (request.body.hasOwnProperty('Location')
-      && request.body.Location !== ""){
+    if (request.body.hasOwnProperty('PartyLocation')
+      && request.body.PartyLocation !== ""){
       //Update the expressions
-      curExpressions = curExpressions.concat('Location = :l')
+      curExpressions = curExpressions.concat('PartyLocation = :l')
       updateValues[':l'] = request.body.Location;
     }
 
@@ -113,10 +113,10 @@ module.exports = {
     */
 
     //Check times
-    if (request.body.hasOwnProperty('Time')){
+    if (request.body.hasOwnProperty('PartyTime')){
       //Update the expressions
-      curExpressions = curExpressions.concat('Time = :t')
-      updateValues[':t'] = request.body.Time;
+      curExpressions = curExpressions.concat('PartyTime = :t')
+      updateValues[':t'] = request.body.PartyTime;
     }
 
     //Check attendees
