@@ -46,24 +46,22 @@ module.exports = {
       // connect to the database
       let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); 
 
+      let request = ID;
+  
       // create the parameters for the query
       let params = {
         TableName: tableName,
-        Key: { ID: ID },
+        Key: { 'ID': request }
       };
 
       //Try to get the party from the table
-      let result = await dynamoDB.get(params).promise();
-
-      //If the result isn't empty, return the item
-      if(result.Item !== undefined){
-        return result.Item;
-      }
-      //If it is empty, return false
-      else {
-        return false;
-      }
-
+      dynamoDB.get(params, function (err, data) { 
+        if(err){
+          return false
+        } else{
+          return data;
+        }
+      })
     } catch(err){
       console.log('Party get error:', err);
       return false;

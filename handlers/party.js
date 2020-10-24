@@ -98,7 +98,30 @@ module.exports = {
     }
     
     //Set the request equal to the event body
-    let request = events.body;
+    let request = {
+      ID: events.pathParameters.ID
+    }
+
+    if(!request.ID){
+      return responseUtil.Build(204, "Must provide ID");
+    }
+
+    let party = await PartyAPI.Get(request.ID);
+
+    //If the party wasn't found
+    if(!party){
+      return response.Build(500, {
+        Message: "Party not found",
+        Party: party
+      });
+    } else {
+      
+      let response = {
+        Message: "Party found!",
+        Party: party
+      }
+      return responseUtil.Build(200, response);
+    }
 
     //
   },
