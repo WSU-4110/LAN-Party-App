@@ -19,7 +19,7 @@ module.exports = {
     let request = JSON.parse(events.body);
     
     //Must have a name
-    if (typeof request.PartyName === undefined)
+    if (!request.hasOwnProperty(Name))
       return responseUtil.Build(403, "Party must have a name");
 
     //Update the name to make sure it is valid
@@ -30,21 +30,21 @@ module.exports = {
     }
 
     // ensure that the party has a location
-    if (typeof request.PartyLocation === undefined || request.PartyLocation === "")
+    if (!request.hasOwnProperty(Location) || request.PartyLocation === "")
       return responseUtil.Build(403, "Party must have a location");
 
     // add a time that the party was created
     request.CreateDate = moment().toISOString();
 
     // ensure that there is a host
-    if (typeof request.Host === undefined)
+    if (!request.hasOwnProperty(Host))
       return responseUtil.Build(403, "Please send a host ID!");
 
     // check that the host exists
     if (!AccountAPI.Get(request.Host))
       return responseUtil.Build(403, "Host doesn't exist!");
     
-    request.Attendees = [{}];
+    request.Attendees = [];
 
 
     let response = await PartyAPI.Save(shortid.generate(), request);
