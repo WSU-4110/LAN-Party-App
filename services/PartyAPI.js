@@ -77,7 +77,7 @@ module.exports = {
         Key: {ID: ID},
         UpdateExpression: updateExpression,
         ExpressionAttributeValues: updateValues,
-        ReturnValues:"Updated!"
+        ReturnValues:"UPDATED_NEW"
       }
 
       let response = await dynamoDB.update(params).promise();
