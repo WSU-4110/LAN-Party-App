@@ -105,12 +105,14 @@ module.exports = {
     if(!request.ID){
       return responseUtil.Build(204, "Must provide ID");
     }
+    
+    console.log(request.ID);
 
     let party = await PartyAPI.Get(request.ID);
 
     //If the party wasn't found
     if(!party){
-      return response.Build(500, {
+      return responseUtil.Build(500, {
         Message: "Party not found",
         Party: party
       });

@@ -51,17 +51,15 @@ module.exports = {
       // create the parameters for the query
       let params = {
         TableName: tableName,
-        Key: { 'ID': request }
+        Key: { ID: request }
       };
 
+      console.log(params.Key.ID);
       //Try to get the party from the table
-      dynamoDB.get(params, function (err, data) { 
-        if(err){
-          return false
-        } else{
-          return data;
-        }
-      })
+      let result = await dynamoDB.get(params).promise();
+      
+      return result ? result : false;
+
     } catch(err){
       console.log('Party get error:', err);
       return false;
