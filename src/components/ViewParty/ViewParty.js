@@ -6,36 +6,25 @@ import { UserContext } from '../../UserContext'
 import axios from 'axios';
 
 //temporary metadata until we can pull it from the DB
-const tempPartyList = [
-    {
-      Host: "Thadd",
-      Name: "Detroit LAN",
-      Location: "Detroit",
-      Latitude: 42.331427,
-      Longitude: -83.0457538,
-      Date: "Thu Oct 22 2020 00:58:34 GMT-0400"
-    }
-  ]
 
 
-const ViewParty=()=>{
+const ViewParty=(props)=>{
 
     return(
         <div>
-        {tempPartyList.map((p) => (
           <div 
             style={{
               padding: "10px 10px 5px",
               borderBottom:"2px solid #0C0C0D",
               backgroundColor: "#35373D"
             }}>
-            <h4>{p.Name}</h4>
-            <h5>Host: {p.Host}</h5>
-            Location: {p.Location}
+            <h4>{props.Name}</h4>
+            <h5>Host: {props.Host}</h5>
+            Location: {props.Location}
             <br/>
-            <p>Date: {p.Date}</p>
+            <p>Date: {props.Date}</p>
           </div>
-          ))}
+          ))
         
     
     <Table striped bordered hover variant="dark">
