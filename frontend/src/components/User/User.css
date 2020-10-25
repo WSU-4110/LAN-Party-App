@@ -1,0 +1,36 @@
+.userHeader {
+  background-color: #333F48;
+  min-height: 30vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  flex-direction: row;
+}
+
+.avatar-section {
+  /* background-color: red; */
+}
+
+.desc-section {
+  font-size: 1.5em;
+  color: #fff;
+}
+
+.card {
+  background-color: #000000 !important;
+  color: #ffffff
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+}
+
+.settings-button-section {
+  padding: 10px 5px;
+}
+
+.userpage-buttons {
+  text-align: center;
+}
