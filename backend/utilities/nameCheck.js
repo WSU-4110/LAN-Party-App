@@ -1,7 +1,5 @@
 'use strict';
 
-const { func } = require("joi");
-
 module.exports = {
 
     //Check if a name is valid
