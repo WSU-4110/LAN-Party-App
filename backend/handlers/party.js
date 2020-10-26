@@ -182,15 +182,20 @@ module.exports = {
 
   // GET ALL OF THE PARTIES //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   GetAll: async function (events) {
-    //Ensure that the event is not empty
-    if (!events){
+    try {
+      //If the event is not empty
+      if (events){
+        let parties = await PartyAPI.GetAll();
+
+        let result = {
+          Message: "Parties retrieved",
+          Parties: parties
+        }
+        return responseUtil.Build(200, result);
+      }
       return responseUtil.Build(204, 'No request made');
+    } catch (error) {
+      return responseUtil.Build(500, { Message: error.Message });
     }
-
-    let response = PartyAPI.GetAll();
-
-    response.Message = 'Parties retrieved!';
-
-    return responseUtil.Build(200, response);
   }
-};
+}
