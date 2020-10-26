@@ -72,6 +72,37 @@ module.exports = {
     }
   },
 
+  // GET AN ACCOUNT BY A USERNAME //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  GetByUsername: async function (Username) {
+    try {
+      let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); // connect to the database
+
+      // create the parameters for the query
+      let params = {
+        TableName: tableName,
+        IndexName: "Username",
+        KeyConditionExpression: "#key = :em",
+        ExpressionAttributeNames: {
+          "#key": "Username",
+        },
+        ExpressionAttributeValues: {
+          ":em": Username,
+        }
+      };
+
+      let result = await dynamoDB.query(params).promise(); // query the database
+
+      // return the result of the query
+      if (result.Items[0]) {
+        let account = result.Items[0];
+        return account;
+      } else false;
+    } catch (err) {
+      console.error("Account Username Error:", err);
+      throw new Error(err.message);
+    }
+  },
+  
   // GET AN ACCOUNT BY AN ID //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   Get: async function (ID) {
     try {
@@ -92,7 +123,7 @@ module.exports = {
       return false;
     }
   },
-
+  
   // GET ALL ACCOUNTS //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   GetAll: async function () {
     try {
