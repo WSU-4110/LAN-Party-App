@@ -99,12 +99,13 @@ module.exports = {
       updateValues[':l'] = request.body.PartyLocation;
     }
 
-    /*
+    
     // ensure that there is a host
     if (request.body.hasOwnProperty('Host')){
       // check that the host exists
-      let test = await AccountAPI.Get(request.body.Host);
-      if (!test){
+      try {
+        await AccountAPI.Get(request.body.Host);
+      } catch (err){
         return responseUtil.Build(403, "Host doesn't exist!");
       }
   
@@ -112,7 +113,7 @@ module.exports = {
       updateExpression = updateExpression + ' Host = :h'
       updateValues[':h'] = request.body.Host;
     }
-    */
+    
 
     //Check times
     if (request.body.hasOwnProperty('PartyTime')){
