@@ -237,3 +237,33 @@ resources:
             Projection:
               ProjectionType: ALL
         BillingMode: PAY_PER_REQUEST
+
+    # friends table
+    friends:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: FRIENDS-LAN
+        AttributeDefinitions:
+          - AttributeName: ID
+            AttributeType: S
+          - AttributeName: UserOneID 
+            AttributeType: S
+          - AttributeName: UserTwoID 
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ID
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: UserOneID
+            KeySchema:
+              - AttributeName: UserOneID
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: UserTwoID
+            KeySchema:
+              - AttributeName: UserTwoID
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
