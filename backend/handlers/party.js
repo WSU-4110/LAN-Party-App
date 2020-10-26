@@ -133,6 +133,12 @@ module.exports = {
       curExpressions = curExpressions.concat('HardwareRequirements = :r')
       updateValues[':r'] = request.body.HardwareRequirements;
     }
+
+    //Check for ageGate
+    if(request.body.hasOwnProperty('AgeGate')){
+      curExpressions = curExpressions.concat('AgeGate = :g');
+      updateValues[':g'] = request.body.AgeGate;
+    }
     
     curExpressions = curExpressions.join(', ');
     updateExpression = updateExpression.concat(curExpressions);
