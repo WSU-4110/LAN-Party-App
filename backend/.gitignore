@@ -1,6 +1,6 @@
 # package directories
 node_modules/
-backend/package-lock.json
+package-lock.json
 
 # Serverless directories
 .serverless
