@@ -42,8 +42,11 @@ module.exports = {
       return responseUtil.Build(403, "Please send a host ID!");
 
     // check that the host exists
-    if (!AccountAPI.Get(request.Host))
-      return responseUtil.Build(403, "Host doesn't exist!");
+    try {
+      await AccountAPI.Get(request.Host);
+    } catch (err){
+      return responseUtil.Build(403, "Host ID invalid");
+    }
     
     request.Attendees = [];
 
