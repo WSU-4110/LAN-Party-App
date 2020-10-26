@@ -16,16 +16,31 @@ Back end: https://github.com/WSU-4110/LAN-party-backend
 
 # Usage
 | Endpoint | Type | Function |
-| | | |
-| | | |
-| | | |
-| | | |
-| | | |
-| | | |
-| | | |
+|---|---|---|
+|/SignUp|POST|create a new account|
+|/SignIn|POST|sign in to an account|
+|/Accounts|GET|get all accounts|
+|/Account/{}|GET|get user by ID|
+|/CreateParty|POST|create party|
+
+## Usage JSON
+### SignUp
+{
+}
+### SignIn
+{
+}
+### Accounts
+{
+}
+### Account
+{
+}
+### CreateParty
+{
+}
 
 # Schema
-
 ## Account
 ## Party
 ## Friend
