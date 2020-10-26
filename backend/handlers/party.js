@@ -99,7 +99,6 @@ module.exports = {
       updateValues[':l'] = request.body.PartyLocation;
     }
 
-    
     // ensure that there is a host
     if (request.body.hasOwnProperty('Host')){
       // check that the host exists
@@ -110,7 +109,7 @@ module.exports = {
       }
   
       //Update the expressions
-      updateExpression = updateExpression + ' Host = :h'
+      curExpressions = curExpressions.concat('Host = :h')
       updateValues[':h'] = request.body.Host;
     }
     
@@ -129,6 +128,11 @@ module.exports = {
       updateValues[':a'] = request.body.Attendees;
     }
 
+    //Check for hardware requirements
+    if (request.body.hasOwnProperty('HardwareRequirements')){
+      curExpressions = curExpressions.concat('HardwareRequirements = :r')
+      updateValues[':r'] = request.body.HardwareRequirements;
+    }
     
     curExpressions = curExpressions.join(', ');
     updateExpression = updateExpression.concat(curExpressions);
