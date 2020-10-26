@@ -50,6 +50,8 @@ const Home = (props) => {
     props.history.push("/ViewParty");
   }
 
+
+  
   return(
     <div>
       <MapComponent />
@@ -89,7 +91,11 @@ const Home = (props) => {
             </Accordion.Toggle>
             <Accordion.Collapse eventKey={p.ID}>
               <Card.Body>
-                <ViewParty location={p.Location} />
+                <ViewParty 
+                Location={p.Location} 
+                Name={p.Name}
+                Host={p.Host} 
+                Date={p.Date} />
               </Card.Body>
             </Accordion.Collapse>
           </Card>
