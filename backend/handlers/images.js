@@ -9,7 +9,7 @@ aws.config.update({
 });
 
 // const S3_BUCKET = process.env.PROJECT_CODE + "-live-images";
-const S3_BUCKET = "only-lans-images";
+const S3_BUCKET = "lan-party-images";
 
 exports.upload = async (req, res) => {
   let body = JSON.parse(req.body);
