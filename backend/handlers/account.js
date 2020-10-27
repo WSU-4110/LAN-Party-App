@@ -4,6 +4,7 @@
 const AccountAPI = require("../services/AccountAPI");
 const moment = require("moment-timezone");
 const responseUtil = require("../utilities/response");
+const crypto = require("crypto");
 
 module.exports = {
 
@@ -135,6 +136,85 @@ module.exports = {
             } else return responseUtil.Build(500, { Message: "No Accounts Exist." }); // else, return an error
         } catch (err) {
             console.error("View Accounts Error:", err);
+            return responseUtil.Build(500, { Message: err.message });
+        }
+    },
+
+    // UPDATE AN ACCOUNT //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    Update: async function (event) {
+        try {
+            // if nothing was provided in the request, return a 204 HTTPS code (No content)
+            if (!event)
+                return responseUtil.Build(204, { Message: "No information was provided with the request!" });
+
+            // next parse the request
+            let request = JSON.parse(event.body);
+            request.ID = event.pathParameters.ID;
+
+            // we need to make sure that an email, password, and ID were sent
+            if (!request.Email)
+                throw new Error("Account Email Required!");
+
+            if (!request.Password)
+                throw new Error("Account Password Required!");
+            
+            if (!request.ID)
+                throw new Error("Account ID Required!");
+
+            // authenticate the account before continuing
+            let account = await AccountAPI.AuthByEmailPassword(request.Email, request.Password);
+            if (!account)
+                throw new Error("Invalid email and password!");
+
+            // these are the values that we need for updating Dynamo, we will concat them with whatever we are updating
+            let updateExpression = "SET ";
+            let curExpressions = [];
+            let updateValues = {};
+
+            // if we are updating the password, add it to the updateValues and curExpressions
+            if (request.NewPassword) {
+                let HashedPassword = crypto.createHmac("sha256", request.ID).update(request.NewPassword).digest("hex"); // create a hash for the new password
+                updateValues[":p"] = HashedPassword;
+                curExpressions = curExpressions.concat("Password = :p");
+            }
+
+            // if we are updating the username, add it to the updateValues and curExpressions
+            if (request.NewUsername) {
+                let UsernameExists = await AccountAPI.GetByUsername(request.NewUsername); // check that the new username doesn't already exist
+                if (UsernameExists)
+                    throw new Error("Username Already Taken!");
+                updateValues[":u"] = request.NewUsername;
+                curExpressions = curExpressions.concat("Username = :u");
+            }
+
+            // if we are updating the email, add it to the updateValues and curExpressions
+            if (request.NewEmail) {
+                request.NewEmail = request.NewEmail.toLowerCase(); // change the email to lowercase
+                let EmailExists = await AccountAPI.GetByEmail(request.NewEmail); // check that the new email doesn't already exist
+                if (EmailExists)
+                    throw new Error("Email Already Taken!");
+                updateValues[":e"] = request.NewEmail;
+                curExpressions = curExpressions.concat("Email = :e");
+            }
+
+            // update the UpdateDate
+            updateValues[":d"] = moment().toISOString(); // let's take note of when we updated this account
+            curExpressions = curExpressions.concat("UpdateDate = :d");
+
+            // combine all the expressions and values
+            curExpressions = curExpressions.join(', ');
+            updateExpression = updateExpression.concat(curExpressions);
+
+            // call the API
+            let response = await AccountAPI.Update(request.ID, updateValues, updateExpression);
+
+            // if we returned with success, then return the new account
+            if (response) {
+                response.Message = "Account updated!";
+                return responseUtil.Build(200, response);
+            } return responseUtil.Build(500, { Message: "No Updates Were Requested." }); // else, return an error
+        } catch (err) {
+            console.error("Account Update Error:", err);
             return responseUtil.Build(500, { Message: err.message });
         }
     }
