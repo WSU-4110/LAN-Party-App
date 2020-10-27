@@ -170,7 +170,7 @@ resources:
         AttributeDefinitions:
           - AttributeName: ID
             AttributeType: S
-          - AttributeName: Name
+          - AttributeName: GameName
             AttributeType: S
           - AttributeName: Genre
             AttributeType: S
@@ -178,9 +178,9 @@ resources:
           - AttributeName: ID
             KeyType: HASH
         GlobalSecondaryIndexes:
-          - IndexName: Name
+          - IndexName: GameName
             KeySchema:
-              - AttributeName: Name
+              - AttributeName: GameName
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
@@ -200,33 +200,33 @@ resources:
         AttributeDefinitions:
           - AttributeName: ID
             AttributeType: S
-          - AttributeName: Name
+          - AttributeName: GameName
             AttributeType: S
           - AttributeName: Host
             AttributeType: S
-          - AttributeName: Location
+          - AttributeName: PartyLocation
             AttributeType: S
-          - AttributeName: Time
+          - AttributeName: GameTime
             AttributeType: S
         KeySchema:
           - AttributeName: ID
             KeyType: HASH
         GlobalSecondaryIndexes:
-          - IndexName: Name
+          - IndexName: PartyName
             KeySchema:
-              - AttributeName: Name
+              - AttributeName: PartyName
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
-          - IndexName: Location
+          - IndexName: PartyLocation
             KeySchema:
-              - AttributeName: Location
+              - AttributeName: PartyLocation
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
-          - IndexName: Time
+          - IndexName: PartyTime
             KeySchema:
-              - AttributeName: Time
+              - AttributeName: PartyTime
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
