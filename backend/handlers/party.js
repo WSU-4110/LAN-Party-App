@@ -43,7 +43,8 @@ module.exports = {
 
     // check that the host exists
     try {
-      await AccountAPI.Get(request.Host);
+      request.HostUsername = await AccountAPI.Get(request.Host);
+      request.HostUsername = request.HostUsername.Username;
     } catch (err){
       return responseUtil.Build(403, "Host ID invalid");
     }
@@ -106,14 +107,16 @@ module.exports = {
     if (request.body.hasOwnProperty('Host')){
       // check that the host exists
       try {
-        await AccountAPI.Get(request.body.Host);
+        request.body.HostUsername = await AccountAPI.Get(request.body.Host);
+        request.body.HostUsername = request.body.HostUsername.Username
       } catch (err){
         return responseUtil.Build(403, "Host doesn't exist!");
       }
   
       //Update the expressions
-      curExpressions = curExpressions.concat('Host = :h')
+      curExpressions = curExpressions.concat('Host = :h, HostUsername = :u')
       updateValues[':h'] = request.body.Host;
+      updateValues[':u'] = request.body.HostUsername;
     }
     
 
