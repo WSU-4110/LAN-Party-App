@@ -15,33 +15,31 @@ Back end: https://github.com/WSU-4110/LAN-party-backend
 # Enviroments
 
 # Usage
-| Endpoint | Type | Function |
-|---|---|---|
-|/SignUp|POST|create a new account|
-|/SignIn|POST|sign in to an account|
-|/Accounts|GET|get all accounts|
-|/Account/{}|GET|get user by ID|
-|/CreateParty|POST|create party|
-
-## Usage JSON
-### SignUp
-{
-}
-### SignIn
-{
-}
-### Accounts
-{
-}
-### Account
-{
-}
-### CreateParty
-{
-}
+| Endpoint | Type | Function | Critical JSON Fields | Optional JSON Fields |
+|---|---|---|---|
+|/SignUp|POST|create a new account|Username, Email, Password|N/A|
+|/SignIn|POST|sign in to an account|Email, Password|N/A|
+|/Account/{ID}|GET|get user by ID|N/A|N/A|
+|/Accounts|GET|get all accounts|N/A|N/A|N/A|
+|/Accounts/{ID}|PATCH|update an account's username, password, and/or email|Email, Password|NewUsername, NewPassword, NewEmail|
+|/CreateParty|POST|create party|?|?|
+|/Party/{ID}|GET|get party by ID|N/A|N/A|
+|/Parties|GET|get all parties|N/A|N/A|
+|/Party/{ID}/Update|PATCH|update a party|?|?|
 
 # Schema
 ## Account
+{
+Email:
+Password:
+Username:
+}
 ## Party
+{
+}
 ## Friend
+{
+}
 ## Game
+{
+}
