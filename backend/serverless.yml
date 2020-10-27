@@ -187,9 +187,9 @@ resources:
           - AttributeName: ID
             KeyType: HASH
         GlobalSecondaryIndexes:
-          - IndexName: GameName
+          - IndexName: Name
             KeySchema:
-              - AttributeName: GameName
+              - AttributeName: Name
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
@@ -221,21 +221,21 @@ resources:
           - AttributeName: ID
             KeyType: HASH
         GlobalSecondaryIndexes:
-          - IndexName: PartyName
+          - IndexName: Name
             KeySchema:
-              - AttributeName: PartyName
+              - AttributeName: Name
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
-          - IndexName: PartyLocation
+          - IndexName: Location
             KeySchema:
-              - AttributeName: PartyLocation
+              - AttributeName: Location
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
-          - IndexName: PartyTime
+          - IndexName: Time
             KeySchema:
-              - AttributeName: PartyTime
+              - AttributeName: Time
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
