@@ -72,6 +72,14 @@ functions:
           path: /Accounts
           cors: true
 
+  UpdateAccount:
+    handler: handlers/account.Update
+    events:
+      - http:
+          method: PATCH
+          path: /Account/{ID}
+          cors: true
+
   # game functions
   ViewGame:
     handler: handlers/game.ViewGame

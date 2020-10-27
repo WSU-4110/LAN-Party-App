@@ -173,5 +173,28 @@ module.exports = {
       console.error("Account Auth 1 Error:", err);
       throw new Error(err.message);
     }
+  },
+
+  // UPDATE THE ACCOUNT /////////////////////////////////////////////////////////////////////////////////////////////
+  Update: async function (ID, Values, updateExpression) {
+    try {
+      let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); // connect to the database
+
+      // create the parameters for the update
+      let params = {
+        TableName: tableName,
+        Key: {ID: ID},
+        UpdateExpression: updateExpression,
+        ExpressionAttributeValues: Values,
+        ReturnValues:"UPDATED_NEW"
+      };
+
+      let result = await dynamoDB.update(params).promise(); // update the entry in the database
+      
+      return result ? result : false;
+    } catch (err) {
+      console.error("Account Update Error!", err);
+      throw new Error(err.message);
+    }
   }
 };
