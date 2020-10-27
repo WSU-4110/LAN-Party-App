@@ -42,8 +42,11 @@ module.exports = {
       return responseUtil.Build(403, "Please send a host ID!");
 
     // check that the host exists
-    if (!AccountAPI.Get(request.Host))
-      return responseUtil.Build(403, "Host doesn't exist!");
+    try {
+      await AccountAPI.Get(request.Host);
+    } catch (err){
+      return responseUtil.Build(403, "Host ID invalid");
+    }
     
     request.Attendees = [];
 
@@ -99,20 +102,20 @@ module.exports = {
       updateValues[':l'] = request.body.PartyLocation;
     }
 
-    /*
     // ensure that there is a host
     if (request.body.hasOwnProperty('Host')){
       // check that the host exists
-      let test = await AccountAPI.Get(request.body.Host);
-      if (!test){
+      try {
+        await AccountAPI.Get(request.body.Host);
+      } catch (err){
         return responseUtil.Build(403, "Host doesn't exist!");
       }
   
       //Update the expressions
-      updateExpression = updateExpression + ' Host = :h'
+      curExpressions = curExpressions.concat('Host = :h')
       updateValues[':h'] = request.body.Host;
     }
-    */
+    
 
     //Check times
     if (request.body.hasOwnProperty('PartyTime')){
@@ -128,6 +131,17 @@ module.exports = {
       updateValues[':a'] = request.body.Attendees;
     }
 
+    //Check for hardware requirements
+    if (request.body.hasOwnProperty('HardwareRequirements')){
+      curExpressions = curExpressions.concat('HardwareRequirements = :r')
+      updateValues[':r'] = request.body.HardwareRequirements;
+    }
+
+    //Check for ageGate
+    if(request.body.hasOwnProperty('AgeGate')){
+      curExpressions = curExpressions.concat('AgeGate = :g');
+      updateValues[':g'] = request.body.AgeGate;
+    }
     
     curExpressions = curExpressions.join(', ');
     updateExpression = updateExpression.concat(curExpressions);
@@ -182,15 +196,20 @@ module.exports = {
 
   // GET ALL OF THE PARTIES //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   GetAll: async function (events) {
-    //Ensure that the event is not empty
-    if (!events){
+    try {
+      //If the event is not empty
+      if (events){
+        let parties = await PartyAPI.GetAll();
+
+        let result = {
+          Message: "Parties retrieved",
+          Parties: parties
+        }
+        return responseUtil.Build(200, result);
+      }
       return responseUtil.Build(204, 'No request made');
+    } catch (error) {
+      return responseUtil.Build(500, { Message: error.Message });
     }
-
-    let response = PartyAPI.GetAll();
-
-    response.Message = 'Parties retrieved!';
-
-    return responseUtil.Build(200, response);
   }
-};
+}
