@@ -16,7 +16,7 @@ Back end: https://github.com/WSU-4110/LAN-party-backend
 
 # Usage
 | Endpoint | Type | Function | Critical JSON Fields | Optional JSON Fields |
-|---|---|---|---|
+|---|---|---|---|---|
 |/SignUp|POST|create a new account|Username, Email, Password|N/A|
 |/SignIn|POST|sign in to an account|Email, Password|N/A|
 |/Account/{ID}|GET|get user by ID|N/A|N/A|
