@@ -94,23 +94,23 @@ module.exports = {
   },
 
   GetAll: async function(){
-    try{
-    let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); 
-    
-    //Grab all the items from the Parties table
-    let response = await dynamoDB.scan( {TableName: tableName }).promise();
-    
-    if(response){
-      return response;
-    } else {
-      console.log('Nothing retrieved from the table.');
-      return false;
-    }
+    try {
+      // connect to the database
+      let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); 
 
-    } catch(err){
-      console.log('there was a fatal error: ', err);
-      return false;
-    };
+      // SCAN THE TABLE FOR THE PARTY OBJS
+      let results = await dynamoDB.scan({ TableName:tableName }).promise();
+      let parties = results.Items;
+
+      // IF parties IS NOT AN ARRAY, MAKE IT AN EMPTY ARRAY
+      if (!Array.isArray(parties))
+        parties = [];
+      
+      return parties;
+    } catch (error) {
+      console.error("Get All Parties Error", error);
+      throw new Error("Get All Parties Error");
+    }
 
   }
 };

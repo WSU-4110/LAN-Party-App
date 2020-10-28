@@ -5,6 +5,7 @@ const crypto = require("crypto");
 const shortid = require("shortid");
 const { v4: uuidv4 } = require("uuid");
 const AWS = require("aws-sdk");
+const { exception } = require("console");
 
 // Updating AWS settings
 AWS.config.update({ region: "us-east-2" }); // region
@@ -117,10 +118,10 @@ module.exports = {
       let result = await dynamoDB.get(params).promise(); // grab the user
 
       if (result.Item) return result.Item;
-      else return false;
+      else throw new exception;
     } catch (err) {
       console.error("Account Get Error:", err);
-      return false;
+      throw err;
     }
   },
   
