@@ -9,10 +9,8 @@ const S3_BUCKET = "lan-party-images";
 // Updating AWS settings
 AWS.config.update({
   region: "us-east-2",
-  //accessKeyId: process.env.S3_ACCESS_ID,
-  accessKeyId: AKIAUC5UTE4JYGPWJTXP,
-  secretAccessKey: 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
-  //secretAccessKey: process.env.S3_ACCESS_SECRET,
+  accessKeyId: process.env.S3_ACCESS_ID,
+  secretAccessKey: process.env.S3_ACCESS_SECRET
 });
 
 module.exports = {

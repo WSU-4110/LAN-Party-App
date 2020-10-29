@@ -7,6 +7,22 @@ const responseUtil = require("../utilities/response");
 const crypto = require("crypto");
 
 module.exports = {
+    Test: async function () {
+        try{   
+         
+            //let response = JSON.parge(event.body);
+            let idd = process.env.S3_ACCESS_ID;
+
+            let result = {
+                Message: "success!",
+                Account: idd
+            };
+            return responseUtil.Build(204, result);
+        }catch (err) {
+            console.error("TEST Error:", err);
+            return responseUtil.Build(500, { Message: err.message });
+        }
+    },
 
     // SIGN UP FOR AN ACCOUNT //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SignUp: async function (event) {
