@@ -49,6 +49,10 @@ module.exports = {
       return responseUtil.Build(403, "Host ID invalid");
     }
     
+    //If there was no intent attached, assume casual
+    if(!request.hasOwnProperty("Intent")){
+      request.Intent = "Casual";
+    }
 
     //If there were games attached, add them. Otherwise, make the list blank
     if(!request.hasOwnProperty("Games")){
@@ -57,6 +61,7 @@ module.exports = {
 
     request.Attendees = [];
 
+    
 
     let response = await PartyAPI.Save(shortid.generate(), request);
 
@@ -156,6 +161,12 @@ module.exports = {
     if(request.body.hasOwnProperty('Games')){
       curExpressions = curExpressions.concat('Games = :m');
       updateValues[':m'] = request.body.Games;
+    }
+
+    //Check for intent
+    if(request.body.hasOwnProperty('Intent')){
+      curExpressions = curExpressions.concat('Intent = :i');
+      updateValues[':i'] = request.body.Intent;
     }
 
     curExpressions = curExpressions.join(', ');
