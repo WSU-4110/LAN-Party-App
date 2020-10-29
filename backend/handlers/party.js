@@ -49,6 +49,12 @@ module.exports = {
       return responseUtil.Build(403, "Host ID invalid");
     }
     
+
+    //If there were games attached, add them. Otherwise, make the list blank
+    if(!request.hasOwnProperty("Games")){
+      request.Games = [];
+    }
+
     request.Attendees = [];
 
 
@@ -146,6 +152,12 @@ module.exports = {
       updateValues[':g'] = request.body.AgeGate;
     }
     
+    //Check for games
+    if(request.body.hasOwnProperty('Games')){
+      curExpressions = curExpressions.concat('Games = :m');
+      updateValues[':m'] = request.body.Games;
+    }
+
     curExpressions = curExpressions.join(', ');
     updateExpression = updateExpression.concat(curExpressions);
     
