@@ -82,7 +82,9 @@ module.exports = {
       ID: events.pathParameters.ID
     }
 
-    if(PartyAPI.Get(request.ID) === false){
+    
+
+    if (!(await PartyAPI.Get(request.ID))){
       return responseUtil.Build(403, "Party ID not valid");
     }
 
