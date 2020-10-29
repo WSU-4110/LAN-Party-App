@@ -209,33 +209,33 @@ resources:
         AttributeDefinitions:
           - AttributeName: ID
             AttributeType: S
-          - AttributeName: GameName
+          - AttributeName: PartyName
             AttributeType: S
           - AttributeName: Host
             AttributeType: S
           - AttributeName: PartyLocation
             AttributeType: S
-          - AttributeName: GameTime
+          - AttributeName: PartyTime
             AttributeType: S
         KeySchema:
           - AttributeName: ID
             KeyType: HASH
         GlobalSecondaryIndexes:
-          - IndexName: Name
+          - IndexName: PartyName
             KeySchema:
-              - AttributeName: Name
+              - AttributeName: PartyName
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
-          - IndexName: Location
+          - IndexName: PartyLocation
             KeySchema:
-              - AttributeName: Location
+              - AttributeName: PartyLocation
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
-          - IndexName: Time
+          - IndexName: PartyTime
             KeySchema:
-              - AttributeName: Time
+              - AttributeName: PartyTime
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
