@@ -82,6 +82,10 @@ module.exports = {
       ID: events.pathParameters.ID
     }
 
+    if(PartyAPI.Get(request.ID) === false){
+      return responseUtil.Build(403, "Party ID not valid");
+    }
+
     console.log(request.body);
     //A string for the updates
     let updateExpression = 'set ';
