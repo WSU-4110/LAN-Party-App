@@ -116,7 +116,7 @@ module.exports = {
       let result = await dynamoDB.get(params).promise(); // grab the user
 
       if (result.Item) return result.Item;
-      else throw new exception;
+      else return false;
     } catch (err) {
       console.log(err.message);
       throw new Error("Get Account Error");
@@ -141,6 +141,8 @@ module.exports = {
   AuthByEmailPassword: async function (Email, Password) {
     try {
       let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); // connect to the database
+      
+      Email = Email.toLowerCase(); // change the email to lowercase
 
       // create the parameters for the query
       let params = {
@@ -175,9 +177,11 @@ module.exports = {
   },
 
   // UPDATE THE ACCOUNT /////////////////////////////////////////////////////////////////////////////////////////////
-  Update: async function (ID, Values, updateExpression) {
+  Update: async function (account, Values, updateExpression) {
     try {
       let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); // connect to the database
+
+      let ID = account.ID;
 
       // create the parameters for the update
       let params = {

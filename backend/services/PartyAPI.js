@@ -9,7 +9,7 @@ const response = require("../utilities/response");
 
 // Updating AWS settings
 AWS.config.update({ region: "us-east-2" }); // region
-let tableName = 'P-LAN'; // the name of our account table in the AWS database
+let tableName = 'PARTIES-LAN'; // the name of our account table in the AWS database
 
 module.exports = {
 

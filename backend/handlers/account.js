@@ -162,20 +162,10 @@ module.exports = {
             let request = JSON.parse(event.body);
             request.ID = event.pathParameters.ID;
 
-            // we need to make sure that an email, password, and ID were sent
-            if (!request.Email)
-                throw new Error("Account Email Required!");
-
-            if (!request.Password)
-                throw new Error("Account Password Required!");
-            
-            if (!request.ID)
-                throw new Error("Account ID Required!");
-
-            // authenticate the account before continuing
-            let account = await AccountAPI.AuthByEmailPassword(request.Email, request.Password);
-            if (!account)
-                throw new Error("Invalid email and password!");
+            // we need to make sure that a valid ID was sent
+            let ValidID = await AccountAPI.Get(request.ID);
+            if (!ValidID)
+                throw new Error("Invalid Account ID!");
 
             // these are the values that we need for updating Dynamo, we will concat them with whatever we are updating
             let updateExpression = "SET ";

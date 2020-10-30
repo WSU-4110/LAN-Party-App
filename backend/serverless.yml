@@ -164,7 +164,7 @@ functions:
     events:
       - http:
           method: PATCH
-          path: /Party/{ID}/Update
+          path: /Party/{ID}
           cors: true
 
   # image functions
@@ -242,7 +242,7 @@ resources:
     parties:
       Type: "AWS::DynamoDB::Table"
       Properties:
-        TableName: P-LAN
+        TableName: PARTIES-LAN
         AttributeDefinitions:
           - AttributeName: ID
             AttributeType: S
