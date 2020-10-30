@@ -39,6 +39,15 @@ provider:
 
 functions:
 
+  images-upload:
+    handler: handlers/images.upload
+    name: images-upload
+    events:
+      - http:
+          path: /images/upload
+          method: post
+          cors: true # solves cors issue
+
   # account functions
   SignUp:
     handler: handlers/account.SignUp
@@ -170,7 +179,7 @@ resources:
         AttributeDefinitions:
           - AttributeName: ID
             AttributeType: S
-          - AttributeName: Name
+          - AttributeName: GameName
             AttributeType: S
           - AttributeName: Genre
             AttributeType: S
@@ -200,39 +209,69 @@ resources:
         AttributeDefinitions:
           - AttributeName: ID
             AttributeType: S
-          - AttributeName: Name
+          - AttributeName: PartyName
             AttributeType: S
           - AttributeName: Host
             AttributeType: S
-          - AttributeName: Location
+          - AttributeName: PartyLocation
             AttributeType: S
-          - AttributeName: Time
+          - AttributeName: PartyTime
             AttributeType: S
         KeySchema:
           - AttributeName: ID
             KeyType: HASH
         GlobalSecondaryIndexes:
-          - IndexName: Name
+          - IndexName: PartyName
             KeySchema:
-              - AttributeName: Name
+              - AttributeName: PartyName
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
-          - IndexName: Location
+          - IndexName: PartyLocation
             KeySchema:
-              - AttributeName: Location
+              - AttributeName: PartyLocation
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
-          - IndexName: Time
+          - IndexName: PartyTime
             KeySchema:
-              - AttributeName: Time
+              - AttributeName: PartyTime
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
           - IndexName: Host
             KeySchema:
               - AttributeName: Host
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+
+    # friends table
+    friends:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: FRIENDS-LAN
+        AttributeDefinitions:
+          - AttributeName: ID
+            AttributeType: S
+          - AttributeName: UserOneID 
+            AttributeType: S
+          - AttributeName: UserTwoID 
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ID
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: UserOneID
+            KeySchema:
+              - AttributeName: UserOneID
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+          - IndexName: UserTwoID
+            KeySchema:
+              - AttributeName: UserTwoID
                 KeyType: HASH
             Projection:
               ProjectionType: ALL

@@ -1,43 +1,21 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import MapComponent from '../GoogleMap/GoogleMap';
 import cookies from 'js-cookie';
 import {Button, Accordion, Card} from 'react-bootstrap';
-import { UserContext } from '../../UserContext'
+import { UserContext } from '../../UserContext';
+import { HomeRenderContext } from '../../HomeRenderContext'
 import ViewParty from '../ViewParty/ViewParty';
+import axios from 'axios';
 
-const tempPartyList = [
-  {
-    ID: "123",
-    Host: "Thadd",
-    Name: "Paris LAN",
-    Location: "Paris",
-    Latitude: 48.856614,
-    Longitude: 2.3522219,
-    Date: "Thu Oct 22 2020 00:58:34 GMT-0400"
-  },
-  {
-    ID: "1234",
-    Host: "Thadd",
-    Name: "Detroit LAN",
-    Location: "Detroit",
-    Latitude: 42.331427,
-    Longitude: -83.0457538,
-    Date: "Thu Oct 22 2020 00:58:34 GMT-0400"
-  },
-  {
-    ID: "12345",
-    Host: "Thadd",
-    Name: "Australia LAN",
-    Location: "Australia",
-    Latitude: 49.856614,
-    Longitude: 2.3532219,
-    Date: "Thu Oct 22 2020 00:58:34 GMT-0400"
-  }
-]
+
 
 const Home = (props) => {
+  const { REACT_APP_URL } = process.env;
   const [user, setUser] = useContext(UserContext);
+  const [homeRender, setHomeRender] = useContext(HomeRenderContext);
+  const [parties, setParties] = useState([]);
+
   const toHostParty = () => {
     props.history.push("/host");
   }
@@ -50,6 +28,27 @@ const Home = (props) => {
     props.history.push("/ViewParty");
   }
 
+  const getParties = () => {
+    const link = `${REACT_APP_URL}Parties`;
+    axios
+      .get(link)
+      .then((res) => {
+        console.log("parties", res);
+        setParties(res.data.Parties);
+      })
+      .catch((error) => console.log(error))
+  }
+
+  useEffect(()=> {
+    getParties();
+  }, [])
+
+  useEffect(()=>{
+    getParties();
+  } , [homeRender])
+
+
+  
   return(
     <div>
       <MapComponent />
@@ -72,7 +71,7 @@ const Home = (props) => {
       </div>
       }
       <Accordion>
-        {tempPartyList.map((p, i) => (
+        {parties.map((p, i) => (
           <Card>
             <Accordion.Toggle 
             style={{
@@ -83,13 +82,17 @@ const Home = (props) => {
             as={Card.Header} 
             eventKey={p.ID}>
               {p.Name} <br/>
-              Host: {p.Host} <br/>
+              Host: {p.HostUsername} <br/>
               Location: {p.Location} <br/>
               Date: {p.Date} <br/>
             </Accordion.Toggle>
             <Accordion.Collapse eventKey={p.ID}>
               <Card.Body>
-                <ViewParty location={p.Location} />
+                <ViewParty 
+                location={p.Location} 
+                name={p.Name}
+                host={p.HostUsername} 
+                date={p.Date} />
               </Card.Body>
             </Accordion.Collapse>
           </Card>
@@ -98,5 +101,6 @@ const Home = (props) => {
     </div>
   )
 }
+
 
 export default Home;

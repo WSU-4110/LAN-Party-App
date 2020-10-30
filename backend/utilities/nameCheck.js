@@ -16,5 +16,15 @@ module.exports = {
         name = name.split(/\s\s+/).join(' ');
 
         return name;
+    },
+
+    //Check for valid usernames
+    isValidUserName: function (userName){
+        //Check if the username has spaces
+        if(/\s/.test(userName)){
+            return false;
+        }
+
+        return true;
     }
 };

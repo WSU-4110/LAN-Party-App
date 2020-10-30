@@ -33,20 +33,25 @@ module.exports = {
             // let's have a create date for our new account
             request.CreateDate = moment().toISOString();
 
-            // let's check and see if the user already has an account
+            // let's check and see if this email is already being used
             let exists = await AccountAPI.GetByEmail(request.Email);
+            
+            // let's check and see if this username is already used
+            let exists2 = await AccountAPI.GetByUsername(request.Username);
 
-            // if they don't already have an account then we can make them one
+            // if the entered username and email are unique then we can proceed
             if (!exists) {
-                let AccountID = request.ID ? request.ID : false;
-                await AccountAPI.Save(AccountID, request);
+                if(!exists2) {
+                    let AccountID = request.ID ? request.ID : false;
+                    await AccountAPI.Save(AccountID, request);
 
-                let result = {
-                    Message: "Account created, log in to continue!",
-                    Account: request
-                };
+                    let result = {
+                        Message: "Account created, log in to continue!",
+                        Account: request
+                    };
 
-                return responseUtil.Build(200, result);
+                    return responseUtil.Build(200, result);
+                } else throw new Error("Username Already Exists!");
             } else throw new Error("Email Already Exists!");
         } catch (err) {
             console.error("New Account Error:", err);
@@ -118,6 +123,7 @@ module.exports = {
         }
     },
 
+    // VIEW ALL ACCOUNTS //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ViewAll: async function () {
         try {
             // return the account information

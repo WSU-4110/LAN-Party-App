@@ -7,9 +7,11 @@ import Login from './components/Register/Login';
 import User from './components/User/User';
 import Host from './components/HostParty/HostParty'
 import ViewParty from './components/ViewParty/ViewParty';
+import PartySearch from './components/PartySearch/PartySearch';
 import cookies from 'js-cookie';
 import { UserContext } from './UserContext';
 import './App.css';
+import axios from 'axios';
 
 function App() {
   const [user, setUser] = useContext(UserContext);
@@ -25,9 +27,11 @@ function App() {
       })
     }
   }
+  
   useEffect(()=>{
     updateUser();
   } , [])
+  
   return (
     <Router>
       <Navigation user={user}/>
@@ -46,6 +50,7 @@ function App() {
           <Route path="/user" exact component={User} />
           <Route path="/host" exact component={Host} />
           <Route path="/viewParty" exact component={ViewParty} />
+          <Route path="/PartySearch" exact component={PartySearch} />
         </Switch>
       </div>
     </Router>

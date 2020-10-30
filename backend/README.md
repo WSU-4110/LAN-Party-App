@@ -11,3 +11,22 @@ This folder is the backend code for our app. We are using Serverless and DynamoD
 # Sprint 1 code
 Front end: https://github.com/WSU-4110/LAN-party-frontend
 Back end: https://github.com/WSU-4110/LAN-party-backend
+
+# Enviroments
+
+# Usage
+| Endpoint | Type | Function |
+| | | |
+| | | |
+| | | |
+| | | |
+| | | |
+| | | |
+| | | |
+
+# Schema
+
+## Account
+## Party
+## Friend
+## Game

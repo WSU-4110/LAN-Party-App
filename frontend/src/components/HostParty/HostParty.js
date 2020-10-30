@@ -8,8 +8,12 @@ import cookies from 'js-cookie';
 import axios from 'axios';
 import Geocode from 'react-geocode';
 import { UserContext } from '../../UserContext'
+<<<<<<< HEAD
 // import { PartiesContext } from '../../PartiesContext'
 // import { HomeRenderContext } from '../../HomeRenderContext'
+=======
+import { HomeRenderContext } from '../../HomeRenderContext'
+>>>>>>> thadd-wip
 import "react-datepicker/dist/react-datepicker.css"
 
 Geocode.setApiKey("AIzaSyAHoOsaxhFYc2fQlGdr-5Mdep3UVkfpfP4");
@@ -19,7 +23,11 @@ Geocode.enableDebug();
 const HostParty = (props) => {
   const { REACT_APP_URL } = process.env;
   const [user, setUser] = useContext(UserContext);
+<<<<<<< HEAD
   // const [homeRender, setHomeRender] = useContext(HomeRenderContext);
+=======
+  const [homeRender, setHomeRender] = useContext(HomeRenderContext);
+>>>>>>> thadd-wip
   const { register, handleSubmit, errors } = useForm();
   // const [hours, setHours] = useState();
   // const [minutes, setMinutes] = useState();
@@ -44,8 +52,13 @@ const HostParty = (props) => {
       // Host: cookies.get("ID"),
       Host: user.ID,
       HostUsername: user.Username,
+<<<<<<< HEAD
       PartyName: data.Title,
       PartyLocation: data.Location,
+=======
+      Name: data.Title,
+      Location: data.Location,
+>>>>>>> thadd-wip
       Latitude: latitude,
       Longitude: longitude,
       PartyTime: startDate
@@ -60,7 +73,11 @@ const HostParty = (props) => {
       .post(link, payload, headers)
       .then(res => {
         console.log(res);
+<<<<<<< HEAD
         // setHomeRender({ render: !homeRender.render })
+=======
+        setHomeRender({ render: !homeRender.render })
+>>>>>>> thadd-wip
       })
       .catch((error) => console.log(error));
 
