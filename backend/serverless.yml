@@ -160,7 +160,7 @@ functions:
 
   # image functions
   UploadImage:
-    handler: handlers/image.Upload
+    handler: utilities/image.Upload
     events:
       - http:
           method: POST

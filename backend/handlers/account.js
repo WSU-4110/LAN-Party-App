@@ -208,6 +208,12 @@ module.exports = {
                 curExpressions = curExpressions.concat("Email = :e");
             }
 
+            // if we are updating the Avatar, add it to the updateValues and curExpressions
+            if (request.Avatar) {
+                updateValues[":a"] = request.Avatar;
+                curExpressions = curExpressions.concat("Avatar = :a"); 
+            }
+
             // update the UpdateDate
             updateValues[":d"] = moment().toISOString(); // let's take note of when we updated this account
             curExpressions = curExpressions.concat("UpdateDate = :d");
@@ -217,7 +223,7 @@ module.exports = {
             updateExpression = updateExpression.concat(curExpressions);
 
             // call the API
-            let response = await AccountAPI.Update(request.ID, updateValues, updateExpression);
+            let response = await AccountAPI.Update(request, updateValues, updateExpression);
 
             // if we returned with success, then return the new account
             if (response) {
