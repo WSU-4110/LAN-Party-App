@@ -1,0 +1,25 @@
+.form-container {
+    width: 100vw;
+    height: inherit;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .form-content {
+    width: 90%;
+  }
+  .form-content form input {
+    background-color: #4a4c51;
+    border-color: #4a4c51;
+    color: #fff
+  }
+  .form-content form input:focus {
+    filter: brightness(0.8);
+    color: #000;
+  }
+  
+  .component-header {
+    padding: 20px 0;
+    text-align: center;
+  }

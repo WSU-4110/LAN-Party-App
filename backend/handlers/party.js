@@ -43,13 +43,25 @@ module.exports = {
 
     // check that the host exists
     try {
-      await AccountAPI.Get(request.Host);
+      request.HostUsername = await AccountAPI.Get(request.Host);
+      request.HostUsername = request.HostUsername.Username;
     } catch (err){
       return responseUtil.Build(403, "Host ID invalid");
     }
     
+    //If there was no intent attached, assume casual
+    if(!request.hasOwnProperty("Intent")){
+      request.Intent = "Casual";
+    }
+
+    //If there were games attached, add them. Otherwise, make the list blank
+    if(!request.hasOwnProperty("Games")){
+      request.Games = [];
+    }
+
     request.Attendees = [];
 
+    
 
     let response = await PartyAPI.Save(shortid.generate(), request);
 
@@ -68,6 +80,12 @@ module.exports = {
     let request = {
       body: JSON.parse(events.body),
       ID: events.pathParameters.ID
+    }
+
+    
+
+    if (!(await PartyAPI.Get(request.ID))){
+      return responseUtil.Build(403, "Party ID not valid");
     }
 
     console.log(request.body);
@@ -106,14 +124,16 @@ module.exports = {
     if (request.body.hasOwnProperty('Host')){
       // check that the host exists
       try {
-        await AccountAPI.Get(request.body.Host);
+        request.body.HostUsername = await AccountAPI.Get(request.body.Host);
+        request.body.HostUsername = request.body.HostUsername.Username
       } catch (err){
         return responseUtil.Build(403, "Host doesn't exist!");
       }
   
       //Update the expressions
-      curExpressions = curExpressions.concat('Host = :h')
+      curExpressions = curExpressions.concat('Host = :h, HostUsername = :u')
       updateValues[':h'] = request.body.Host;
+      updateValues[':u'] = request.body.HostUsername;
     }
     
 
@@ -143,6 +163,18 @@ module.exports = {
       updateValues[':g'] = request.body.AgeGate;
     }
     
+    //Check for games
+    if(request.body.hasOwnProperty('Games')){
+      curExpressions = curExpressions.concat('Games = :m');
+      updateValues[':m'] = request.body.Games;
+    }
+
+    //Check for intent
+    if(request.body.hasOwnProperty('Intent')){
+      curExpressions = curExpressions.concat('Intent = :i');
+      updateValues[':i'] = request.body.Intent;
+    }
+
     curExpressions = curExpressions.join(', ');
     updateExpression = updateExpression.concat(curExpressions);
     
