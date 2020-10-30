@@ -131,5 +131,76 @@ module.exports = {
             console.error("View Accounts Error:", err);
             return responseUtil.Build(500, { Message: err.message });
         }
+    },
+
+    UpdateFriends: async function(events) {
+        if(!events){
+            return responseUtil.Build(204, "No information was sent");
+        }
+
+        //Get the events
+        let request = events.body;
+        request.SenderID = events.pathParameters;
+
+        //Check that the ID is valid
+        try {
+            let sender = await AccountAPI.Get(request.SenderID);
+        } catch (err) {
+            return responseUtil.Build(403, "Sender ID not valid!");
+        }
+
+        //Check if the request had request
+        if(request.hasOwnProperty("Requested")){
+            //Check if the requested id is valid
+            try {
+                let requested = await AccountAPI.Get(request.Requested);
+            } catch (err){
+                return responseUtil.Build(403, "Requested ID not valid!");
+            }
+            //Save the request to the sender's account
+            let updateExpression = 'set FriendRequests = :f';
+
+            //If the sender has no friends, make sure the item is at least initialized
+            if(!sender.hasOwnProperty("FriendRequests")){
+                sender.FriendRequests = [];
+            }
+            let updateValues = {
+                ':f': sender.FriendRequests.concat({
+                    ID: requested.ID,
+                    Username: requested.Username,
+                    Sender: true
+                })
+            }
+            
+            try {
+                let result = await AccountAPI.Update(sender.ID, updateValues, updateExpression);
+
+                if(!result){
+                    return responseUtil.Build(500, "Could not update friends list");
+                } else {
+                    //Repeat for the recipient
+                    if(!requested.hasOwnProperty('FriendRequests')){
+                        requested.FriendRequests = [];
+                    }
+
+                    updateValues = {
+                        ':f': requested.FriendRequests.concat({
+                            ID: sender.ID,
+                            Username: sender.Username,
+                            Sender: false
+                        })
+                    };
+                    result = await AccountAPI.Update(sender.ID, updateValues, updateExpression);
+
+                    if(!result){
+                        return responseUtil.Build(500, "Could not update friends list");
+                    } else {
+                        return responseUtil.Build(200, "Request sent");
+                    }
+                }
+            } catch (err) {
+                return responseUtil.Build(500, "Could not update friends list");
+            }
+        }
     }
 };
