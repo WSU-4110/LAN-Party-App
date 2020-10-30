@@ -7,21 +7,6 @@ const responseUtil = require("../utilities/response");
 const crypto = require("crypto");
 
 module.exports = {
-    Test: async function () {
-        try{   
-         
-            //let response = JSON.parge(event.body);
-            let idd = process.env.S3_ACCESS_ID;
-
-            let result = {
-                Message: "success!",
-                Account: idd
-            };
-            return responseUtil.Build(204, result);
-        } catch (err) {
-            return responseUtil.Build(500, { Message: err.message });
-        }
-    },
 
     // SIGN UP FOR AN ACCOUNT //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     SignUp: async function (event) {
@@ -217,9 +202,9 @@ module.exports = {
 
             // if we returned with success, then return the new account
             if (response) {
-                response.Message = "Account updated!";
-                return responseUtil.Build(200, response);
-            } return responseUtil.Build(500, { Message: "No Updates Were Requested." }); // else, return an error
+                let UpdatedAccount = await AccountAPI.Get(request.ID);
+                return responseUtil.Build(200, UpdatedAccount);
+            } else return responseUtil.Build(500, { Message: "No Updates Were Requested." }); // else, return an error
         } catch (err) {
             return responseUtil.Build(500, { Message: err.message });
         }

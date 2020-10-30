@@ -8,3 +8,4 @@ package-lock.json
 # enviroment variables
 secrets.yml
 .env
+env.yml

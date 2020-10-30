@@ -11,10 +11,6 @@ service: only-lans
 # we can pin our service to only deploy with a specific Serverless version
 frameworkVersion: '2'
 
-package:
-  exclude:
-    - secrets.yml # let's not upload this file to serverless
-
 provider:
   name: aws
   logRetentionInDays: 30 # avoid meaningless bills
@@ -23,11 +19,6 @@ provider:
   versionFunctions: false
   runtime: nodejs12.x
   region: us-east-2
-
-  # enviroment variables
-  enviroment:
-    S3_ACCESS_ID: ${self:custom.secrets.S3_ACCESS_ID}
-    S3_ACCESS_SECRET: ${self:custom.secrets.S3_ACCESS_SECRET}
 
   # giving users appropriate permissions to the database, parameters, and any other resources they may need for this service
   iamRoleStatements:
@@ -46,27 +37,7 @@ provider:
       Action: "kms:Decrypt"
       Resource: "*"
 
-custom:
-  stage: ${opt:stage, self:provider.stage}
-  secrets: ${file(secrets.yml):${self:custom.stage}}
-
 functions:
-  Test:
-    handler: handlers/account.Test
-    events:
-      - http:
-          method: GET
-          path: /Test
-          cors: true
-
-  images-upload:
-    handler: handlers/images.upload
-    name: images-upload
-    events:
-      - http:
-          path: /images/upload
-          method: post
-          cors: true # solves cors issue
 
   # account functions
   SignUp:

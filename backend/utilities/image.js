@@ -37,8 +37,8 @@ module.exports = {
     let ReturnData = await s3.getSignedUrl("putObject", params);
 
     let response = {
-      SignedRequest: ReturnData,
-      URL: `https://${S3_BUCKET}.s3.amazonaws.com/${FileName + '-' + guid}`,
+      signedRequest: ReturnData,
+      url: `https://${S3_BUCKET}.s3.amazonaws.com/${FileName + '-' + guid}`,
     };
 
     return responseUtil.Build(200, response);
