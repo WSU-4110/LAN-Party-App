@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 // import { GoogleMap, Marker } from "react-google-maps"
 import { compose, withProps } from "recompose";
 import {
@@ -7,25 +7,12 @@ import {
   GoogleMap,
   Marker
 } from "react-google-maps";
+import { PartiesContext } from '../../PartiesContext';
 
-let tempList = [
-  {
-    Host: "Thadd",
-    Name: "Detroit LAN",
-    Location: "Detroit",
-    Latitude: 42.331427,
-    Longitude: -83.0457538,
-    Date: "Thu Oct 22 2020 00:58:34 GMT-0400"
-  },
-  {
-    Host: "Thadd",
-    Name: "Paris LAN",
-    Location: "Paris",
-    Latitude: 48.856614,
-    Longitude: 2.3522219,
-    Date: "Thu Oct 22 2020 00:58:34 GMT-0400"
-  }
-]
+const PartyList = () => {
+  const [parties, setParties] = useContext(PartiesContext);
+  return parties;
+}
 
 const MapComponent = compose(
   withProps({
@@ -47,9 +34,9 @@ const MapComponent = compose(
     {/* {
       // <Marker color="#cdcdcd" position={{ lat: 42.331429, lng: -83.045753 }} />
     } */}
-    {tempList.map((host, i) => {
+    {props.markerList.map((host, i) => {
         if (host.Latitude && host.Longitude) {
-          console.log("TEST", host.Latitude);
+          // console.log("TEST", host.Latitude);
          return(<Marker
             key={i}
             position={{
@@ -64,4 +51,14 @@ const MapComponent = compose(
   </GoogleMap>
 ));
 
-export default MapComponent;
+
+
+const Map = () => {
+  const [parties, setParties] = useContext(PartiesContext);
+  return (
+    <MapComponent markerList={parties} />
+  )
+}
+
+
+export default Map;
