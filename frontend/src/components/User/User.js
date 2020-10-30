@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Table, Button, Accordion, Card } from 'react-bootstrap';
 import cookies from 'js-cookie';
 import axios from 'axios';
@@ -21,12 +21,8 @@ const User = () => {
 
   let image_array = [];
 
-  const updateUser = (e) => {
+  const updateUser = (e, url) => {
     e.preventDefault();
-
-    const payload = {
-      
-    }
 
     const headers = {
       headers: {
@@ -34,12 +30,21 @@ const User = () => {
       }
     };
     // PATCH URL
-    const Link = `${REACT_APP_URL}Account/${user.ID}/Update`;
+    const Link = `${REACT_APP_URL}Account/${user.ID}`;
+
+    const payload = {
+      Avatar: url
+    }
 
     axios
       .patch(Link, payload, headers)
       .then((res) => {
-        console.log("res: ", res);
+        console.log("patch res: ", res);
+        setAvatar(res.data.Avatar);
+        setUser({
+          ...res.data,
+        })
+        cookies.set("Avatar", res.data.Avatar);
       })
       .catch((error) => console.log(error));
   };
@@ -85,6 +90,8 @@ const User = () => {
             // console.log("url:", url);
             // console.log("url_state:", url_state);
             image_array.push(url);
+            setAvatar(url);
+            updateUser(e, url);
           })
           .catch((error) => {
             alert("ERROR " + JSON.stringify(error));
@@ -95,16 +102,12 @@ const User = () => {
         alert(JSON.stringify(error));
       });
   }
-
   /**
-   * 
-   * 
    * 
    * END IMAGE UPLOAD
    * 
-   * 
    */
-  console.log('user avatar', user.Avatar);
+
   return(
     <div style={{backgroundColor: ""}}>
       <div className="userHeader">

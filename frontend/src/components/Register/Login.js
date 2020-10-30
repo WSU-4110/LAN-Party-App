@@ -37,6 +37,7 @@ const Login = (props) => {
         cookies.set("Username", res.data.Username, {expires: inAnHour});
         cookies.set("ID", res.data.ID, {expires: inAnHour});
         cookies.set("Email", res.data.Email);
+        cookies.set("Avatar", res.data.Avatar);
         cookies.set("Logged", "true", {expires: inAnHour});
       })
       .catch((error) => console.log(error));

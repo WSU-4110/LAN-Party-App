@@ -23,6 +23,7 @@ function App() {
         Username: cookies.get("Username"),
         Email: cookies.get("Email"),
         ID: cookies.get("ID"),
+        Avatar: cookies.get("Avatar"),
         LoggedIn: true
       })
     }
