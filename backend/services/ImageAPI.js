@@ -7,8 +7,8 @@ const AWS = require("aws-sdk");
 // Updating AWS settings
 AWS.config.update({
   region: "us-east-2",
-  accessKeyId: "AKIAUC5UTE4JYGPWJTXP", // process.env.S3_ACCESS_ID,
-  secretAccessKey: "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" // process.env.S3_ACCESS_SECRET
+  accessKeyId: process.env.S3_ACCESS_ID,
+  secretAccessKey: process.env.S3_ACCESS_SECRET
 });
 
 const S3_BUCKET = "lan-party-images";
