@@ -3,7 +3,8 @@ import { NavLink } from 'react-router-dom';
 import MapComponent from '../GoogleMap/GoogleMap';
 import cookies from 'js-cookie';
 import {Button, Accordion, Card} from 'react-bootstrap';
-import { UserContext } from '../../UserContext'
+import { UserContext } from '../../UserContext';
+import { HomeRenderContext } from '../../HomeRenderContext'
 import ViewParty from '../ViewParty/ViewParty';
 import axios from 'axios';
 
@@ -12,7 +13,9 @@ import axios from 'axios';
 const Home = (props) => {
   const { REACT_APP_URL } = process.env;
   const [user, setUser] = useContext(UserContext);
+  const [homeRender, setHomeRender] = useContext(HomeRenderContext);
   const [parties, setParties] = useState([]);
+
   const toHostParty = () => {
     props.history.push("/host");
   }
@@ -35,9 +38,14 @@ const Home = (props) => {
       })
       .catch((error) => console.log(error))
   }
+
+  useEffect(()=> {
+    getParties();
+  }, [])
+
   useEffect(()=>{
     getParties();
-  } , [])
+  } , [homeRender])
 
 
   
@@ -73,18 +81,18 @@ const Home = (props) => {
             }} 
             as={Card.Header} 
             eventKey={p.ID}>
-              {p.PartyName} <br/>
-              Host: {p.HostName} <br/>
-              Location: {p.PartyLocation} <br/>
-              Date: {p.PartyTime} <br/>
+              {p.Name} <br/>
+              Host: {p.HostUsername} <br/>
+              Location: {p.Location} <br/>
+              Date: {p.Date} <br/>
             </Accordion.Toggle>
             <Accordion.Collapse eventKey={p.ID}>
               <Card.Body>
                 <ViewParty 
-                Location={p.PartyLocation} 
-                Name={p.PartyName}
-                Host={p.HostName} 
-                Date={p.DateTime} />
+                location={p.Location} 
+                name={p.Name}
+                host={p.HostUsername} 
+                date={p.Date} />
               </Card.Body>
             </Accordion.Collapse>
           </Card>
