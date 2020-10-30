@@ -1,7 +1,7 @@
 import React, {useContext} from 'react';
 import { useForm } from "react-hook-form";
 import { Form, Button } from 'react-bootstrap';
-import { UserContext } from '../../UserContext';
+import { UserContext } from '../../context/UserContext';
 import axios from 'axios';
 import cookies from 'js-cookie';
 import './Register.css'
@@ -26,9 +26,11 @@ const Login = (props) => {
     axios
       .post(link, payload, headers)
       .then(res => {
-        console.log(res);
+        console.log(res.data.Avatar);
+        let avatar = res.data.Avatar ? res.data.Avatar : 'https://images.unsplash.com/photo-1602254872083-22caf4166bd7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60';
         setUser({
           ...res.data,
+          Avatar: avatar,
           LoggedIn: true
         })
         let inAnHour = new Date(new Date().getTime() + 60 * 60 * 1000);

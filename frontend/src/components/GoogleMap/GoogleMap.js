@@ -7,7 +7,7 @@ import {
   GoogleMap,
   Marker
 } from "react-google-maps";
-import { PartiesContext } from '../../PartiesContext';
+import { PartiesContext } from '../../context/PartiesContext';
 
 const PartyList = () => {
   const [parties, setParties] = useContext(PartiesContext);

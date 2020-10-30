@@ -2,8 +2,8 @@ import React, { useState, useContext } from 'react';
 import { Table, Button, Accordion, Card } from 'react-bootstrap';
 import cookies from 'js-cookie';
 import axios from 'axios';
-import './User.css'
-import { UserContext } from '../../UserContext'
+import './User.css';
+import { UserContext } from '../../context/UserContext'
 
 const User = () => {
   const { REACT_APP_URL } = process.env;
@@ -104,12 +104,12 @@ const User = () => {
    * 
    * 
    */
-
+  console.log('user avatar', user.Avatar);
   return(
     <div style={{backgroundColor: ""}}>
       <div className="userHeader">
         <div className="avatar-section">
-          <img className="avatar" src="https://images.unsplash.com/photo-1602254872083-22caf4166bd7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60" />
+          <img className="avatar" src={user.Avatar} />
           <input
             onChange={handleChange}
             ref={(ref) => {

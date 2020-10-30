@@ -9,7 +9,7 @@ import Host from './components/HostParty/HostParty'
 import ViewParty from './components/ViewParty/ViewParty';
 import PartySearch from './components/PartySearch/PartySearch';
 import cookies from 'js-cookie';
-import { UserContext } from './UserContext';
+import { UserContext } from './context/UserContext';
 import './App.css';
 import axios from 'axios';
 
