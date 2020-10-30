@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { NavLink } from 'react-router-dom';
-import MapComponent from '../GoogleMap/GoogleMap';
+import Map from '../GoogleMap/GoogleMap';
 import cookies from 'js-cookie';
 import {Button, Accordion, Card} from 'react-bootstrap';
 import { UserContext } from '../../UserContext';
+import { PartiesContext } from '../../PartiesContext'
 import { HomeRenderContext } from '../../HomeRenderContext'
 import ViewParty from '../ViewParty/ViewParty';
 import axios from 'axios';
@@ -14,7 +15,7 @@ const Home = (props) => {
   const { REACT_APP_URL } = process.env;
   const [user, setUser] = useContext(UserContext);
   const [homeRender, setHomeRender] = useContext(HomeRenderContext);
-  const [parties, setParties] = useState([]);
+  const [parties, setParties] = useContext(PartiesContext);
 
   const toHostParty = () => {
     props.history.push("/host");
@@ -51,7 +52,7 @@ const Home = (props) => {
   
   return(
     <div>
-      <MapComponent />
+      <Map />
       {user.LoggedIn===true 
       ?
         <div
