@@ -46,7 +46,7 @@ const HostParty = (props) => {
       Location: data.Location,
       Latitude: latitude,
       Longitude: longitude,
-      PartyTime: startDate
+      Date: startDate
     };
     const headers = {
       headers: {
