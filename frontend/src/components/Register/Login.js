@@ -25,9 +25,6 @@ const Login = (props) => {
     };
     const link = `${REACT_APP_URL}SignIn`;
 
-    let secureEmail = crypto.AES.encrypt(data.email, REACT_APP_SECRET_KEY);
-    let decryptedEmail = crypto.AES.decrypt(secureEmail, REACT_APP_SECRET_KEY);
-
     axios
       .post(link, payload, headers)
       .then(res => {
