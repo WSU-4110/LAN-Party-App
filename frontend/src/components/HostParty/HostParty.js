@@ -11,7 +11,7 @@ import { UserContext } from '../../context/UserContext'
 import { HomeRenderContext } from '../../context/HomeRenderContext'
 import "react-datepicker/dist/react-datepicker.css"
 
-Geocode.setApiKey(process.env.REACT_APP_URL);
+Geocode.setApiKey(process.env.REACT_APP_MAP_GEOCODE_KEY);
 Geocode.setLanguage("en");
 Geocode.enableDebug();
 
