@@ -45,6 +45,8 @@ const User = () => {
         setAvatar(res.data.Avatar);
         setUser({
           ...res.data,
+          Token: cookies.get("Token"),
+          LoggedIn: true
         })
         cookies.set("Avatar", res.data.Avatar);
       })
@@ -125,7 +127,7 @@ const User = () => {
             <div className="editButtonGroup">
               {editMode
                 ?
-                  <Form.Group controlId="file-upload">
+                  <Form.Group className="choose-image-form" controlId="file-upload">
                     <Form.Label className="filelabel">{chosenImage}</Form.Label>
                     <Form.Control
                       id="file-upload"
@@ -161,7 +163,7 @@ const User = () => {
             {chosenImage !== 'Choose Image'
             ?
               <Button
-                style={{marginTop:"-20px", marginBottom:"10px"}}
+                style={{marginTop:"-10px", marginBottom:"10px"}}
                 size="sm"
                 onClick={handleUpload} >
                 Confirm

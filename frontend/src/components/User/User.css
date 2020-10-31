@@ -63,13 +63,17 @@
   text-align: center;
 }
 
+.choose-image-form {
+  margin-bottom: 0 !important;
+}
 #file-upload {
-	width: 0.1px;
-  height: 0.1px;
-	opacity: 0;
+	/* width: 0.1px;
+  height: 0.1px; */
+	/* opacity: 0;
 	overflow: hidden;
 	position: absolute;
-  z-index: -1;
+  z-index: -1; */
+  display: none;
 }
 .filelabel {
   width: 144px;
