@@ -2,9 +2,9 @@
   background-color: #333F48;
   min-height: 30vh;
   display: flex;
-  align-items: center;
-  justify-content: space-around;
-  flex-direction: row;
+  /* align-items: center; */
+  /* justify-content: space-around; */
+  /* flex-direction: row;  */
 }
 
 .avatar-section {
@@ -12,11 +12,36 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  flex-basis: 50%;
+
+  display: flex;
+  flex-direction: column;
+}
+.imageContainer {
+  flex-basis: 75%;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.editButtonGroup {
+  flex-basis: 25%;
+
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center; */
+  align-items: center;
+  /* margin-bottom: 5px; */
 }
 
 .desc-section {
   font-size: 1.5em;
   color: #fff;
+  flex-basis: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
 }
 
 .card {
@@ -36,4 +61,40 @@
 
 .userpage-buttons {
   text-align: center;
+}
+
+#file-upload {
+	width: 0.1px;
+  height: 0.1px;
+	opacity: 0;
+	overflow: hidden;
+	position: absolute;
+  z-index: -1;
+}
+.filelabel {
+  width: 144px;
+  height: 30px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 5px;
+  font-size: 1em;
+  font-weight: 400;
+  padding: .15rem .50rem;
+  border-radius: .25rem;
+  color: white;
+  background-color: rgb(187, 60, 60);
+  display: inline-block;
+  text-align: center;
+}
+.filelabel:focus,
+.filelabel:hover {
+    background-color: rgb(172, 54, 54);
+}
+.filelabel {
+	cursor: pointer; /* "hand" cursor */
+}
+.filelabel:focus {
+	outline: 1px dotted #000;
+	outline: -webkit-focus-ring-color auto 5px;
 }

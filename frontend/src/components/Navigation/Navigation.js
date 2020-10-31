@@ -10,10 +10,6 @@ const Navigation = (props) => {
   const [user, setUser] = useContext(UserContext);
 
   const logout = () => {
-    cookies.remove("Username");
-    cookies.remove("ID");
-    cookies.remove("Email");
-    cookies.remove("Logged");
     // RESET THE GLOBAL VALUES
     setUser({
       LoggedIn: false,
@@ -23,6 +19,8 @@ const Navigation = (props) => {
       Token: '',
       ID: ''
     })
+    cookies.remove("Token");
+    cookies.remove("Avatar");
 
     props.history.push("/");
   }

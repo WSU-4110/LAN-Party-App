@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Table, Button, Accordion, Card } from 'react-bootstrap';
+import { Table, Button, Accordion, Card, Form } from 'react-bootstrap';
 import cookies from 'js-cookie';
 import axios from 'axios';
 import './User.css';
@@ -10,6 +10,8 @@ const User = () => {
   const [user, setUser] = useContext(UserContext);
   
   const [avatar, setAvatar] = useState();
+  const [editMode, setEditMode] = useState(false);
+  const [chosenImage, setChosenImage] = useState('Choose Image');
 
   /**
    * 
@@ -50,7 +52,10 @@ const User = () => {
   };
 
   let uploadInput, url_state;
-  const handleChange = (ev) => {};
+  const handleChange = (ev) => {
+    let filename = ev.target.value.split( '\\' ).pop();
+    setChosenImage(filename);
+  };
   const handleUpload = (e) => {
     e.preventDefault();
     let file = uploadInput.files[0];
@@ -92,6 +97,8 @@ const User = () => {
             image_array.push(url);
             setAvatar(url);
             updateUser(e, url);
+            setEditMode(false);
+            setChosenImage('Choose Image');
           })
           .catch((error) => {
             alert("ERROR " + JSON.stringify(error));
@@ -112,21 +119,56 @@ const User = () => {
     <div style={{backgroundColor: ""}}>
       <div className="userHeader">
         <div className="avatar-section">
-          <img className="avatar" src={user.Avatar} />
-          <input
-            onChange={handleChange}
-            ref={(ref) => {
-              uploadInput = ref;
-            }}
-            type="file"
-          />
-          <br />
-          <Button
-            size="sm"
-            onClick={handleUpload} 
-            style={{marginTop:"10px"}}>
-            Edit Avatar
-          </Button>
+          <div className='imageContainer'>
+            <img className="avatar" src={user.Avatar} />
+          </div>
+            <div className="editButtonGroup">
+              {editMode
+                ?
+                  <Form.Group controlId="file-upload">
+                    <Form.Label className="filelabel">{chosenImage}</Form.Label>
+                    <Form.Control
+                      id="file-upload"
+                      type="file" 
+                      name="fileInput"
+                      onChange={handleChange}
+                      // aria-describedby="emailReq"
+                      ref={(ref) => {
+                        uploadInput = ref;
+                      }} />
+                  </Form.Group>
+                : null
+              }
+            {/* <input
+              id="file-upload"
+              name="file"
+              onChange={handleChange}
+              ref={(ref) => {
+                uploadInput = ref;
+              }}
+              type="file"
+            />
+            <label for="file" id="filelabel">Choose a file</label> */}
+            {!editMode
+              ?
+                <Button
+                  size="sm"
+                  onClick={() => setEditMode(true)} >
+                  Edit Avatar
+                </Button>
+              : null
+            }
+            {chosenImage !== 'Choose Image'
+            ?
+              <Button
+                style={{marginTop:"-20px", marginBottom:"10px"}}
+                size="sm"
+                onClick={handleUpload} >
+                Confirm
+              </Button>
+            : null
+            }
+          </div>
         </div>
         <div className="desc-section">
           {user.Username}

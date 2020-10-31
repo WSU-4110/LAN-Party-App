@@ -11,7 +11,7 @@ import { UserContext } from '../../context/UserContext'
 import { HomeRenderContext } from '../../context/HomeRenderContext'
 import "react-datepicker/dist/react-datepicker.css"
 
-Geocode.setApiKey("AIzaSyAHoOsaxhFYc2fQlGdr-5Mdep3UVkfpfP4");
+Geocode.setApiKey(process.env.REACT_APP_URL);
 Geocode.setLanguage("en");
 Geocode.enableDebug();
 
@@ -40,7 +40,6 @@ const HostParty = (props) => {
     let longitude = await getLongitude(data.Location);
 
     const payload = {
-      // Host: cookies.get("ID"),
       Host: user.ID,
       HostUsername: user.Username,
       Name: data.Title,
