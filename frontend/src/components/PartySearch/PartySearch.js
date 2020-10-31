@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useContext} from 'react';
 import { useForm } from "react-hook-form";
 import { Form, Button } from 'react-bootstrap';
-import { UserContext } from '../../UserContext';
+import { UserContext } from '../../context/UserContext';
 import axios from 'axios';
 import cookies from 'js-cookie';
 import './PartySearch.css';

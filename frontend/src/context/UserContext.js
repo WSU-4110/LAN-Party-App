@@ -9,7 +9,8 @@ export const UserInfoProvider = (props) => {
     Email: '',
     Password: '',
     Token: '',
-    ID: ''
+    ID: '',
+    Avatar: ''
   });
 
   return(
