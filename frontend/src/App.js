@@ -32,7 +32,7 @@ function App() {
     axios
       .get(link, headers)
       .then((res) => {
-        console.log("account info", res.data)
+        // console.log("account info", res.data)
         setUser({
           ...res.data.Account,
           Token: cookies.get("Token"),
@@ -46,8 +46,6 @@ function App() {
     if (cookies.get("Token"))
       getAccountInfo();
   } , [])
-
-  console.log("user", user);
   
   return (
     <Router>

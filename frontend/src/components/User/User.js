@@ -5,11 +5,11 @@ import axios from 'axios';
 import './User.css';
 import { UserContext } from '../../context/UserContext'
 
-const User = () => {
+const User = (props) => {
   const { REACT_APP_URL } = process.env;
   const [user, setUser] = useContext(UserContext);
   
-  const [avatar, setAvatar] = useState();
+  const [avatar, setAvatar] = useState(user.Avatar);
   const [editMode, setEditMode] = useState(false);
   const [chosenImage, setChosenImage] = useState('Choose Image');
 
@@ -116,6 +116,13 @@ const User = () => {
    * END IMAGE UPLOAD
    * 
    */
+
+  useEffect(()=> {
+    // if the token expires while on this page and the user refresh
+    // then put them back to login page
+    if(!cookies.get("Token"))
+      props.history.push("/login")
+  })
 
   return(
     <div style={{backgroundColor: ""}}>
