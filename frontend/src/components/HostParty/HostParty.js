@@ -129,6 +129,18 @@ const HostParty = (props) => {
             {errors.email && <Form.Text className="text-danger" id="hardwareReq">Required</Form.Text>}
           </Form.Group>
           
+          {/* Minimum Age */}
+          <Form.Group controlId="formEmail">
+            <Form.Label>Minimum Age</Form.Label>
+            <Form.Control 
+              type="number" 
+              placeholder="Set Minimum Age" 
+              name="Age"
+              aria-describedby="ageReq"
+              ref={register({ required: true })} />
+            {errors.email && <Form.Text className="text-danger" id="hardwareReq">Required</Form.Text>}
+          </Form.Group>
+          
           <div style={{textAlign:"center"}}>
             <Button variant="primary" type="submit">
               Submit
