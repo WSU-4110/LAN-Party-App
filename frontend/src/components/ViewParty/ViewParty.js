@@ -23,6 +23,7 @@ const ViewParty=(props)=>{
         Location: {props.location}
         <br/>
         <p>Date: {props.date}</p>
+        <p>Hardware: {props.hardware}</p>
       </div>
       
       <Table striped bordered hover variant="dark">
