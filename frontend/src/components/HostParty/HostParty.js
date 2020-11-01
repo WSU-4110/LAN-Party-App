@@ -138,7 +138,7 @@ const HostParty = (props) => {
               name="Age"
               aria-describedby="ageReq"
               ref={register({ required: true })} />
-            {errors.email && <Form.Text className="text-danger" id="hardwareReq">Required</Form.Text>}
+            {errors.email && <Form.Text className="text-danger" id="ageReq">Required</Form.Text>}
           </Form.Group>
           
           <div style={{textAlign:"center"}}>
