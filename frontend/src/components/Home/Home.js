@@ -2,10 +2,10 @@ import React, { useState, useEffect, useContext, FormControl } from 'react';
 import { NavLink } from 'react-router-dom';
 import Map from '../GoogleMap/GoogleMap';
 import cookies from 'js-cookie';
-import {Button, Accordion, Card, Dropdown} from 'react-bootstrap';
-import { UserContext } from '../../UserContext';
-import { PartiesContext } from '../../PartiesContext'
-import { HomeRenderContext } from '../../HomeRenderContext'
+import {Button, Accordion, Card} from 'react-bootstrap';
+import { UserContext } from '../../context/UserContext';
+import { PartiesContext } from '../../context/PartiesContext'
+import { HomeRenderContext } from '../../context/HomeRenderContext'
 import ViewParty from '../ViewParty/ViewParty';
 import axios from 'axios';
 

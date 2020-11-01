@@ -7,12 +7,7 @@ import {
   GoogleMap,
   Marker
 } from "react-google-maps";
-import { PartiesContext } from '../../PartiesContext';
-
-const PartyList = () => {
-  const [parties, setParties] = useContext(PartiesContext);
-  return parties;
-}
+import { PartiesContext } from '../../context/PartiesContext';
 
 const MapComponent = compose(
   withProps({
@@ -22,7 +17,7 @@ const MapComponent = compose(
      * The key "AIzaSyBkNaAGLEVq0YLQMi-PYEMabFeREadYe1Q" can be ONLY used in this sandbox (no forked).
      */
     googleMapURL:
-      "https://maps.googleapis.com/maps/api/js?key=AIzaSyAHoOsaxhFYc2fQlGdr-5Mdep3UVkfpfP4&v=3.exp&libraries=geometry,drawing,places",
+      `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_MAP_API_KEY}&v=3.exp&libraries=geometry,drawing,places`,
     loadingElement: <div style={{ height: `100%` }} />,
     containerElement: <div style={{ height: `400px` }} />,
     mapElement: <div style={{ height: `100%` }} />
