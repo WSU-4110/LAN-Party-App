@@ -2,15 +2,13 @@ import React, { useState, useEffect, useContext, FormControl } from 'react';
 import { NavLink } from 'react-router-dom';
 import Map from '../GoogleMap/GoogleMap';
 import cookies from 'js-cookie';
-import {Button, Accordion, Card, Dropdown} from 'react-bootstrap';
+import {Button, Accordion, Card} from 'react-bootstrap';
 import { UserContext } from '../../context/UserContext';
 import { PartiesContext } from '../../context/PartiesContext'
 import { HomeRenderContext } from '../../context/HomeRenderContext'
 import ViewParty from '../ViewParty/ViewParty';
 import axios from 'axios';
 
-// RIP CustomToggle, will try again to use it for search, but I failed for sprint 2
-// -James
 
 const Home = (props) => {
   const { REACT_APP_URL } = process.env;
@@ -25,10 +23,6 @@ const Home = (props) => {
 
   const toLogin = () => {
     props.history.push("/login");
-  }
-
-  const toViewParty = () => {
-    props.history.push("/ViewParty");
   }
 
   const getParties = () => {

@@ -1,0 +1,55 @@
+.form-container {
+    width: 100vw;
+    height: inherit;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .form-content {
+    width: 90%;
+  }
+  .form-content form input {
+    background-color: #4a4c51;
+    border-color: #4a4c51;
+    color: #fff
+  }
+  .form-content form input:focus {
+    filter: brightness(0.8);
+    color: #000;
+  }
+  
+  .component-header {
+    padding: 20px 0;
+    text-align: center;
+  }
+
+  .avatar-section {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-basis: 50%;
+  
+    display: flex;
+    flex-direction: column;
+  }
+  .imageContainer {
+    flex-basis: 75%;
+  
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+  }
+  .searchAvatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-right: 20px;
+  }

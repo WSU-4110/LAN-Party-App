@@ -26,17 +26,18 @@ const Navigation = (props) => {
   }
 
   return(
-    <Navbar 
+    <Navbar
+      className = 'navbar-dark'
       expand="lg" 
       style={{
-        backgroundColor: "#1e2124", 
+        backgroundColor: "#000", 
         boxShadow: "0 2px 4px -1px rgba(0,0,0,0.25)",
         // filter: "brightness(0.6)"
       }}>
       <Navbar.Brand>
         <NavLink to="/" style={{color:"#fff", textDecoration:"none"}}>LanParty</NavLink>
       </Navbar.Brand>
-      <Navbar.Toggle aria-controls="basic-navbar-nav" />
+      <Navbar.Toggle aria-controls="basic-navbar-nav" style ={{color:"#fff"}} />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="mr-auto">
           {user.LoggedIn===true ? null
@@ -54,6 +55,9 @@ const Navigation = (props) => {
           <>
           <Nav.Link>
             <NavLink to="/user"style={{color:"#fff"}}>User</NavLink>
+          </Nav.Link>
+          <Nav.Link>
+            <NavLink to="/SearchUser"style={{color:"#fff"}}>SearchUser</NavLink>
           </Nav.Link>
           <Nav.Link href="/" style={{color:"#fff"}} onClick={logout}>
             Logout
