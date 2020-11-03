@@ -17,6 +17,7 @@ const Home = (props) => {
   const [user, setUser] = useContext(UserContext);
   const [homeRender, setHomeRender] = useContext(HomeRenderContext);
   const [parties, setParties] = useContext(PartiesContext);
+  const [search, setSearch] = useState('');
 
   const toHostParty = () => {
     props.history.push("/host");
@@ -49,8 +50,9 @@ const Home = (props) => {
     getParties();
   } , [homeRender])
 
-
-
+  const filteredParties = parties.filter( parties => {
+    return parties.Name.toLowerCase().includes( search.toLowerCase() )
+  } )
   
   return(
     <div>
@@ -74,9 +76,10 @@ const Home = (props) => {
       </div>
       }
 
+      <input type= "text" placeholder = "search parties" onChange = { e => setSearch(e.target.value)} />
 
       <Accordion>
-        {parties.map((p, i) => (
+        {filteredParties.map((p, i) => (
           <Card>
             <Accordion.Toggle 
             style={{
@@ -106,6 +109,5 @@ const Home = (props) => {
     </div>
   )
 }
-
 
 export default Home;
