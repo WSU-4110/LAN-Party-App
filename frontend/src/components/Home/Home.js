@@ -94,7 +94,7 @@ const Home = (props) => {
                 name={p.Name}
                 host={p.HostUsername} 
                 date={p.Date}
-                hardware={p.hardware}
+                hardware={p.HardwareReq}
                 age={p.MinAge} />
               </Card.Body>
             </Accordion.Collapse>
