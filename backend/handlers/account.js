@@ -220,10 +220,13 @@ module.exports = {
                 return responseUtil.Build(403, "Requested ID invalid");
             }
 
-            //Remove the confirmed item from the sender's friend request 
-            sender.FriendRequests.splice(
-                sender.FriendRequests.findIndex((element) =>{ element.ID === requested.ID}), 1);
-
+            try {
+                //Remove the confirmed item from the sender's friend request 
+                sender.FriendRequests.splice(
+                    sender.FriendRequests.findIndex((element) =>{ element.ID === requested.ID}), 1);
+            } catch(err) {
+                return responseUtil.Build(403, "Requested ID not found in sender's friend requests");
+            }
             //Values to store in the sender's table.
             let storeVal = {
                 ID: requested.ID,
