@@ -46,7 +46,9 @@ const HostParty = (props) => {
       Location: data.Location,
       Latitude: latitude,
       Longitude: longitude,
-      Date: startDate
+      Date: startDate,
+      HardwareReq: data.Hardware,
+      MinAge: data.Age
     };
     const headers = {
       headers: {
