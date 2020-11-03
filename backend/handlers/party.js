@@ -19,19 +19,19 @@ module.exports = {
     let request = JSON.parse(events.body);
     
     //Must have a name
-    if (!request.hasOwnProperty("PartyName"))
+    if (!request.hasOwnProperty("Name"))
       return responseUtil.Build(403, "Party must have a name");
 
     //Update the name to make sure it is valid
-    request.PartyName = nameUtil.isValidParty(request.PartyName);
+    request.Name = nameUtil.isValidParty(request.Name);
 
-    if(request.PartyName === false){
+    if(request.Name === false){
       return responseUtil.Build(403, "Party name not valid");
     }
 
     // ensure that the party has a location
-    if (!request.hasOwnProperty("PartyLocation") 
-    || request.PartyLocation === "")
+    if (!request.hasOwnProperty("Location") 
+    || request.Location === "")
       return responseUtil.Build(403, "Party must have a location");
 
     // add a time that the party was created
@@ -97,27 +97,27 @@ module.exports = {
     let updateValues = {};
 
     //Check if the name is exists
-    if(request.body.hasOwnProperty('PartyName')){
+    if(request.body.hasOwnProperty('Name')){
       //Update the name to make sure it's valid
-      request.body.PartyName = nameUtil.isValidParty(request.body.PartyName);
+      request.body.Name = nameUtil.isValidParty(request.body.Name);
 
       //Check if the name is valid 
-      if(request.body.PartyName === false){
+      if(request.body.Name === false){
         responseUtil.Build(403, "Party name not valid");
       }
 
       //Update the expressions
-      curExpressions = curExpressions.concat('PartyName = :n');
-      updateValues[':n'] = request.body.PartyName;
+      curExpressions = curExpressions.concat('Name = :n');
+      updateValues[':n'] = request.body.Name;
     }
 
     // ensure that the party has a location
-    if (request.body.hasOwnProperty('PartyLocation')
-      && request.body.PartyLocation !== ""){
+    if (request.body.hasOwnProperty('Location')
+      && request.body.Location !== ""){
         
       //Update the expressions
-      curExpressions = curExpressions.concat('PartyLocation = :l')
-      updateValues[':l'] = request.body.PartyLocation;
+      curExpressions = curExpressions.concat('Location = :l')
+      updateValues[':l'] = request.body.Location;
     }
 
     // ensure that there is a host
@@ -138,10 +138,10 @@ module.exports = {
     
 
     //Check times
-    if (request.body.hasOwnProperty('PartyTime')){
+    if (request.body.hasOwnProperty('Time')){
       //Update the expressions
-      curExpressions = curExpressions.concat('PartyTime = :t')
-      updateValues[':t'] = request.body.PartyTime;
+      curExpressions = curExpressions.concat('Time = :t')
+      updateValues[':t'] = request.body.Time;
     }
 
     //Check attendees

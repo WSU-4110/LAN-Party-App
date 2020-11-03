@@ -55,7 +55,6 @@ module.exports = {
                 } else throw new Error("Username Already Exists!");
             } else throw new Error("Email Already Exists!");
         } catch (err) {
-            console.error("New Account Error:", err);
             return responseUtil.Build(500, { Message: err.message });
         }
     },
@@ -90,7 +89,6 @@ module.exports = {
             // else, return an error
             return responseUtil.Build(500, { Message: "Account Login Error Detected." });
         } catch (err) {
-            console.error("Login Error:", err);
             return responseUtil.Build(500, { Message: err.message });
         }
     },
@@ -119,7 +117,6 @@ module.exports = {
                 return responseUtil.Build(200, result); // send the result
             } else return responseUtil.Build(500, { Message: "No Account With That ID." }); // else, return an error
         } catch (err) {
-            console.error("View Account Error:", err);
             return responseUtil.Build(500, { Message: err.message });
         }
     },
@@ -135,7 +132,6 @@ module.exports = {
                 return responseUtil.Build(200, accounts); // then, send the result
             } else return responseUtil.Build(500, { Message: "No Accounts Exist." }); // else, return an error
         } catch (err) {
-            console.error("View Accounts Error:", err);
             return responseUtil.Build(500, { Message: err.message });
         }
     },
@@ -151,20 +147,10 @@ module.exports = {
             let request = JSON.parse(event.body);
             request.ID = event.pathParameters.ID;
 
-            // we need to make sure that an email, password, and ID were sent
-            if (!request.Email)
-                throw new Error("Account Email Required!");
-
-            if (!request.Password)
-                throw new Error("Account Password Required!");
-            
-            if (!request.ID)
-                throw new Error("Account ID Required!");
-
-            // authenticate the account before continuing
-            let account = await AccountAPI.AuthByEmailPassword(request.Email, request.Password);
-            if (!account)
-                throw new Error("Invalid email and password!");
+            // we need to make sure that a valid ID was sent
+            let ValidID = await AccountAPI.Get(request.ID);
+            if (!ValidID)
+                throw new Error("Invalid Account ID!");
 
             // these are the values that we need for updating Dynamo, we will concat them with whatever we are updating
             let updateExpression = "SET ";
@@ -197,6 +183,12 @@ module.exports = {
                 curExpressions = curExpressions.concat("Email = :e");
             }
 
+            // if we are updating the Avatar, add it to the updateValues and curExpressions
+            if (request.Avatar) {
+                updateValues[":a"] = request.Avatar;
+                curExpressions = curExpressions.concat("Avatar = :a"); 
+            }
+
             // update the UpdateDate
             updateValues[":d"] = moment().toISOString(); // let's take note of when we updated this account
             curExpressions = curExpressions.concat("UpdateDate = :d");
@@ -206,15 +198,14 @@ module.exports = {
             updateExpression = updateExpression.concat(curExpressions);
 
             // call the API
-            let response = await AccountAPI.Update(request.ID, updateValues, updateExpression);
+            let response = await AccountAPI.Update(request, updateValues, updateExpression);
 
             // if we returned with success, then return the new account
             if (response) {
-                response.Message = "Account updated!";
-                return responseUtil.Build(200, response);
-            } return responseUtil.Build(500, { Message: "No Updates Were Requested." }); // else, return an error
+                let UpdatedAccount = await AccountAPI.Get(request.ID);
+                return responseUtil.Build(200, UpdatedAccount);
+            } else return responseUtil.Build(500, { Message: "No Updates Were Requested." }); // else, return an error
         } catch (err) {
-            console.error("Account Update Error:", err);
             return responseUtil.Build(500, { Message: err.message });
         }
     }

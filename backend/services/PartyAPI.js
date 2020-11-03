@@ -42,7 +42,7 @@ module.exports = {
     }
   },
 
-  Get: async function(ID){
+  Get: async function(ID) {
     try{
       // connect to the database
       let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); 

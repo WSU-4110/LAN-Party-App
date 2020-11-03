@@ -2,6 +2,10 @@
 node_modules/
 package-lock.json
 
-# Serverless directories
+# serverless directories
 .serverless
+
+# enviroment variables
+secrets.yml
 .env
+env.yml

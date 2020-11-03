@@ -39,15 +39,6 @@ provider:
 
 functions:
 
-  images-upload:
-    handler: handlers/images.upload
-    name: images-upload
-    events:
-      - http:
-          path: /images/upload
-          method: post
-          cors: true # solves cors issue
-
   # account functions
   SignUp:
     handler: handlers/account.SignUp
@@ -144,7 +135,16 @@ functions:
     events:
       - http:
           method: PATCH
-          path: /Party/{ID}/Update
+          path: /Party/{ID}
+          cors: true
+
+  # image functions
+  UploadImage:
+    handler: utilities/image.Upload
+    events:
+      - http:
+          method: POST
+          path: /Image/Upload
           cors: true
 
 resources:
