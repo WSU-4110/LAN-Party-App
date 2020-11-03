@@ -3402,6 +3402,11 @@ crypto-js@^4.0.0:
   resolved "https://registry.yarnpkg.com/crypto-js/-/crypto-js-4.0.0.tgz#2904ab2677a9d042856a2ea2ef80de92e4a36dcc"
   integrity sha512-bzHZN8Pn+gS7DQA6n+iUmBfl0hO5DJq++QP3U6uTucDtk/0iGpXd/Gg7CGR0p8tJhofJyaKoWBuJI4eAO00BBg==
 
+crypto.js@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/crypto.js/-/crypto.js-2.0.2.tgz#6cc9c1703e7145f4456d2ac9ccf495895438b0c4"
+  integrity sha512-FKJP/s3KmqS8ThuInxpIGwuL8Wcfeg/0A5Nscko71zwDL+a/X7Y2HDQPtu7kTuDVAV/3ofxIEVdnNxqfks4zUw==
+
 css-blank-pseudo@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/css-blank-pseudo/-/css-blank-pseudo-0.1.4.tgz#dfdefd3254bf8a82027993674ccf35483bfcb3c5"
