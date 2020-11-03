@@ -152,6 +152,8 @@ module.exports = {
 
         //Check if the request had request
         if(request.hasOwnProperty("Requested")){
+            if(sender.ID === request.Requested)
+                return responseUtil.Build(403, "Cannot friend self");
             //Check if the requested id is valid
             try {
                 var requested = await AccountAPI.Get(request.Requested);
@@ -206,6 +208,10 @@ module.exports = {
         
         
         else if (request.hasOwnProperty("Confirm")){ 
+
+            if(sender.ID === request.Confirm)
+                return responseUtil.Build(403, "Cannot friend self");
+
             let updateExpression = 'set Friends = :f, FriendRequests = :r';
 
             try {
