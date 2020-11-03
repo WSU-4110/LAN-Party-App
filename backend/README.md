@@ -22,6 +22,7 @@ Back end: https://github.com/WSU-4110/LAN-party-backend
 |/Account/{ID}|GET|get user by ID|N/A|N/A|
 |/Accounts|GET|get all accounts|N/A|N/A|N/A|
 |/Accounts/{ID}|PATCH|update an account's username, password, and/or email|Email, Password|NewUsername, NewPassword, NewEmail|
+|/Account/{ID}/AddFriend|PATCH|send / confirm friend requests to other users|ID|Request, Confirm|
 |/CreateParty|POST|create party|PartyName, Host, PartyLocation, PartyTime|Games, HardwareRequirements, Intent, AgeGate|
 |/Party/{ID}|GET|get party by ID|N/A|N/A|
 |/Parties|GET|get all parties|N/A|N/A|
@@ -33,11 +34,10 @@ Back end: https://github.com/WSU-4110/LAN-party-backend
 Email:
 Password:
 Username:
+Friends:
+FriendRequests:
 }
 ## Party
-{
-}
-## Friend
 {
 }
 ## Game
