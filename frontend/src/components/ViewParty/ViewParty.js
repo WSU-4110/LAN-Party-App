@@ -10,6 +10,28 @@ import axios from 'axios';
 
 const ViewParty=(props)=>{
 
+  const joinParty=() =>{
+
+    const headers = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+  
+  const Link = `${process.env.REACT_APP_URL}/Party/${props.ID}/Update`;
+
+  const payload={
+    Attendees: props.Attendees.push({ID:props.user.ID,Username: props.user.Username})
+  }
+
+  axios
+      .patch(Link, payload, headers)
+      .then((res) => {
+        console.log("patch res: ", res);
+      })
+      .catch((error) => console.log(error));
+    }
+
   return(
     <div>
       <div 
@@ -51,7 +73,16 @@ const ViewParty=(props)=>{
           </tr>
         </tbody>
       </Table>
+
+      <Button onClick={joinParty}>
+        Join Party
+        
+      </Button>
+
+
     </div>
+
+
   )
 }
 export default ViewParty;
