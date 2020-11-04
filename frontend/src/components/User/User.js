@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from 'react';
-import { Table, Button, Accordion, Card, Form } from 'react-bootstrap';
+import { useForm } from "react-hook-form";
+import { Table, Button, Accordion, Card, Form, Col, Badge, FormControl, InputGroup } from 'react-bootstrap';
 import cookies from 'js-cookie';
 import axios from 'axios';
 import './User.css';
@@ -7,10 +8,15 @@ import { UserContext } from '../../context/UserContext'
 
 const User = (props) => {
   const { REACT_APP_URL } = process.env;
+  const { register, handleSubmit, setError, errors } = useForm();
   const [user, setUser] = useContext(UserContext);
   
   const [avatar, setAvatar] = useState(user.Avatar);
+
   const [editMode, setEditMode] = useState(false);
+  const [editEmail, setEditEmail] = useState(false);
+  const [editPassword, setEditPassword] = useState(false);
+
   const [chosenImage, setChosenImage] = useState('Choose Image');
 
   /**
@@ -117,12 +123,166 @@ const User = (props) => {
    * 
    */
 
+   /**
+    * 
+    * CHANGE EMAIL
+    * 
+    */
+  const changeEmail = (data, e) => {
+    e.preventDefault();
+
+    // make sure email is not the current one
+    if (data.email.toLowerCase() === user.Email.toLowerCase()) {
+      alert("New email must be different");
+      console.log("New and old email can't be the same");
+      setEditEmail(false);
+      return;
+    }
+
+    const headers = {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    };
+    // PATCH URL
+    const Link = `${REACT_APP_URL}Account/${user.ID}`;
+    const payload = {
+      Email: data.email
+    }
+
+    console.log("email payload", data.email);
+    // axios
+    //   .patch(Link, payload, headers)
+    //   .then((res) => {
+    //     console.log("patch res: ", res);
+    //     setUser({
+    //       ...res.data,
+    //       Token: cookies.get("Token"),
+    //       LoggedIn: true
+    //     })
+    //     cookies.set("Avatar", res.data.Avatar);
+    //   })
+    //   .catch((error) => console.log(error));
+
+    setEditEmail(false);
+  }
+
+  /**
+   * 
+   * CHANGE PASSWORD
+   * 
+   */
+  const changePassword = (data, e) => {
+    e.preventDefault();
+
+    // new email cannot be same as current
+    if (data.oldpassword === data.newpassword) {
+      console.log("passwords cannot be the same");
+      return;
+    }
+
+    const headers = {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    };
+    // PATCH URL
+    const Link = `${REACT_APP_URL}Account/${user.ID}`;
+    const payload = {
+      old: data.oldpassword,
+      new: data.newpassword
+    }
+
+    console.log("password payload", payload);
+    // axios
+    //   .patch(Link, payload, headers)
+    //   .then((res) => {
+    //     console.log("patch res: ", res);
+    //     setUser({
+    //       ...res.data,
+    //       Token: cookies.get("Token"),
+    //       LoggedIn: true
+    //     })
+    //     cookies.set("Avatar", res.data.Avatar);
+    //   })
+    //   .catch((error) => console.log(error));
+
+    setEditPassword(false);
+  }
+
   useEffect(()=> {
     // if the token expires while on this page and the user refresh
     // then put them back to login page
     if(!cookies.get("Token"))
       props.history.push("/login")
   })
+
+  const renderEditEmail = () => {
+    // if in edit mode
+    if (editEmail) {
+      return (
+        <Form onSubmit={handleSubmit(changeEmail)}>
+            <Form.Row className="align-items-center">
+              <Col xs="auto">
+                <Form.Control
+                  size="sm"
+                  className="mb-2"
+                  type="email"
+                  name="email"
+                  placeholder={user.Email}
+                  aria-describedby="emailReq"
+                  ref={register({ required: true })}
+                />
+              </Col>
+              <Col xs="auto" style={{display:'flex', alignContent:'center', justifyContent:'center'}}>
+                <Button size="sm" type="submit" variant="secondary" className="mb-2">
+                  Change
+                </Button>
+                <Badge 
+                  style={{marginLeft:'5px'}}
+                  className="close-btn"
+                  onClick={()=>setEditEmail(false)}>X</Badge>
+              </Col>
+            </Form.Row>
+        </Form>
+      )
+    }
+    // regular mode
+    return (
+      <p>
+        {user.Email} <Badge style={{cursor:'pointer'}} className="change-email" variant="secondary" onClick={() => setEditEmail(true)}>Edit</Badge>
+      </p>
+    )
+  }
+
+  const renderEditPassword = () => {
+    if (editPassword) {
+      return (
+        <Form onSubmit={handleSubmit(changePassword)}>
+          <Form.Control 
+            className="mb-2" 
+            size="sm" 
+            type="password"
+            name="oldpassword"
+            placeholder="current password"
+            ref={register({ required: true })} />
+          <Form.Control 
+            size="sm" 
+            type="password" 
+            name="newpassword"
+            placeholder="new password"
+            ref={register({ required: true })} />
+          <Button size="sm" type="submit">Confirm</Button> <Badge className="close-btn" onClick={()=>setEditPassword(false)}>X</Badge>
+        </Form>
+      )
+    }
+
+    return (
+      <>
+        <Button size="sm" variant="danger" onClick={() => setEditPassword(true)}>Change Password</Button>
+      </>
+    )
+  }
 
   return(
     <div style={{backgroundColor: ""}}>
@@ -181,8 +341,8 @@ const User = (props) => {
         </div>
         <div className="desc-section">
           {user.Username}
-          <br/>
-          {user.Email}
+          {renderEditEmail()}
+          {renderEditPassword()}
         </div>
       </div>
       
