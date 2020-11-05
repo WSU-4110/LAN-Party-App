@@ -7,16 +7,18 @@ import setMinutes from "date-fns/setMinutes";
 import cookies from 'js-cookie';
 import axios from 'axios';
 import Geocode from 'react-geocode';
-import { UserContext } from '../../UserContext'
+import { UserContext } from '../../context/UserContext'
+import { HomeRenderContext } from '../../context/HomeRenderContext'
 import "react-datepicker/dist/react-datepicker.css"
 
-Geocode.setApiKey("AIzaSyAHoOsaxhFYc2fQlGdr-5Mdep3UVkfpfP4");
+Geocode.setApiKey(process.env.REACT_APP_MAP_GEOCODE_KEY);
 Geocode.setLanguage("en");
 Geocode.enableDebug();
 
 const HostParty = (props) => {
   const { REACT_APP_URL } = process.env;
   const [user, setUser] = useContext(UserContext);
+  const [homeRender, setHomeRender] = useContext(HomeRenderContext);
   const { register, handleSubmit, errors } = useForm();
   // const [hours, setHours] = useState();
   // const [minutes, setMinutes] = useState();
@@ -38,8 +40,8 @@ const HostParty = (props) => {
     let longitude = await getLongitude(data.Location);
 
     const payload = {
-      // Host: cookies.get("ID"),
       Host: user.ID,
+      HostUsername: user.Username,
       Name: data.Title,
       Location: data.Location,
       Latitude: latitude,
@@ -56,6 +58,7 @@ const HostParty = (props) => {
       .post(link, payload, headers)
       .then(res => {
         console.log(res);
+        setHomeRender({ render: !homeRender.render })
       })
       .catch((error) => console.log(error));
 

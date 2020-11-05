@@ -80,6 +80,14 @@ functions:
           method: GET
           path: /Accounts
           cors: true
+  
+  UpdateFriends:
+    handler: handlers/account.UpdateFriends
+    events:
+      - http:
+          method: PATCH
+          path: /Account/{ID}/AddFriend
+          cors: true
 
   UpdateAccount:
     handler: handlers/account.Update
