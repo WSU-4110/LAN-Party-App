@@ -60,8 +60,8 @@ module.exports = {
     }
 
     request.Attendees = [{
-      ID: Host,
-      Username: HostUsername
+      ID: request.Host,
+      Username: request.HostUsername
     }];
 
     
@@ -148,9 +148,73 @@ module.exports = {
 
     //Check attendees
     if (request.hasOwnProperty('Attendees')){
+      //Check if we're adding users
+      if(request.Attendees.hasOwnProperty('Add')){
+        //Make sure that the account exists
+        try {
+          var newAttendee = await AccountAPI.Get(request.Attendees.Add);
+          if (newAttendee === false){
+            return responseUtil.Build(403, "New attendee does not exist");
+          }
+        } catch (err) {
+          return responseUtil.Build(403, "New attendee could not be found");
+        }
+
+        let saveItem = {
+          Username : newAttendee.Username,
+          ID : newAttendee.ID
+        }
+        
+        //Insert it into the list
+        if(!party.hasOwnProperty('Attendees') || party.Attendees.length === 0){
+          party.Attendees = [saveItem];
+        }
+
+        //Check that it isn't in the list already
+        else if(party.Attendees.findIndex(attendee => attendee.ID === saveItem.ID) !== -1){
+          console.log(party.Attendees.findIndex(attendee => attendee.ID === saveItem.ID));
+          return responseUtil.Build(403, "Attendee already registered");
+        }
+
+        //Check that they aren't the new highest member
+        else if(party.Attendees[party.Attendees.length - 1].ID < saveItem.ID){
+          console.log(party.Attendees.findIndex(attendee => attendee.ID === saveItem.ID));
+          party.Attendees.push(saveItem);
+        } 
+
+        else {
+          console.log(party.Attendees.findIndex(attendee => attendee.ID === saveItem.ID));
+          try{
+            let i = 0; 
+            while (party.Attendees[i].ID > saveItem.ID){
+              console.log(i + ' | ' + party.Attendees[i]);
+              i++
+            }
+
+            party.Attendees.splice(i, 0, saveItem);
+          } catch(err){
+            party.Attendees.push(saveItem);
+          }
+        }
+
+      }
+      
+      //If there was a remove
+      if(request.Attendees.hasOwnProperty("Remove")){
+        //Check if the ID is present in the array
+        let i = party.Attendees.findIndex(attendee => attendee.ID === request.Attendees.Remove);
+
+        if(typeof i === -1){
+          return responseUtil.Build(403, "User not in party already");
+        } else {
+          party.Attendees.splice(i, 1);
+        }
+      }
+
+
       //Update the expressions
       curExpressions = curExpressions.concat('Attendees = :a')
-      updateValues[':a'] = request.Attendees;
+      updateValues[':a'] = party.Attendees;
     }
 
     //Check for hardware requirements
