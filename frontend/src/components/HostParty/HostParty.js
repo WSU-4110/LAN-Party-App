@@ -147,7 +147,7 @@ const HostParty = (props) => {
             {errors.email && <Form.Text className="text-danger" id="ageReq">Required</Form.Text>}
           </Form.Group>
 
-            {/* Hardware Requirements */}
+            {/* Additional Notes */}
             <Form.Group controlId="formEmail"> 
             <Form.Label>Additional Notes</Form.Label>
             <Form.Control 
@@ -155,7 +155,7 @@ const HostParty = (props) => {
               placeholder="Any additional notes?" 
               name="Notes"
               aria-describedby="notesReq"
-              ref={register({ required: true })} />
+              ref={register({ required: false })} />
             {errors.email && <Form.Text className="text-danger" id="hardwareReq">Required</Form.Text>}
           </Form.Group>
           
