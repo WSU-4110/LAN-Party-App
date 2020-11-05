@@ -84,16 +84,16 @@ const Home = (props) => {
             eventKey={p.ID}>
               {p.Name} <br/>
               Host: {p.HostUsername} <br/>
-              Location: {p.Location} <br/>
-              Date: {p.Date} <br/>
+              Location: {p.PartyLocation} <br/>
+              Date: {p.PartyTime} <br/>
             </Accordion.Toggle>
             <Accordion.Collapse eventKey={p.ID}>
               <Card.Body>
                 <ViewParty 
-                location={p.Location} 
-                name={p.Name}
-                host={p.HostUsername} 
-                date={p.Date}
+                location={p.PartyLocation}
+                name={p.PartyName}
+                host={p.HostUsername}
+                date={p.PartyTime}
                 hardware={p.HardwareReq}
                 age={p.MinAge}
                 notes={p.Notes} />

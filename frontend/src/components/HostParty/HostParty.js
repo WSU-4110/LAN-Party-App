@@ -42,11 +42,11 @@ const HostParty = (props) => {
     const payload = {
       Host: user.ID,
       HostUsername: user.Username,
-      Name: data.Title,
-      Location: data.Location,
+      PartyName: data.Title,
+      PartyLocation: data.Location,
       Latitude: latitude,
       Longitude: longitude,
-      Date: startDate,
+      PartyTime: startDate,
       HardwareReq: data.Hardware,
       MinAge: data.Age,
       NotesReq: data.Notes
