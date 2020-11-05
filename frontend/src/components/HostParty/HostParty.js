@@ -49,7 +49,7 @@ const HostParty = (props) => {
       PartyTime: startDate,
       HardwareReq: data.Hardware,
       MinAge: data.Age,
-      NotesReq: data.Notes
+      Notes: data.Notes
     };
     const headers = {
       headers: {
@@ -156,7 +156,7 @@ const HostParty = (props) => {
               name="Notes"
               aria-describedby="notesReq"
               ref={register({ required: false })} />
-            {errors.email && <Form.Text className="text-danger" id="hardwareReq">Required</Form.Text>}
+            {errors.email && <Form.Text className="text-danger" id="notesReq">Required</Form.Text>}
           </Form.Group>
           
           <div style={{textAlign:"center"}}>
