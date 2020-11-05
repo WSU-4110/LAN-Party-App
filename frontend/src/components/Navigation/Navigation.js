@@ -39,28 +39,29 @@ const Navigation = (props) => {
       <Navbar.Toggle aria-controls="basic-navbar-nav" />
       <Navbar.Collapse id="basic-navbar-nav">
         <Nav className="mr-auto">
-          {user.LoggedIn===true ? null
-          :
-          <>
-          <Nav.Link>
-          <NavLink to="/signup"style={{color:"#fff"}}>Signup</NavLink>
-        </Nav.Link>
-        <Nav.Link>
-          <NavLink to="/login"style={{color:"#fff"}}>Login</NavLink>
-        </Nav.Link>
-        </>
+          {user.LoggedIn === true ? null
+            :
+              <>
+                <Nav.Link>
+                  <NavLink to="/signup"style={{color:"#fff"}}>Signup</NavLink>
+                </Nav.Link>
+                <Nav.Link>
+                  <NavLink to="/login"style={{color:"#fff"}}>Login</NavLink>
+                </Nav.Link>
+              </>
           }
-          {user.LoggedIn===true ?
-          <>
-          <Nav.Link>
-            <NavLink to="/user"style={{color:"#fff"}}>User</NavLink>
-          </Nav.Link>
-          <Nav.Link href="/" style={{color:"#fff"}} onClick={logout}>
-            Logout
-          </Nav.Link>
-          </>
-          : null
-}
+          {user.LoggedIn === true 
+            ?
+              <>
+                <Nav.Link>
+                  <NavLink to="/user"style={{color:"#fff"}}>User</NavLink>
+                </Nav.Link>
+                <Nav.Link href="/" style={{color:"#fff"}} onClick={logout}>
+                  Logout
+                </Nav.Link>
+              </>
+            : null
+          }
         </Nav>
       </Navbar.Collapse>
     </Navbar>
