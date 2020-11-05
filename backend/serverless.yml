@@ -86,7 +86,7 @@ functions:
     events:
       - http:
           method: PATCH
-          path: /Account/{ID}/AddFriend
+          path: /AddFriend/Account/{ID}
           cors: true
 
   UpdateAccount:
