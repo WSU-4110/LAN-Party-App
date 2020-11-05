@@ -3,81 +3,88 @@ import { Table, Button, Accordion, Card } from 'react-bootstrap';
 import cookies from 'js-cookie';
 import './ViewParty.css'
 import { UserContext } from '../../context/UserContext'
+import { PartiesContext } from '../../context/PartiesContext'
+import { HomeRenderContext } from '../../context/HomeRenderContext'
 import axios from 'axios';
 
 //temporary metadata until we can pull it from the DB
 
 
 const ViewParty=(props)=>{
+  const { REACT_APP_URL } = process.env;
+  const [user, setUser] = useContext(UserContext);
+  const [homeRender, setHomeRender] = useContext(HomeRenderContext);
+  const [party, setParty] = useState(props.party);
+  const [attendees, setAttendees] = useState(props.party.Attendees);
 
   const joinParty=() =>{
-
     const headers = {
       headers: {
         "Content-Type": "application/json",
       },
     };
-  
-  const Link = `${process.env.REACT_APP_URL}/Party/${props.ID}/Update`;
-
-  const payload={
-    Attendees: props.Attendees.push({ID:props.user.ID,Username: props.user.Username})
+    const Link = `${process.env.REACT_APP_URL}Party/${party.ID}`;
+    const payload={
+      Attendees: {
+        Add: props.user.ID
+      }
+    }
+    axios
+    .patch(Link, payload, headers)
+    .then((res) => {
+      console.log("patch res: ", res);
+      let current = attendees.concat(res.data.Attributes.Attendees.reverse()[0]);
+      setAttendees(current);
+    })
+    .catch((error) => console.log(error));
   }
 
-  axios
-      .patch(Link, payload, headers)
+    const leaveParty=() =>{
+      const headers = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+    const Link = `${process.env.REACT_APP_URL}Party/${party.ID}`;
+    const payload={
+      Attendees: {
+        Remove: props.user.ID
+      }
+    }
+    axios
+    .patch(Link, payload, headers)
       .then((res) => {
         console.log("patch res: ", res);
+        setAttendees(res.data.Attributes.Attendees);
       })
-      .catch((error) => console.log(error));
-    }
+      .catch((error) => console.log(error));    
+  }
 
+  
   return(
     <div>
-      <div 
-        style={{
-          padding: "10px 10px 5px",
-          borderBottom:"2px solid #0C0C0D",
-          backgroundColor: "#35373D"
-        }}>
-        <h4>{props.name}</h4>
-        <h5>Host: {props.host}</h5>
-        Location: {props.location}
-        <br/>
-        <p>Date: {props.date}</p>
-      </div>
       
       <Table striped bordered hover variant="dark">
         <thead>
           <tr>
             <th>#</th>
             <th>Participants</th>
-            <th>Game</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>1</td>
-            <td>35</td>
-            <td>Tekken 7</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>50</td>
-            <td>Street Fighter V</td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>300</td>
-            <td>Smash Bros. Melee</td>
-          </tr>
+          {attendees.map((attendee, index) =>(
+            <tr>
+              <td>{index+1}</td>
+              <td>{attendee.Username}</td>
+            </tr>
+          ))}
         </tbody>
       </Table>
 
-      <Button onClick={joinParty}>
-        Join Party
-        
-      </Button>
+      {cookies.get("Token")
+  ? <Button onClick={joinParty}>Join Party</Button>
+  : <Button onClick={props.toLogin}>Login to join</Button>
+}
 
 
     </div>
