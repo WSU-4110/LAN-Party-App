@@ -92,9 +92,11 @@ const ViewParty=(props)=>{
       </Table>
 
       {cookies.get("Token")
-  ? <Button onClick={joinParty}>Join Party</Button>
-  : <Button onClick={props.toLogin}>Login to join</Button>
-}
+        ? attendees.some(att => att.ID.includes(props.user.ID))
+          ? <Button variant="danger" onClick={leaveParty}>Leave Party</Button>
+          : <Button variant="success" onClick={joinParty}>Join Party</Button>
+        : <Button onClick={props.toLogin}>Login to join</Button>
+      }
 
 
     </div>
