@@ -97,10 +97,13 @@ const Home = (props) => {
             <Accordion.Collapse eventKey={p.ID}>
               <Card.Body>
                 <ViewParty 
-                location={p.PartyLocation} 
+                location={p.PartyLocation}
                 name={p.PartyName}
-                host={p.HostUsername} 
-                date={p.PartyTime} />
+                host={p.HostUsername}
+                date={p.PartyTime}
+                hardware={p.HardwareReq}
+                age={p.MinAge}
+                notes={p.Notes} />
               </Card.Body>
             </Accordion.Collapse>
           </Card>
