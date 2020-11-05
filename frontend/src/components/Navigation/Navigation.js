@@ -60,23 +60,12 @@ const Navigation = (props) => {
                 <Nav.Link href="/" style={{color:"#fff"}} onClick={logout}>
                   Logout
                 </Nav.Link>
+                <Nav.Link>
+                  <NavLink to="/SearchUser"style={{color:"#fff"}}>SearchUser</NavLink>
+                </Nav.Link>
               </>
             : null
           }
-          {user.LoggedIn===true ?
-          <>
-          <Nav.Link>
-            <NavLink to="/user"style={{color:"#fff"}}>User</NavLink>
-          </Nav.Link>
-          <Nav.Link>
-            <NavLink to="/SearchUser"style={{color:"#fff"}}>SearchUser</NavLink>
-          </Nav.Link>
-          <Nav.Link href="/" style={{color:"#fff"}} onClick={logout}>
-            Logout
-          </Nav.Link>
-          </>
-          : null
-}
         </Nav>
       </Navbar.Collapse>
     </Navbar>
