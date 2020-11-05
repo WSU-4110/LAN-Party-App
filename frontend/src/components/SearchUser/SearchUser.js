@@ -15,10 +15,6 @@ const SearchUser=(props)=>{
   const [allUsers, setAllUsers] = useState([]);
   const [homeRender, setHomeRender] = useContext(HomeRenderContext);
   const [search, setSearch] = useState('');
-
-
-  console.log('whatever in a string', allUsers);
-
   
   const getAllUsers = () => {
     const link = `${REACT_APP_URL}Accounts`;
