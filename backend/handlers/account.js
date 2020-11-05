@@ -55,6 +55,7 @@ module.exports = {
                 } else throw new Error("Username Already Exists!");
             } else throw new Error("Email Already Exists!");
         } catch (err) {
+            console.log(err);
             return responseUtil.Build(500, { Message: err.message });
         }
     },
@@ -89,6 +90,7 @@ module.exports = {
             // else, return an error
             return responseUtil.Build(500, { Message: "Account Login Error Detected." });
         } catch (err) {
+            console.log(err);
             return responseUtil.Build(500, { Message: err.message });
         }
     },
@@ -117,6 +119,7 @@ module.exports = {
                 return responseUtil.Build(200, result); // send the result
             } else return responseUtil.Build(500, { Message: "No Account With That ID." }); // else, return an error
         } catch (err) {
+            console.log(err);
             return responseUtil.Build(500, { Message: err.message });
         }
     },
@@ -132,6 +135,7 @@ module.exports = {
                 return responseUtil.Build(200, accounts); // then, send the result
             } else return responseUtil.Build(500, { Message: "No Accounts Exist." }); // else, return an error
         } catch (err) {
+            console.log(err);
             return responseUtil.Build(500, { Message: err.message });
         }
     },
@@ -206,6 +210,7 @@ module.exports = {
                 return responseUtil.Build(200, UpdatedAccount);
             } else return responseUtil.Build(500, { Message: "No Updates Were Requested." }); // else, return an error
         } catch (err) {
+            console.log(err);
             return responseUtil.Build(500, { Message: err.message });
         }
     }

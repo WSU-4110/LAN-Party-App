@@ -3,7 +3,6 @@
 // Imports
 const crypto = require("crypto");
 const shortid = require("shortid");
-const { v4: uuidv4 } = require("uuid");
 const AWS = require("aws-sdk");
 
 // Updating AWS settings
