@@ -14,7 +14,7 @@ const Signup = (props) => {
       Username: data.username,
       Password: data.password,
       Email: data.email,
-      Avatar: 'https://images.unsplash.com/photo-1602254872083-22caf4166bd7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60'
+      Avatar: "https://images.unsplash.com/photo-1602254872083-22caf4166bd7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
     };
 
     const headers = {
