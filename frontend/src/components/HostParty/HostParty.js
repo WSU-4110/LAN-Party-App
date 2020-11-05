@@ -137,7 +137,9 @@ const HostParty = (props) => {
           <Form.Group controlId="formEmail">
             <Form.Label>Minimum Age</Form.Label>
             <Form.Control 
-              type="number" 
+              type="number"
+              min="16"
+              max="100" 
               placeholder="Set Minimum Age" 
               name="Age"
               aria-describedby="ageReq"
