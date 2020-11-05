@@ -3,7 +3,6 @@
 // Imports
 const crypto = require("crypto");
 const shortid = require("shortid");
-const { v4: uuidv4 } = require("uuid");
 const AWS = require("aws-sdk");
 const { exception } = require("console");
 
@@ -37,7 +36,7 @@ module.exports = {
       await dynamoDB.put(parameters).promise(); // add the user to the database
       return NewAccount; // return this account as we leave
     } catch (err) {
-      console.error("Account Save Error:", err.message);
+      console.log(err);
       throw new Error("Account Save Error");
     }
   },
@@ -68,8 +67,8 @@ module.exports = {
         return account;
       } else false;
     } catch (err) {
-      console.error("Account Email Error:", err);
-      throw new Error(err.message);
+      console.log(err.message);
+      throw new Error("Get Account By Email Error");
     }
   },
 
@@ -99,8 +98,8 @@ module.exports = {
         return account;
       } else false;
     } catch (err) {
-      console.error("Account Username Error:", err);
-      throw new Error(err.message);
+      console.log(err.message);
+      throw new Error("Get Account By Username Error");
     }
   },
   
@@ -118,10 +117,10 @@ module.exports = {
       let result = await dynamoDB.get(params).promise(); // grab the user
 
       if (result.Item) return result.Item;
-      else throw new exception;
+      else return false;
     } catch (err) {
-      console.error("Account Get Error:", err);
-      throw err;
+      console.log(err.message);
+      throw new Error("Get Account Error");
     }
   },
   
@@ -134,7 +133,7 @@ module.exports = {
       if (results) return results;
       else throw new Error("No Accounts Found!");
     } catch (err) {
-      console.error("Account GetAll Error:", err);
+      console.log(err.message);
       throw new Error("Account GetAll Error");
     }
   },
@@ -143,6 +142,8 @@ module.exports = {
   AuthByEmailPassword: async function (Email, Password) {
     try {
       let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); // connect to the database
+      
+      Email = Email.toLowerCase(); // change the email to lowercase
 
       // create the parameters for the query
       let params = {
@@ -171,8 +172,33 @@ module.exports = {
         } else throw new Error("Invalid password!");
       } else throw new Error("No account found.");
     } catch (err) {
-      console.error("Account Auth 1 Error:", err);
-      throw new Error(err.message);
+      console.log(err.message);
+      throw new Error("Authentication Error");
+    }
+  },
+
+  // UPDATE THE ACCOUNT /////////////////////////////////////////////////////////////////////////////////////////////
+  Update: async function (account, Values, updateExpression) {
+    try {
+      let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); // connect to the database
+
+      let ID = account.ID;
+
+      // create the parameters for the update
+      let params = {
+        TableName: tableName,
+        Key: {ID: ID},
+        UpdateExpression: updateExpression,
+        ExpressionAttributeValues: Values,
+        ReturnValues:"UPDATED_NEW"
+      };
+
+      let result = await dynamoDB.update(params).promise(); // update the entry in the database
+      
+      return result ? result : false;
+    } catch (err) {
+      console.log(err.message);
+      throw new Error("Account Update Error");
     }
   },
   

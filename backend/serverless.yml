@@ -19,6 +19,11 @@ provider:
   versionFunctions: false
   runtime: nodejs12.x
   region: us-east-2
+  # enviroment:
+  #   S3_ACCESS_ID: ${ssm:only-lans-s3-id~true}
+  #   S3_ACCESS_SECRET: ${ssm:only-lans-s3-secret~true}
+    
+    #${self:custom.settings}
 
   # giving users appropriate permissions to the database, parameters, and any other resources they may need for this service
   iamRoleStatements:
@@ -37,17 +42,12 @@ provider:
       Action: "kms:Decrypt"
       Resource: "*"
 
+# custom:
+#   settings:
+#     S3_ACCESS_ID: ${ssm:only-lans-s3-id~true}
+#     S3_ACCESS_SECRET: ${ssm:only-lans-s3-secret~true}
+
 functions:
-
-  images-upload:
-    handler: handlers/images.upload
-    name: images-upload
-    events:
-      - http:
-          path: /images/upload
-          method: post
-          cors: true # solves cors issue
-
   # account functions
   SignUp:
     handler: handlers/account.SignUp
@@ -87,6 +87,14 @@ functions:
       - http:
           method: PATCH
           path: /Account/{ID}/AddFriend
+          cors: true
+
+  UpdateAccount:
+    handler: handlers/account.Update
+    events:
+      - http:
+          method: PATCH
+          path: /Account/{ID}
           cors: true
 
   # game functions
@@ -144,7 +152,16 @@ functions:
     events:
       - http:
           method: PATCH
-          path: /Party/{ID}/Update
+          path: /Party/{ID}
+          cors: true
+
+  # image functions
+  UploadImage:
+    handler: utilities/image.Upload
+    events:
+      - http:
+          method: POST
+          path: /Image/Upload
           cors: true
 
 resources:
