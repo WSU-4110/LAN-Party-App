@@ -1,21 +1,23 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, FormControl } from 'react';
 import { NavLink } from 'react-router-dom';
 import Map from '../GoogleMap/GoogleMap';
 import cookies from 'js-cookie';
-import {Button, Accordion, Card} from 'react-bootstrap';
+import {Button, Accordion, Card, Dropdown} from 'react-bootstrap';
 import { UserContext } from '../../context/UserContext';
 import { PartiesContext } from '../../context/PartiesContext'
 import { HomeRenderContext } from '../../context/HomeRenderContext'
 import ViewParty from '../ViewParty/ViewParty';
 import axios from 'axios';
 
-
+// RIP CustomToggle, will try again to use it for search, but I failed for sprint 2
+// -James
 
 const Home = (props) => {
   const { REACT_APP_URL } = process.env;
   const [user, setUser] = useContext(UserContext);
   const [homeRender, setHomeRender] = useContext(HomeRenderContext);
   const [parties, setParties] = useContext(PartiesContext);
+  const [search, setSearch] = useState('');
 
   const toHostParty = () => {
     props.history.push("/host");
@@ -48,7 +50,9 @@ const Home = (props) => {
     getParties();
   } , [homeRender])
 
-
+  const filteredParties = parties.filter( parties => {
+    return parties.PartyName.toLowerCase().includes( search.toLowerCase() )
+  } )
   
   return(
     <div>
@@ -71,8 +75,11 @@ const Home = (props) => {
         <Button variant="info" size="lg" onClick={toLogin}>Host A Party</Button>
       </div>
       }
+
+      <input type= "text" placeholder = "search parties" onChange = { e => setSearch(e.target.value)} />
+
       <Accordion>
-        {parties.map((p, i) => (
+        {filteredParties.map((p, i) => (
           <Card>
             <Accordion.Toggle 
             style={{
@@ -82,7 +89,7 @@ const Home = (props) => {
             }} 
             as={Card.Header} 
             eventKey={p.ID}>
-              {p.Name} <br/>
+              {p.PartyName} <br/>
               Host: {p.HostUsername} <br/>
               Location: {p.PartyLocation} <br/>
               Date: {p.PartyTime} <br/>
@@ -105,6 +112,5 @@ const Home = (props) => {
     </div>
   )
 }
-
 
 export default Home;

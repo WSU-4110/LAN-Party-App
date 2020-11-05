@@ -59,7 +59,10 @@ module.exports = {
       request.Games = [];
     }
 
-    request.Attendees = [];
+    request.Attendees = [{
+      ID: request.Host,
+      Username: request.HostUsername
+    }];
 
     
 
@@ -77,18 +80,17 @@ module.exports = {
     }
 
 
-    let request = {
-      body: JSON.parse(events.body),
-      ID: events.pathParameters.ID
-    }
-
+    let request = JSON.parse(events.body)
+      request.ID = events.pathParameters.ID;
     
 
-    if (!(await PartyAPI.Get(request.ID))){
+    let party = await PartyAPI.Get(request.ID);
+
+    if (!party){
       return responseUtil.Build(403, "Party ID not valid");
     }
 
-    console.log(request.body);
+    console.log(request);
     //A string for the updates
     let updateExpression = 'set ';
 
@@ -97,82 +99,146 @@ module.exports = {
     let updateValues = {};
 
     //Check if the name is exists
-    if(request.body.hasOwnProperty('PartyName')){
+    if(request.hasOwnProperty('PartyName')){
       //Update the name to make sure it's valid
-      request.body.PartyName = nameUtil.isValidParty(request.body.PartyName);
+      request.PartyName = nameUtil.isValidParty(request.PartyName);
 
       //Check if the name is valid 
-      if(request.body.PartyName === false){
+      if(request.PartyName === false){
         responseUtil.Build(403, "Party name not valid");
       }
 
       //Update the expressions
       curExpressions = curExpressions.concat('PartyName = :n');
-      updateValues[':n'] = request.body.PartyName;
+      updateValues[':n'] = request.PartyName;
     }
 
     // ensure that the party has a location
-    if (request.body.hasOwnProperty('PartyLocation')
-      && request.body.PartyLocation !== ""){
+    if (request.hasOwnProperty('PartyLocation')
+      && request.PartyLocation !== ""){
         
       //Update the expressions
       curExpressions = curExpressions.concat('PartyLocation = :l')
-      updateValues[':l'] = request.body.PartyLocation;
+      updateValues[':l'] = request.PartyLocation;
     }
 
     // ensure that there is a host
-    if (request.body.hasOwnProperty('Host')){
+    if (request.hasOwnProperty('Host')){
       // check that the host exists
       try {
-        request.body.HostUsername = await AccountAPI.Get(request.body.Host);
-        request.body.HostUsername = request.body.HostUsername.Username
+        request.HostUsername = await AccountAPI.Get(request.Host);
+        request.HostUsername = request.HostUsername.Username
       } catch (err){
         return responseUtil.Build(403, "Host doesn't exist!");
       }
   
       //Update the expressions
       curExpressions = curExpressions.concat('Host = :h, HostUsername = :u')
-      updateValues[':h'] = request.body.Host;
-      updateValues[':u'] = request.body.HostUsername;
+      updateValues[':h'] = request.Host;
+      updateValues[':u'] = request.HostUsername;
     }
     
 
     //Check times
-    if (request.body.hasOwnProperty('PartyTime')){
+    if (request.hasOwnProperty('PartyTime')){
       //Update the expressions
       curExpressions = curExpressions.concat('PartyTime = :t')
-      updateValues[':t'] = request.body.PartyTime;
+      updateValues[':t'] = request.PartyTime;
     }
 
     //Check attendees
-    if (request.body.hasOwnProperty('Attendees')){
+    if (request.hasOwnProperty('Attendees')){
+      //Check if we're adding users
+      if(request.Attendees.hasOwnProperty('Add')){
+        //Make sure that the account exists
+        try {
+          var newAttendee = await AccountAPI.Get(request.Attendees.Add);
+          if (newAttendee === false){
+            return responseUtil.Build(403, "New attendee does not exist");
+          }
+        } catch (err) {
+          return responseUtil.Build(403, "New attendee could not be found");
+        }
+
+        let saveItem = {
+          Username : newAttendee.Username,
+          ID : newAttendee.ID
+        }
+        
+        //Insert it into the list
+        if(!party.hasOwnProperty('Attendees') || party.Attendees.length === 0){
+          party.Attendees = [saveItem];
+        }
+
+        //Check that it isn't in the list already
+        else if(party.Attendees.findIndex(attendee => attendee.ID === saveItem.ID) !== -1){
+          console.log(party.Attendees.findIndex(attendee => attendee.ID === saveItem.ID));
+          return responseUtil.Build(403, "Attendee already registered");
+        }
+
+        //Check that they aren't the new highest member
+        else if(party.Attendees[party.Attendees.length - 1].ID < saveItem.ID){
+          console.log(party.Attendees.findIndex(attendee => attendee.ID === saveItem.ID));
+          party.Attendees.push(saveItem);
+        } 
+
+        else {
+          console.log(party.Attendees.findIndex(attendee => attendee.ID === saveItem.ID));
+          try{
+            let i = 0; 
+            while (party.Attendees[i].ID > saveItem.ID){
+              console.log(i + ' | ' + party.Attendees[i]);
+              i++
+            }
+
+            party.Attendees.splice(i, 0, saveItem);
+          } catch(err){
+            party.Attendees.push(saveItem);
+          }
+        }
+
+      }
+      
+      //If there was a remove
+      if(request.Attendees.hasOwnProperty("Remove")){
+        //Check if the ID is present in the array
+        let i = party.Attendees.findIndex(attendee => attendee.ID === request.Attendees.Remove);
+
+        if(typeof i === -1){
+          return responseUtil.Build(403, "User not in party already");
+        } else {
+          party.Attendees.splice(i, 1);
+        }
+      }
+
+
       //Update the expressions
       curExpressions = curExpressions.concat('Attendees = :a')
-      updateValues[':a'] = request.body.Attendees;
+      updateValues[':a'] = party.Attendees;
     }
 
     //Check for hardware requirements
-    if (request.body.hasOwnProperty('HardwareRequirements')){
+    if (request.hasOwnProperty('HardwareRequirements')){
       curExpressions = curExpressions.concat('HardwareRequirements = :r')
-      updateValues[':r'] = request.body.HardwareRequirements;
+      updateValues[':r'] = request.HardwareRequirements;
     }
 
     //Check for ageGate
-    if(request.body.hasOwnProperty('AgeGate')){
+    if(request.hasOwnProperty('AgeGate')){
       curExpressions = curExpressions.concat('AgeGate = :g');
-      updateValues[':g'] = request.body.AgeGate;
+      updateValues[':g'] = request.AgeGate;
     }
     
     //Check for games
-    if(request.body.hasOwnProperty('Games')){
+    if(request.hasOwnProperty('Games')){
       curExpressions = curExpressions.concat('Games = :m');
-      updateValues[':m'] = request.body.Games;
+      updateValues[':m'] = request.Games;
     }
 
     //Check for intent
-    if(request.body.hasOwnProperty('Intent')){
+    if(request.hasOwnProperty('Intent')){
       curExpressions = curExpressions.concat('Intent = :i');
-      updateValues[':i'] = request.body.Intent;
+      updateValues[':i'] = request.Intent;
     }
 
     curExpressions = curExpressions.join(', ');
