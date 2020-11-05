@@ -63,6 +63,16 @@ const ViewParty=(props)=>{
   
   return(
     <div>
+      <div 
+        style={{
+          padding: "10px 10px 5px",
+          borderBottom:"2px solid #0C0C0D",
+          backgroundColor: "#35373D"
+        }}>
+        <p>Hardware: {props.hardware}</p>
+        <p>Minimum Age: {props.age}</p>
+        <p>Notes from Host: {props.notes}</p>
+      </div>
       
       <Table striped bordered hover variant="dark">
         <thead>

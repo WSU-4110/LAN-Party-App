@@ -97,7 +97,10 @@ const Home = (props) => {
                 host={p.HostUsername} 
                 date={p.Date}
                 Attendees = {p.Attendees}
-                user={user} 
+                user={user}
+                hardware={p.HardwareReq}
+                age={p.MinAge}
+                notes={p.Notes} 
                 toLogin = {toLogin}/>
               </Card.Body>
             </Accordion.Collapse>

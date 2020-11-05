@@ -42,11 +42,14 @@ const HostParty = (props) => {
     const payload = {
       Host: user.ID,
       HostUsername: user.Username,
-      Name: data.Title,
-      Location: data.Location,
+      PartyName: data.Title,
+      PartyLocation: data.Location,
       Latitude: latitude,
       Longitude: longitude,
-      Date: startDate
+      PartyTime: startDate,
+      HardwareReq: data.Hardware,
+      MinAge: data.Age,
+      Notes: data.Notes
     };
     const headers = {
       headers: {
@@ -117,18 +120,56 @@ const HostParty = (props) => {
             />
           </Form.Group>
 
+          {/* Hardware Requirements */}
+          <Form.Group controlId="formEmail"> 
+            <Form.Label>Set Hardware Requirements</Form.Label>
+            <Form.Control 
+              type="text"
+              rows={3}
+              placeholder="Set Hardware Requirements" 
+              name="Hardware"
+              aria-describedby="hardwareReq"
+              ref={register({ required: true })} />
+            {errors.email && <Form.Text className="text-danger" id="hardwareReq">Required</Form.Text>}
+          </Form.Group>
+          
+          {/* Minimum Age */}
+          <Form.Group controlId="formEmail">
+            <Form.Label>Minimum Age</Form.Label>
+            <Form.Control 
+              type="number"
+              min="16"
+              max="100" 
+              placeholder="Set Minimum Age" 
+              name="Age"
+              aria-describedby="ageReq"
+              ref={register({ required: true })} />
+            {errors.email && <Form.Text className="text-danger" id="ageReq">Required</Form.Text>}
+          </Form.Group>
+
+            {/* Additional Notes */}
+            <Form.Group controlId="formEmail"> 
+            <Form.Label>Additional Notes</Form.Label>
+            <Form.Control 
+              type="text"
+              placeholder="Any additional notes?" 
+              name="Notes"
+              aria-describedby="notesReq"
+              ref={register({ required: false })} />
+            {errors.email && <Form.Text className="text-danger" id="notesReq">Required</Form.Text>}
+          </Form.Group>
+          
           <div style={{textAlign:"center"}}>
             <Button variant="primary" type="submit">
               Submit
             </Button>
           </div>
-
           
           {/* Restrictions */}
             {/* Age, Alcohol */}
           {/* Party Size */}
           {/* Casual / Ranked */}
-          {/* Additional Notes */}
+          
         </Form>
       </div>
     </div>
