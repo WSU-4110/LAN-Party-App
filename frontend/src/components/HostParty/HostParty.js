@@ -48,7 +48,8 @@ const HostParty = (props) => {
       Longitude: longitude,
       Date: startDate,
       HardwareReq: data.Hardware,
-      MinAge: data.Age
+      MinAge: data.Age,
+      NotesReq: data.Notes
     };
     const headers = {
       headers: {
@@ -120,10 +121,11 @@ const HostParty = (props) => {
           </Form.Group>
 
           {/* Hardware Requirements */}
-          <Form.Group controlId="formEmail">
+          <Form.Group controlId="formEmail"> 
             <Form.Label>Set Hardware Requirements</Form.Label>
             <Form.Control 
-              type="text" 
+              type="text"
+              rows={3}
               placeholder="Set Hardware Requirements" 
               name="Hardware"
               aria-describedby="hardwareReq"
@@ -142,6 +144,18 @@ const HostParty = (props) => {
               ref={register({ required: true })} />
             {errors.email && <Form.Text className="text-danger" id="ageReq">Required</Form.Text>}
           </Form.Group>
+
+            {/* Hardware Requirements */}
+            <Form.Group controlId="formEmail"> 
+            <Form.Label>Additional Notes</Form.Label>
+            <Form.Control 
+              type="text"
+              placeholder="Any additional notes?" 
+              name="Notes"
+              aria-describedby="notesReq"
+              ref={register({ required: true })} />
+            {errors.email && <Form.Text className="text-danger" id="hardwareReq">Required</Form.Text>}
+          </Form.Group>
           
           <div style={{textAlign:"center"}}>
             <Button variant="primary" type="submit">
@@ -153,7 +167,7 @@ const HostParty = (props) => {
             {/* Age, Alcohol */}
           {/* Party Size */}
           {/* Casual / Ranked */}
-          {/* Additional Notes */}
+          
         </Form>
       </div>
     </div>
