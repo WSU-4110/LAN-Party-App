@@ -51,7 +51,7 @@ const Home = (props) => {
   } , [homeRender])
 
   const filteredParties = parties.filter( parties => {
-    return parties.Name.toLowerCase().includes( search.toLowerCase() )
+    return parties.PartyName.toLowerCase().includes( search.toLowerCase() )
   } )
   
   return(
@@ -89,18 +89,18 @@ const Home = (props) => {
             }} 
             as={Card.Header} 
             eventKey={p.ID}>
-              {p.Name} <br/>
+              {p.PartyName} <br/>
               Host: {p.HostUsername} <br/>
-              Location: {p.Location} <br/>
-              Date: {p.Date} <br/>
+              Location: {p.PartyLocation} <br/>
+              Date: {p.PartyTime} <br/>
             </Accordion.Toggle>
             <Accordion.Collapse eventKey={p.ID}>
               <Card.Body>
                 <ViewParty 
-                location={p.Location} 
-                name={p.Name}
+                location={p.PartyLocation} 
+                name={p.PartyName}
                 host={p.HostUsername} 
-                date={p.Date} />
+                date={p.PartyTime} />
               </Card.Body>
             </Accordion.Collapse>
           </Card>
