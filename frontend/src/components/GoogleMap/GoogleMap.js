@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 // import { GoogleMap, Marker } from "react-google-maps"
 import { compose, withProps } from "recompose";
 import {
@@ -7,25 +7,7 @@ import {
   GoogleMap,
   Marker
 } from "react-google-maps";
-
-let tempList = [
-  {
-    Host: "Thadd",
-    Name: "Detroit LAN",
-    Location: "Detroit",
-    Latitude: 42.331427,
-    Longitude: -83.0457538,
-    Date: "Thu Oct 22 2020 00:58:34 GMT-0400"
-  },
-  {
-    Host: "Thadd",
-    Name: "Paris LAN",
-    Location: "Paris",
-    Latitude: 48.856614,
-    Longitude: 2.3522219,
-    Date: "Thu Oct 22 2020 00:58:34 GMT-0400"
-  }
-]
+import { PartiesContext } from '../../context/PartiesContext';
 
 const MapComponent = compose(
   withProps({
@@ -35,7 +17,7 @@ const MapComponent = compose(
      * The key "AIzaSyBkNaAGLEVq0YLQMi-PYEMabFeREadYe1Q" can be ONLY used in this sandbox (no forked).
      */
     googleMapURL:
-      "https://maps.googleapis.com/maps/api/js?key=AIzaSyAHoOsaxhFYc2fQlGdr-5Mdep3UVkfpfP4&v=3.exp&libraries=geometry,drawing,places",
+      `https://maps.googleapis.com/maps/api/js?key=${process.env.REACT_APP_MAP_API_KEY}&v=3.exp&libraries=geometry,drawing,places`,
     loadingElement: <div style={{ height: `100%` }} />,
     containerElement: <div style={{ height: `400px` }} />,
     mapElement: <div style={{ height: `100%` }} />
@@ -47,9 +29,9 @@ const MapComponent = compose(
     {/* {
       // <Marker color="#cdcdcd" position={{ lat: 42.331429, lng: -83.045753 }} />
     } */}
-    {tempList.map((host, i) => {
+    {props.markerList.map((host, i) => {
         if (host.Latitude && host.Longitude) {
-          console.log("TEST", host.Latitude);
+          // console.log("TEST", host.Latitude);
          return(<Marker
             key={i}
             position={{
@@ -64,4 +46,14 @@ const MapComponent = compose(
   </GoogleMap>
 ));
 
-export default MapComponent;
+
+
+const Map = () => {
+  const [parties, setParties] = useContext(PartiesContext);
+  return (
+    <MapComponent markerList={parties} />
+  )
+}
+
+
+export default Map;

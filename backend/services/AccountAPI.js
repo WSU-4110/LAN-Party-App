@@ -36,6 +36,7 @@ module.exports = {
       await dynamoDB.put(parameters).promise(); // add the user to the database
       return NewAccount; // return this account as we leave
     } catch (err) {
+      console.log(err);
       throw new Error("Account Save Error");
     }
   },
@@ -182,6 +183,29 @@ module.exports = {
       let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); // connect to the database
 
       let ID = account.ID;
+
+      // create the parameters for the update
+      let params = {
+        TableName: tableName,
+        Key: {ID: ID},
+        UpdateExpression: updateExpression,
+        ExpressionAttributeValues: Values,
+        ReturnValues:"UPDATED_NEW"
+      };
+
+      let result = await dynamoDB.update(params).promise(); // update the entry in the database
+      
+      return result ? result : false;
+    } catch (err) {
+      console.log(err.message);
+      throw new Error("Account Update Error");
+    }
+  },
+  
+  
+  Update: async function (ID, Values, updateExpression) {
+    try {
+      let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); // connect to the database
 
       // create the parameters for the update
       let params = {

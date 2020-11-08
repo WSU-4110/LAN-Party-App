@@ -8,28 +8,44 @@ import User from './components/User/User';
 import Host from './components/HostParty/HostParty'
 import ViewParty from './components/ViewParty/ViewParty';
 import PartySearch from './components/PartySearch/PartySearch';
+import SearchUser from './components/SearchUser/SearchUser';
 import cookies from 'js-cookie';
-import { UserContext } from './UserContext';
+import { UserContext } from './context/UserContext';
+import crypto from 'crypto-js'
 import './App.css';
 import axios from 'axios';
 
 function App() {
+  const { REACT_APP_SECRET_KEY, REACT_APP_URL } = process.env;
   const [user, setUser] = useContext(UserContext);
-  // set user
-  const updateUser = () => {
-    if(cookies.get("Logged") === "true") {
-      setUser({
-        ...user,
-        Username: cookies.get("Username"),
-        Email: cookies.get("Email"),
-        ID: cookies.get("ID"),
-        LoggedIn: true
-      })
+
+  const getAccountInfo = () => {
+    const headers = {
+      headers: {
+        "Content-Type": "application/json"
+      }
     }
+
+    let id = crypto.AES.decrypt(cookies.get("Token"), REACT_APP_SECRET_KEY);
+    let original = id.toString(crypto.enc.Utf8);
+    const link = `${REACT_APP_URL}Account/${original}`;
+  
+    axios
+      .get(link, headers)
+      .then((res) => {
+        // console.log("account info", res.data)
+        setUser({
+          ...res.data.Account,
+          Token: cookies.get("Token"),
+          LoggedIn: true
+        })
+      })
+      .catch((error) => console.log(error))
   }
   
   useEffect(()=>{
-    updateUser();
+    if (cookies.get("Token"))
+      getAccountInfo();
   } , [])
   
   return (
@@ -51,6 +67,7 @@ function App() {
           <Route path="/host" exact component={Host} />
           <Route path="/viewParty" exact component={ViewParty} />
           <Route path="/PartySearch" exact component={PartySearch} />
+          <Route path="/SearchUser" exact component={SearchUser} />
         </Switch>
       </div>
     </Router>

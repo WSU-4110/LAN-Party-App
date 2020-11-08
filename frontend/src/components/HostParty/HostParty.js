@@ -7,16 +7,18 @@ import setMinutes from "date-fns/setMinutes";
 import cookies from 'js-cookie';
 import axios from 'axios';
 import Geocode from 'react-geocode';
-import { UserContext } from '../../UserContext'
+import { UserContext } from '../../context/UserContext'
+import { HomeRenderContext } from '../../context/HomeRenderContext'
 import "react-datepicker/dist/react-datepicker.css"
 
-Geocode.setApiKey("AIzaSyAHoOsaxhFYc2fQlGdr-5Mdep3UVkfpfP4");
+Geocode.setApiKey(process.env.REACT_APP_MAP_GEOCODE_KEY);
 Geocode.setLanguage("en");
 Geocode.enableDebug();
 
 const HostParty = (props) => {
   const { REACT_APP_URL } = process.env;
   const [user, setUser] = useContext(UserContext);
+  const [homeRender, setHomeRender] = useContext(HomeRenderContext);
   const { register, handleSubmit, errors } = useForm();
   // const [hours, setHours] = useState();
   // const [minutes, setMinutes] = useState();
@@ -38,13 +40,16 @@ const HostParty = (props) => {
     let longitude = await getLongitude(data.Location);
 
     const payload = {
-      // Host: cookies.get("ID"),
       Host: user.ID,
-      Name: data.Title,
-      Location: data.Location,
+      HostUsername: user.Username,
+      PartyName: data.Title,
+      PartyLocation: data.Location,
       Latitude: latitude,
       Longitude: longitude,
-      Date: startDate
+      PartyTime: startDate,
+      HardwareReq: data.Hardware,
+      MinAge: data.Age,
+      Notes: data.Notes
     };
     const headers = {
       headers: {
@@ -56,6 +61,7 @@ const HostParty = (props) => {
       .post(link, payload, headers)
       .then(res => {
         console.log(res);
+        setHomeRender({ render: !homeRender.render })
       })
       .catch((error) => console.log(error));
 
@@ -114,18 +120,56 @@ const HostParty = (props) => {
             />
           </Form.Group>
 
+          {/* Hardware Requirements */}
+          <Form.Group controlId="formEmail"> 
+            <Form.Label>Set Hardware Requirements</Form.Label>
+            <Form.Control 
+              type="text"
+              rows={3}
+              placeholder="Set Hardware Requirements" 
+              name="Hardware"
+              aria-describedby="hardwareReq"
+              ref={register({ required: true })} />
+            {errors.email && <Form.Text className="text-danger" id="hardwareReq">Required</Form.Text>}
+          </Form.Group>
+          
+          {/* Minimum Age */}
+          <Form.Group controlId="formEmail">
+            <Form.Label>Minimum Age</Form.Label>
+            <Form.Control 
+              type="number"
+              min="16"
+              max="100" 
+              placeholder="Set Minimum Age" 
+              name="Age"
+              aria-describedby="ageReq"
+              ref={register({ required: true })} />
+            {errors.email && <Form.Text className="text-danger" id="ageReq">Required</Form.Text>}
+          </Form.Group>
+
+            {/* Additional Notes */}
+            <Form.Group controlId="formEmail"> 
+            <Form.Label>Additional Notes</Form.Label>
+            <Form.Control 
+              type="text"
+              placeholder="Any additional notes?" 
+              name="Notes"
+              aria-describedby="notesReq"
+              ref={register({ required: false })} />
+            {errors.email && <Form.Text className="text-danger" id="notesReq">Required</Form.Text>}
+          </Form.Group>
+          
           <div style={{textAlign:"center"}}>
             <Button variant="primary" type="submit">
               Submit
             </Button>
           </div>
-
           
           {/* Restrictions */}
             {/* Age, Alcohol */}
           {/* Party Size */}
           {/* Casual / Ranked */}
-          {/* Additional Notes */}
+          
         </Form>
       </div>
     </div>

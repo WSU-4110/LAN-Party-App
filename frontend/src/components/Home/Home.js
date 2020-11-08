@@ -1,28 +1,28 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, FormControl } from 'react';
 import { NavLink } from 'react-router-dom';
-import MapComponent from '../GoogleMap/GoogleMap';
+import Map from '../GoogleMap/GoogleMap';
 import cookies from 'js-cookie';
 import {Button, Accordion, Card} from 'react-bootstrap';
-import { UserContext } from '../../UserContext'
+import { UserContext } from '../../context/UserContext';
+import { PartiesContext } from '../../context/PartiesContext'
+import { HomeRenderContext } from '../../context/HomeRenderContext'
 import ViewParty from '../ViewParty/ViewParty';
 import axios from 'axios';
-
 
 
 const Home = (props) => {
   const { REACT_APP_URL } = process.env;
   const [user, setUser] = useContext(UserContext);
-  const [parties, setParties] = useState([]);
+  const [homeRender, setHomeRender] = useContext(HomeRenderContext);
+  const [parties, setParties] = useContext(PartiesContext);
+  const [search, setSearch] = useState('');
+
   const toHostParty = () => {
     props.history.push("/host");
   }
 
   const toLogin = () => {
     props.history.push("/login");
-  }
-
-  const toViewParty = () => {
-    props.history.push("/ViewParty");
   }
 
   const getParties = () => {
@@ -35,15 +35,22 @@ const Home = (props) => {
       })
       .catch((error) => console.log(error))
   }
+
+  useEffect(()=> {
+    getParties();
+  }, [])
+
   useEffect(()=>{
     getParties();
-  } , [])
+  } , [homeRender])
 
-
+  const filteredParties = parties.filter( parties => {
+    return parties.PartyName.toLowerCase().includes( search.toLowerCase() )
+  } )
   
   return(
     <div>
-      <MapComponent />
+      <Map />
       {user.LoggedIn===true 
       ?
         <div
@@ -62,8 +69,11 @@ const Home = (props) => {
         <Button variant="info" size="lg" onClick={toLogin}>Host A Party</Button>
       </div>
       }
+
+      <input type= "text" placeholder = "search parties" onChange = { e => setSearch(e.target.value)} />
+
       <Accordion>
-        {parties.map((p, i) => (
+        {filteredParties.map((p, i) => (
           <Card>
             <Accordion.Toggle 
             style={{
@@ -74,17 +84,24 @@ const Home = (props) => {
             as={Card.Header} 
             eventKey={p.ID}>
               {p.PartyName} <br/>
-              Host: {p.HostName} <br/>
+              Host: {p.HostUsername} <br/>
               Location: {p.PartyLocation} <br/>
               Date: {p.PartyTime} <br/>
             </Accordion.Toggle>
             <Accordion.Collapse eventKey={p.ID}>
               <Card.Body>
                 <ViewParty 
-                Location={p.PartyLocation} 
-                Name={p.PartyName}
-                Host={p.HostName} 
-                Date={p.DateTime} />
+                party = {p}
+                location={p.Location} 
+                name={p.Name}
+                host={p.HostUsername} 
+                date={p.Date}
+                Attendees = {p.Attendees}
+                user={user}
+                hardware={p.HardwareReq}
+                age={p.MinAge}
+                notes={p.Notes} 
+                toLogin = {toLogin}/>
               </Card.Body>
             </Accordion.Collapse>
           </Card>
@@ -93,6 +110,5 @@ const Home = (props) => {
     </div>
   )
 }
-
 
 export default Home;

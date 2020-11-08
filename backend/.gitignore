@@ -6,6 +6,4 @@ package-lock.json
 .serverless
 
 # enviroment variables
-secrets.yml
 .env
-env.yml
