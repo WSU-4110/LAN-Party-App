@@ -32,7 +32,17 @@ module.exports = {
   },
 
   // RETURN ALL GAMES //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  GetAll: async function (ID, AccountInfo) {
+  GetAll: async function () {
+    try {
+      let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); // connect to the database
+      let results = await dynamoDB.scan({ TableName: tableName }).promise(); // grab the users
+
+      if (results) return results;
+      else throw new Error("No Games Found!");
+    } catch (err) {
+      console.log(err.message);
+      throw new Error("Game GetAll Error");
+    }
   }
 
 };
