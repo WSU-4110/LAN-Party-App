@@ -2,10 +2,52 @@
 
 // Imports
 const GameAPI = require("../services/GameAPI");
+const moment = require("moment-timezone");
 const responseUtil = require("../utilities/response");
 
 module.exports = {
         
+    // MAKE A NEW GAME  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    NewGame: async function (event) {
+        try {
+            // if nothing was provided in the request, return a 204 HTTPS code (No content)
+            if (!event)
+                return responseUtil.Build(204, { Message: "No information was provided with the request!" });
+
+            // next parse the request
+            let request = JSON.parse(event.body);
+
+            // they need to have entered an email, username, and a password
+            if (!request.GameName)
+                throw new Error("Game Name Required!");
+
+            if (!request.Genre)
+                throw new Error("Game Genre Required!");
+
+            // let's have a create date for our new account
+            request.CreateDate = moment().toISOString();
+
+            // let's check and see if this name is already being used
+            let exists = await GameAPI.GetByName(request.GameName);
+
+            // if the entered name is unique, then we can proceed
+            if (!exists) {
+                let GameID = request.ID ? request.ID : false;
+                await GameAPI.Create(GameID, request);
+
+                let result = {
+                    Message: "Game created!",
+                    Game: request
+                };
+
+                return responseUtil.Build(200, result);
+            } else throw new Error("Game Name Already Exists!");
+        } catch (err) {
+            console.log(err);
+            return responseUtil.Build(500, { Message: err.message });
+        }
+    },
+    
     // VIEW A GAME //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ViewGame: async function (event) {
         try {

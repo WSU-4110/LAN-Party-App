@@ -114,6 +114,14 @@ functions:
           path: /Games
           cors: true
 
+  CreateGame:
+    handler: handlers/game.CreateGame
+    events:
+      - http:
+          method: POST
+          path: /CreateGame
+          cors: true
+
   # party functions
   CreateParty:
     handler: handlers/party.Create
