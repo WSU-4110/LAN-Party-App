@@ -10,6 +10,31 @@ const tableName = 'GAMES-LAN'; // the name of our game table in the AWS database
 
 module.exports = {
 
+  // CREATE A NEW GAME //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  Create: async function (ID, GameInfo) {   
+    try { 
+      let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); // connect to the database
+      let NewGame = GameInfo;
+
+      if (ID)
+        NewGame.ID = ID;
+      else
+        NewGame.ID = shortid.generate(); // make a new ID
+
+      // we will be sending this file to the database
+      const parameters = {
+        TableName: tableName,
+        Item: NewGame,
+      };
+
+      await dynamoDB.put(parameters).promise(); // add the user to the database
+      return NewGame; // return this account as we leave
+    } catch (err) {
+      console.log(err);
+      throw new Error("Game Create Error");
+    }
+  },
+
   // RETURN A GAME BY ID //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   Get: async function (ID) {
     try {
