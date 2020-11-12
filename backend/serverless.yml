@@ -86,7 +86,7 @@ functions:
     events:
       - http:
           method: PATCH
-          path: /Account/{ID}/AddFriend
+          path: /AddFriend/Account/{ID}
           cors: true
 
   UpdateAccount:
@@ -112,14 +112,6 @@ functions:
       - http:
           method: GET
           path: /Games
-          cors: true
-
-  CreateGame:
-    handler: handlers/game.Create
-    events:
-      - http:
-          method: GET
-          path: /CreateGame
           cors: true
 
   # party functions
