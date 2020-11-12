@@ -56,6 +56,37 @@ module.exports = {
     }
   },
 
+  // GET A GAME BY AN EMAIL //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  GetByName: async function (Name) {
+    try {
+      let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); // connect to the database
+
+      // create the parameters for the query
+      let params = {
+        TableName: tableName,
+        IndexName: "Name",
+        KeyConditionExpression: "#key = :n",
+        ExpressionAttributeNames: {
+          "#key": "Name",
+        },
+        ExpressionAttributeValues: {
+          ":n": Name,
+        },
+      };
+
+      let result = await dynamoDB.query(params).promise(); // query the database
+
+      // return the result of the query
+      if (result.Items[0]) {
+        let game = result.Items[0];
+        return game;
+      } else false;
+    } catch (err) {
+      console.log(err.message);
+      throw new Error("Get Game By Name Error");
+    }
+  },
+
   // RETURN ALL GAMES //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   GetAll: async function () {
     try {
