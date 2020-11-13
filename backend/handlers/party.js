@@ -19,24 +19,25 @@ module.exports = {
     let request = JSON.parse(events.body);
 
     //Create prototype party
-    let required = ['PartyName', 'PartyLocation', 'Host']
+    let required = ['PartyName', 'PartyLocation', 'Host', 'PartyTime'];
     
-    for (const key in required){
+    required.forEach((key, index) => {
       if(!request.hasOwnProperty(key)){
         return responseUtil.Build(403, 'Missing attribute: ' + key);
       }
-    }
+    });
 
     let defaults = {
       Intent: 'casual',
-      Games: []
+      Games: [],
+      AgeGate: false
     }
 
-    for (const key in Object.keys(defaults)){
+    Object.keys(defaults).forEach((key, index) =>{
       if(!request.hasOwnProperty(key)){
         request[key] = defaults[key];
       }
-    }
+    });
 
     //Update the name to make sure it is valid
     request.PartyName = nameUtil.isValidParty(request.PartyName);
