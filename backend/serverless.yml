@@ -19,6 +19,9 @@ provider:
   versionFunctions: false
   runtime: nodejs12.x
   region: us-east-2
+  apiGateway:
+    shouldStartNameWithService: true
+  
   # enviroment:
   #   S3_ACCESS_ID: ${ssm:only-lans-s3-id~true}
   #   S3_ACCESS_SECRET: ${ssm:only-lans-s3-secret~true}
