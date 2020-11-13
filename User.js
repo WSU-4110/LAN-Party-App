@@ -6,6 +6,11 @@ import axios from 'axios';
 import './User.css';
 import { UserContext } from '../../context/UserContext'
 
+
+// imports for user.js
+import HostParty from '../../ViewModel/HostParty'
+
+
 const User = (props) => {
   const { REACT_APP_URL } = process.env;
   const { register, handleSubmit, setError, errors } = useForm();

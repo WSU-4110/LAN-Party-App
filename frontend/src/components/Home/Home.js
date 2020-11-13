@@ -7,6 +7,7 @@ import { UserContext } from '../../context/UserContext';
 import { PartiesContext } from '../../context/PartiesContext'
 import { HomeRenderContext } from '../../context/HomeRenderContext'
 import ViewParty from '../ViewParty/ViewParty';
+import HostParty from "../../ViewModel/HostParty"
 import axios from 'axios';
 
 
