@@ -1,10 +1,8 @@
 import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
 import cookies from 'js-cookie';
-import { 
-  Navbar,
-  Nav, } from 'react-bootstrap';
-import {UserContext} from '../../context/UserContext';
+import { Navbar, Nav, } from 'react-bootstrap';
+import {UserContext} from '../../Models/UserContext';
 
 const Navigation = (props) => {
   const [user, setUser] = useContext(UserContext);

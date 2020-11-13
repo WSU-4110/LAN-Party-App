@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useContext} from 'react';
 import { useForm } from "react-hook-form";
 import { Form, Button } from 'react-bootstrap';
-import { UserContext } from '../../context/UserContext';
+import { UserContext } from '../../Models/UserContext';
 import axios from 'axios';
 import cookies from 'js-cookie';
 import './PartySearch.css';
@@ -33,13 +33,6 @@ const PartySearch = (props) => {
 
   useEffect(()=>{
     getParties();
-  } , [])
-
-
-
-
-    
-
-    
+  } , [])   
 }
 export default PartySearch;

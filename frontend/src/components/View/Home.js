@@ -9,32 +9,12 @@ import { HomeRenderContext } from '../../context/HomeRenderContext'
 import ViewParty from '../ViewParty/ViewParty';
 import axios from 'axios';
 
-
 const Home = (props) => {
   const { REACT_APP_URL } = process.env;
   const [user, setUser] = useContext(UserContext);
   const [homeRender, setHomeRender] = useContext(HomeRenderContext);
   const [parties, setParties] = useContext(PartiesContext);
   const [search, setSearch] = useState('');
-
-  const toHostParty = () => {
-    props.history.push("/host");
-  }
-
-  const toLogin = () => {
-    props.history.push("/login");
-  }
-
-  const getParties = () => {
-    const link = `${REACT_APP_URL}Parties`;
-    axios
-      .get(link)
-      .then((res) => {
-        console.log("parties", res);
-        setParties(res.data.Parties);
-      })
-      .catch((error) => console.log(error))
-  }
 
   useEffect(()=> {
     getParties();
@@ -43,10 +23,6 @@ const Home = (props) => {
   useEffect(()=>{
     getParties();
   } , [homeRender])
-
-  const filteredParties = parties.filter( parties => {
-    return parties.PartyName.toLowerCase().includes( search.toLowerCase() )
-  } )
   
   return(
     <div>

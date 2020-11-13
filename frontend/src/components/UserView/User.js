@@ -4,7 +4,7 @@ import { Table, Button, Accordion, Card, Form, Col, Badge, FormControl, InputGro
 import cookies from 'js-cookie';
 import axios from 'axios';
 import './User.css';
-import { UserContext } from '../../context/UserContext'
+import { UserContext } from '../../Models/UserContext'
 
 const User = (props) => {
   const { REACT_APP_URL } = process.env;
