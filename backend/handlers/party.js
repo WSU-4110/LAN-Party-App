@@ -17,10 +17,26 @@ module.exports = {
       return responseUtil.Build(204, "Event is empty");
 
     let request = JSON.parse(events.body);
+
+    //Create prototype party
+    let required = ['PartyName', 'PartyLocation', 'Host']
     
-    //Must have a name
-    if (!request.hasOwnProperty("PartyName"))
-      return responseUtil.Build(403, "Party must have a name");
+    for (const key in required){
+      if(!request.hasOwnProperty(key)){
+        return responseUtil.Build(403, 'Missing attribute: ' + key);
+      }
+    }
+
+    let defaults = {
+      Intent: 'casual',
+      Games: []
+    }
+
+    for (const key in Object.keys(defaults)){
+      if(!request.hasOwnProperty(key)){
+        request[key] = defaults[key];
+      }
+    }
 
     //Update the name to make sure it is valid
     request.PartyName = nameUtil.isValidParty(request.PartyName);
@@ -30,16 +46,11 @@ module.exports = {
     }
 
     // ensure that the party has a location
-    if (!request.hasOwnProperty("PartyLocation") 
-    || request.PartyLocation === "")
+    if (request.PartyLocation === "")
       return responseUtil.Build(403, "Party must have a location");
 
     // add a time that the party was created
     request.CreateDate = moment().toISOString();
-
-    // ensure that there is a host
-    if (!request.hasOwnProperty("Host"))
-      return responseUtil.Build(403, "Please send a host ID!");
 
     // check that the host exists
     try {
@@ -47,16 +58,6 @@ module.exports = {
       request.HostUsername = request.HostUsername.Username;
     } catch (err){
       return responseUtil.Build(403, "Host ID invalid");
-    }
-    
-    //If there was no intent attached, assume casual
-    if(!request.hasOwnProperty("Intent")){
-      request.Intent = "Casual";
-    }
-
-    //If there were games attached, add them. Otherwise, make the list blank
-    if(!request.hasOwnProperty("Games")){
-      request.Games = [];
     }
 
     request.Attendees = [{
