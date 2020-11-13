@@ -2,23 +2,8 @@
 
 module.exports = {
 
-    //Check if values are valid
-    valueCheck: function(key, value){
-        switch(key) {
-            case 'PartyName':
-                break;
-            case 'PartyLocation':
-                return value !== '';
-            case 'PartyTime':
-                break;
-            default:
-                return true;
-        }
-
-    },
-
     //Check if a name is valid
-    isValidName: function (name){
+    isValidParty: function (name){
         //Trim the string of whitespace 
         name = name.trim();
 
