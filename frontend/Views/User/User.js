@@ -4,7 +4,14 @@ import { Table, Button, Accordion, Card, Form, Col, Badge, FormControl, InputGro
 import cookies from 'js-cookie';
 import axios from 'axios';
 import './User.css';
-import { UserContext } from '../../context/UserContext'
+import { UserContext } from '../../src/context(Models)/UserContext'
+
+// imports for user.js
+import ChangeEmail from '../../ViewModel/ChangeEmail'
+import UploadImage from '../../ViewModel/UploadImage';
+import UpdateUser from '../../ViewModel/UpdateUser';
+import handleChange from '../../ViewModel/HandleChange';
+import ChangePassword from '../../ViewModel/ChangePassword';
 
 const User = (props) => {
   const { REACT_APP_URL } = process.env;
@@ -26,188 +33,25 @@ const User = (props) => {
    * 
    * 
    */
-
   let image_array = [];
-
-  const updateUser = (e, url) => {
-    e.preventDefault();
-
-    const headers = {
-      headers: {
-        "Content-Type": "application/json"
-      }
-    };
-    // PATCH URL
-    const Link = `${REACT_APP_URL}Account/${user.ID}`;
-
-    const payload = {
-      Avatar: url
-    }
-
-    axios
-      .patch(Link, payload, headers)
-      .then((res) => {
-        console.log("patch res: ", res);
-        setAvatar(res.data.Avatar);
-        setUser({
-          ...res.data,
-          Token: cookies.get("Token"),
-          LoggedIn: true
-        })
-        cookies.set("Avatar", res.data.Avatar);
-      })
-      .catch((error) => console.log(error));
-  };
-
   let uploadInput, url_state;
-  const handleChange = (ev) => {
-    let filename = ev.target.value.split( '\\' ).pop();
-    setChosenImage(filename);
-  };
-  const handleUpload = (e) => {
-    e.preventDefault();
-    let file = uploadInput.files[0];
-    // split the filename to get the name and type
-    let fileParts = uploadInput.files[0].name.split(".");
-    let fileName = fileParts[0];
-    let fileType = fileParts[1];
-    let request_data = {
-      fileName: fileName,
-      fileType: fileType,
-    };
-
-    console.log("request_data", request_data);
-    console.log("file", file);
-
-    axios
-      .post(`${REACT_APP_URL}Image/Upload`, request_data)
-      .then((response) => {
-        console.log("axios response:", response);
-        var returnData = response.data;
-        var signedRequest = returnData.signedRequest;
-        var url = returnData.url;
-        url_state = url;
-        console.log("Recieved a signed request ", signedRequest);
-
-    //     // Put the fileType in the headers for the upload
-        var options = {
-          headers: {
-            "Content-Type": fileType,
-          },
-        };
-        axios
-          .put(signedRequest, file, options)
-          .then((result) => {
-            console.log(result)
-            // console.log("Response from s3");
-            // console.log("url:", url);
-            // console.log("url_state:", url_state);
-            image_array.push(url);
-            setAvatar(url);
-            updateUser(e, url);
-            setEditMode(false);
-            setChosenImage('Choose Image');
-          })
-          .catch((error) => {
-            alert("ERROR " + JSON.stringify(error));
-          });
-      })
-      .catch((error) => {
-        console.log("error:", error);
-        alert(JSON.stringify(error));
-      });
-  }
-  /**
-   * 
-   * END IMAGE UPLOAD
-   * 
-   */
+  HandleChange.handleChange(e, uploadInput, url_state);
+  UploadImage.handleUpload(e);
 
    /**
     * 
     * CHANGE EMAIL
     * 
     */
-  const changeEmail = (data, e) => {
-    e.preventDefault();
-
-    // make sure email is not the current one
-    if (data.email.toLowerCase() === user.Email.toLowerCase()) {
-      alert("New email must be different");
-      console.log("New and old email can't be the same");
-      setEditEmail(false);
-      return;
-    }
-
-    const headers = {
-      headers: {
-        "Content-Type": "application/json"
-      }
-    };
-    // PATCH URL
-    const Link = `${REACT_APP_URL}Account/${user.ID}`;
-    const payload = {
-      NewEmail: data.email
-    }
-
-    console.log("email payload", data.email);
-    axios
-      .patch(Link, payload, headers)
-      .then((res) => {
-        console.log("patch res: ", res);
-        setUser({
-          ...res.data,
-          Token: cookies.get("Token"),
-          LoggedIn: true
-        })
-        cookies.set("Avatar", res.data.Avatar);
-      })
-      .catch((error) => console.log(error));
-
-    setEditEmail(false);
-  }
+    changeEmail.changeEmail();
 
   /**
    * 
    * CHANGE PASSWORD
    * 
    */
-  const changePassword = (data, e) => {
-    e.preventDefault();
-
-    // new email cannot be same as current
-    if (data.oldpassword === data.newpassword) {
-      console.log("passwords cannot be the same");
-      return;
-    }
-
-    const headers = {
-      headers: {
-        "Content-Type": "application/json"
-      }
-    };
-    // PATCH URL
-    const Link = `${REACT_APP_URL}Account/${user.ID}`;
-    const payload = {
-      NewPassword: data.newpassword
-    }
-
-    console.log("password payload", payload);
-    axios
-      .patch(Link, payload, headers)
-      .then((res) => {
-        console.log("patch res: ", res);
-        setUser({
-          ...res.data,
-          Token: cookies.get("Token"),
-          LoggedIn: true
-        })
-        cookies.set("Avatar", res.data.Avatar);
-      })
-      .catch((error) => console.log(error));
-
-    setEditPassword(false);
-  }
+  ChangePassword.changePassword(data, e);
+  
 
   useEffect(()=> {
     // if the token expires while on this page and the user refresh

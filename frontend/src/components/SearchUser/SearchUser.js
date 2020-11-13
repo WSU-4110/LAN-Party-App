@@ -2,8 +2,8 @@ import React, {useState, useEffect, useContext} from 'react';
 import { useForm } from "react-hook-form";
 import Map from '../GoogleMap/GoogleMap';
 import {Button, Accordion, Card} from 'react-bootstrap';
-import { UserContext } from '../../context/UserContext';
-import { HomeRenderContext } from '../../context/HomeRenderContext'
+import { UserContext } from '../../context(Models)/UserContext';
+import { HomeRenderContext } from '../../context(Models)/HomeRenderContext'
 import axios from 'axios';
 import cookies from 'js-cookie';
 import './SearchUser.css';

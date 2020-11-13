@@ -2,9 +2,9 @@ import React, { useState, useContext } from 'react';
 import { Table, Button, Accordion, Card } from 'react-bootstrap';
 import cookies from 'js-cookie';
 import './ViewParty.css'
-import { UserContext } from '../../context/UserContext'
-import { PartiesContext } from '../../context/PartiesContext'
-import { HomeRenderContext } from '../../context/HomeRenderContext'
+import { UserContext } from '../../context(Models)/UserContext'
+import { PartiesContext } from '../../context(Models)/PartiesContext'
+import { HomeRenderContext } from '../../context(Models)/HomeRenderContext'
 import axios from 'axios';
 
 //temporary metadata until we can pull it from the DB

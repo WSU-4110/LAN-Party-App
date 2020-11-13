@@ -3,9 +3,9 @@ import { NavLink } from 'react-router-dom';
 import Map from '../GoogleMap/GoogleMap';
 import cookies from 'js-cookie';
 import {Button, Accordion, Card} from 'react-bootstrap';
-import { UserContext } from '../../context/UserContext';
-import { PartiesContext } from '../../context/PartiesContext'
-import { HomeRenderContext } from '../../context/HomeRenderContext'
+import { UserContext } from '../../context(Models)/UserContext';
+import { PartiesContext } from '../../context(Models)/PartiesContext'
+import { HomeRenderContext } from '../../context(Models)/HomeRenderContext'
 import ViewParty from '../ViewParty/ViewParty';
 import axios from 'axios';
 

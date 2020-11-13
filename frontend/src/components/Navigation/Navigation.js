@@ -4,7 +4,7 @@ import cookies from 'js-cookie';
 import { 
   Navbar,
   Nav, } from 'react-bootstrap';
-import {UserContext} from '../../context/UserContext';
+import {UserContext} from '../../context(Models)/UserContext';
 
 const Navigation = (props) => {
   const [user, setUser] = useContext(UserContext);

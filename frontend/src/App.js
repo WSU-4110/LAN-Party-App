@@ -4,13 +4,13 @@ import Navigation from './components/Navigation/Navigation';
 import Home from './components/Home/Home';
 import Signup from './components/Register/Signup';
 import Login from './components/Register/Login';
-import User from './components/User/User';
+import User from '../Views/User/User';
 import Host from './components/HostParty/HostParty'
 import ViewParty from './components/ViewParty/ViewParty';
 import PartySearch from './components/PartySearch/PartySearch';
 import SearchUser from './components/SearchUser/SearchUser';
 import cookies from 'js-cookie';
-import { UserContext } from './context/UserContext';
+import { UserContext } from './context(Models)/UserContext';
 import crypto from 'crypto-js'
 import './App.css';
 import axios from 'axios';

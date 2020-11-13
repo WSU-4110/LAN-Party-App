@@ -7,8 +7,8 @@ import setMinutes from "date-fns/setMinutes";
 import cookies from 'js-cookie';
 import axios from 'axios';
 import Geocode from 'react-geocode';
-import { UserContext } from '../../context/UserContext'
-import { HomeRenderContext } from '../../context/HomeRenderContext'
+import { UserContext } from '../../context(Models)/UserContext'
+import { HomeRenderContext } from '../../context(Models)/HomeRenderContext'
 import "react-datepicker/dist/react-datepicker.css"
 
 Geocode.setApiKey(process.env.REACT_APP_MAP_GEOCODE_KEY);

@@ -7,7 +7,7 @@ import {
   GoogleMap,
   Marker
 } from "react-google-maps";
-import { PartiesContext } from '../../context/PartiesContext';
+import { PartiesContext } from '../../context(Models)/PartiesContext';
 
 const MapComponent = compose(
   withProps({
