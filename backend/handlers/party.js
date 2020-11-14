@@ -385,7 +385,53 @@ module.exports = {
     if(!events){
       return responseUtil.Build(204, "Events is empty");
     }
+
+    let request = JSON.parse(events.body)
+    request.ID = events.pathParameters.ID;
+
+    //Retrieve the party
+    let party = await PartyAPI.Get(request.ID);
     
+    if(party === false) {
+      return responseUtil.Build(403, 'Party ID not valid');
+    }
+
+    //If there is already a request made for the party, we keep the original
+    if(party.hasOwnProperty(RequestLocationChange) 
+        && party.RequestLocationChange !== undefined){
+      return responseUtil.Build(403, "There is a request already in progress");
+    }
+
+    //A prototype of the required fields of the required fields
+    let required = ['Title', 'Body', 'User', 'Location'];
+
+    party.RequestLocationChange = {};
+
+    //Check if each required key is present
+    required.forEach((key) =>{
+      if(!request.hasOwnProperty(key)){
+        return responseUtil.Build(403, "Missing key: " + key);
+      }
+      //Add the key to the new request
+      party.RequestLocationChange[key] = request[key];
+    });
+
+    //Create a new update expression
+    let updateExpression = 'Set RequestLocationChange = :R';
+    let expressionValues = {
+      ':R': party.RequestLocationChange
+    }
+    
+    try{
+      let response = await PartyAPI.Update(request.ID, expressionValues, updateExpression);
+      if (response !== false){
+        return responseUtil.Build(200, response);
+      } else {
+        return responseUtil.Build(500, "Could not fulfil update request")
+      }
+    } catch (err) {
+      return responseUtil.Build(500, "Could not fulfil update request")
+    }
   },
 
   // GET A PARTY BY AN ID //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
