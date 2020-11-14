@@ -171,7 +171,7 @@ functions:
     events:
       - http:
           method: PATCH
-          path: Invite/Party/{ID}
+          path: Party/RequestLocation/{ID}
           cors: true
 
   # image functions
