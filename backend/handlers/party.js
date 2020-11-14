@@ -300,7 +300,7 @@ module.exports = {
     }
 
     //If there is no invite list, create one
-    if(!party.hasOwnProperty('Invited') || party.Invited === []){
+    if(!party.hasOwnProperty('Invited') || party.Invited.length === 0){
       party.Invited = [saveItem];
     } else {
       try {
@@ -328,10 +328,38 @@ module.exports = {
       //Try to save the item
       let response = await PartyAPI.Update(request.ID, values, expression);
       if (response !== false){
-        response.message = 'Invited'
-        return responseUtil.Build(200, response);
+        //Set the save item to include values of party ID and Name
+        saveItem = {
+          ID: party.ID,
+          PartyName: party.PartyName
+        }
+
+        //Check if the invites exist on the user
+        if(!user.hasOwnProperty('Invites') || user.Invites.length === 0){
+          user.Invites = [saveItem];
+        } else {
+          //Append it to the front
+          user.Invites.unshift(saveItem);
+        }
+
+        expression = 'Set Invites = :I'
+        values = {
+          ':I': user.Invites
+        }
+
+        try{
+          response = await AccountAPI.Update(user.ID, values, expression);
+          if(response !== false){
+            response.Message = 'Invite successful'
+            return responseUtil.Build(200, response);
+          } else {
+            return responseUtil.Build(403, "Could not add party to user invites")
+          }
+        } catch (err) {
+          return responseUtil.Build(403, "Could not add party to user invites")
+        }
       } else {
-        return responseUtil.Build(403, 'Could not invite');
+        return responseUtil.Build(403, 'Could not invite to party');
       }
     } catch (err) {
       return responseUtil.Build(403, err);
