@@ -7,6 +7,7 @@ const responseUtil = require("../utilities/response");
 const nameUtil = require("../utilities/nameCheck");
 const shortid = require("shortid");
 const moment = require("moment-timezone");
+const { invalid } = require("moment-timezone");
 
 module.exports = {
 
@@ -206,7 +207,7 @@ module.exports = {
         //Check if the ID is present in the array
         let i = party.Attendees.findIndex(attendee => attendee.ID === request.Attendees.Remove);
 
-        if(typeof i === -1){
+        if(i === -1){
           return responseUtil.Build(403, "User not in party already");
         } else {
           party.Attendees.splice(i, 1);
@@ -254,6 +255,96 @@ module.exports = {
       response.Message = "Party Created";
       return responseUtil.Build(200, response);
     }
+  },
+
+  // INVITE USER TO PARTY //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  Invite: async function(events){
+    if(!events){
+      return responseUtil.Build(204, "Events is empty");
+    }
+
+    let request = JSON.parse(events.body);
+    request.ID = events.ID;
+
+    //Check that we have a userID in the event
+    if(!request.hasOwnProperty('ID')){
+      return responseUtil.Build(204, "No user ID provided")
+    }
+
+    try{
+    let user = await AccountAPI.Get(request.User);
+      if(user === false){
+        return responseUtil.Build(403, "User ID not valid");
+      }
+    } catch (err){
+      return responseUtil.Build(403, "User ID not valid");
+    }
+
+    let party = await PartyAPI.Get(request.Party);
+
+    if (!party){
+      return responseUtil.Build(403, "Party ID not valid");
+    }
+
+    
+
+    //Check that the user isn't in the party
+    if(party.Attendees.findIndex(attendee => attendee.ID ===user.ID) !== -1){
+      return responseUtil.Build(403, "User already in party");
+    }
+
+    //Create an item to save in the list
+    let saveItem = {
+      ID: user.ID,
+      Username: user.Username
+    }
+
+    //If there is no invite list, create one
+    if(!party.hasOwnProperty('Invited') || party.Invited === []){
+      party.Invited = [saveItem];
+    } else {
+      try {
+        let i = 0;
+        while(party.Invited[i].ID > saveItem.ID){
+          i++;
+        }
+        if(party.Invited[i].ID === saveItem.ID){
+          return responseUtil.Build(403, "User already invited");
+        } else {
+          party.Invited.splice(i, 0, saveItem);
+        }
+      } catch (err){
+        party.Invited.push(saveItem);
+      }
+    }
+
+    //Create the save expressions
+    let expression = 'Set Invited = :I'
+    let values = {
+      ':I': party.Invited
+    };
+
+    try{
+      //Try to save the item
+      let response = await PartyAPI.Update(request.ID, values, expression);
+      if (response !== false){
+        response.message = 'Invited'
+        return responseUtil.Build(200, response);
+      } else {
+        return responseUtil.Build(403, 'Could not invite');
+      }
+    } catch (err) {
+      return responseUtil.Build(403, err);
+    }
+    
+  },
+
+  // REQUEST LOCATION CHANGE //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  RequestLocationChange: async function (events){
+    if(!events){
+      return responseUtil.Build(204, "Events is empty");
+    }
+    
   },
 
   // GET A PARTY BY AN ID //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
