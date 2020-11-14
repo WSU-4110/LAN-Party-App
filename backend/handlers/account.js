@@ -239,6 +239,9 @@ module.exports = {
             //Check if the requested id is valid
             try {
                 var requested = await AccountAPI.Get(request.Requested);
+                if(requested === false){
+                    return responseUtil.Build(403, "Requested ID not valid!");
+                }
             } catch (err){
                 return responseUtil.Build(403, "Requested ID not valid!");
             }
@@ -298,6 +301,9 @@ module.exports = {
 
             try {
                 var requested = await AccountAPI.Get(request.Confirm);
+                if(requested === false){
+                    return responseUtil.Build(403, "Requested ID not valid!");
+                }
             } catch (err) {
                 return responseUtil.Build(403, "Requested ID invalid");
             }
