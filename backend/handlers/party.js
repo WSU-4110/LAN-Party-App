@@ -168,6 +168,14 @@ module.exports = {
           ID : newAttendee.ID
         }
         
+        //If the new attendee is currently in the invites, take them out
+        if(party.hasOwnProperty('Invited')){
+          let locOfInvite = party.Invited.findIndex(attendee => attendee.ID === newAttendee.ID);
+          if(locOfInvite !== -1){
+            party.Invited.splice(locOfInvite, 1);
+          }
+        }
+        
         //Insert it into the list
         if(!party.hasOwnProperty('Attendees') || party.Attendees.length === 0){
           party.Attendees = [saveItem];
