@@ -173,6 +173,9 @@ module.exports = {
           let locOfInvite = party.Invited.findIndex(attendee => attendee.ID === newAttendee.ID);
           if(locOfInvite !== -1){
             party.Invited.splice(locOfInvite, 1);
+    
+            curExpressions.push('Invited = :z')
+            updateValues[':z'] = party.Invited;
           }
         }
         
