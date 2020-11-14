@@ -157,6 +157,22 @@ functions:
           method: PATCH
           path: /Party/{ID}
           cors: true
+  
+  InviteToParty:
+    handler: handlers/party.Invite
+    events:
+      - http:
+          method: PATCH
+          path: Invite/Party/{ID}
+          cors: true
+  
+  RequestLocationChange:
+    handler: handlers/party.RequestLocationChange
+    events:
+      - http:
+          method: PATCH
+          path: Invite/Party/{ID}
+          cors: true
 
   # image functions
   UploadImage:
