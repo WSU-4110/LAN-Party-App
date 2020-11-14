@@ -416,6 +416,22 @@ module.exports = {
       party.RequestLocationChange[key] = request[key];
     });
 
+    //Make sure that a user is valid
+    let user
+    
+    try {
+      user = await AccountAPI.Get(request.User);
+      if(user === false){
+        return responseUtil.Build(403, "User not valid");
+      }
+    } catch (err){
+      return responseUtil.Build(403, "User not valid")
+    }
+
+    party.RequestLocationChange.User = {
+      ID: user.ID,
+      Username: user.Username
+    }
     //Create a new update expression
     let updateExpression = 'Set RequestLocationChange = :R';
     let expressionValues = {
