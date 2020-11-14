@@ -4,7 +4,7 @@
 const PartyAPI = require("../services/PartyAPI");
 const AccountAPI = require("../services/AccountAPI");
 const responseUtil = require("../utilities/response");
-const nameUtil = require("../utilities/nameCheck");
+const nameUtil = require("../utilities/PartyCheck");
 const shortid = require("shortid");
 const moment = require("moment-timezone");
 const { invalid } = require("moment-timezone");
@@ -264,25 +264,27 @@ module.exports = {
     }
 
     let request = JSON.parse(events.body);
-    request.ID = events.ID;
+    request.ID = events.pathParameters.ID;
 
     //Check that we have a userID in the event
     if(!request.hasOwnProperty('ID')){
       return responseUtil.Build(204, "No user ID provided")
     }
+    
+    let user
 
     try{
-    let user = await AccountAPI.Get(request.User);
-      if(user === false){
-        return responseUtil.Build(403, "User ID not valid");
-      }
+      user = await AccountAPI.Get(request.User);
+        if(user === false){
+          return responseUtil.Build(403, "User ID not valid");
+        }
     } catch (err){
       return responseUtil.Build(403, "User ID not valid");
     }
 
-    let party = await PartyAPI.Get(request.Party);
+    let party = await PartyAPI.Get(request.ID);
 
-    if (!party){
+    if (party === false){
       return responseUtil.Build(403, "Party ID not valid");
     }
 
