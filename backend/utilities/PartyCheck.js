@@ -17,18 +17,20 @@ module.exports = {
                 let reqs = ['Longitude', 'Latitude', 'Name'];
 
                 output.value = {};
-                
+
                 let missingKey = false;
 
-                reqs.forEach(key => {
-                    if(!value.hasOwnProperty(key)){
-                        missingKey = key;
+                for(let i = 0; i < reqs.length; i++){
+                    if(!value.hasOwnProperty(reqs[i])){
+                        missingKey = reqs[i];
+                        break;
                     } else {
-                     output.value[key] = value[key];
+                        output.value[reqs[i]] = value[reqs[i]];
                     }
-                })
-
-                output.isValid = (missingKey !== false);
+                }
+                
+                //Valid if there was no missing key
+                output.isValid = (missingKey === false);
                 return output;
 
             case 'Host':
@@ -49,17 +51,19 @@ module.exports = {
                     HostUsername: account.Username
                 };
                 output.isValid = true;
-                
-                console.log(output);
 
                 return output;
 
             case 'PartyTime':
+                let curTime = moment();
                 output.value = value;
+                value = moment(value, ["MMMM D, yyyy h:mm a", "MMMM DD, yyyy h:mm a",
+                                        "MMMM D, yyyy hh:mm a", "MMMM DD, yyyy hh:mm a"], true);
                 try {
-                output.isValid = value.isAfter(moment.now());
+                    output.isValid = value.isAfter(curTime);
                 } catch (err){
                     output.isValid = false;
+                    console.log("error: " + err);
                 }
                 return output;
 
