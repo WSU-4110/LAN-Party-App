@@ -97,6 +97,22 @@ functions:
           path: /Account/{ID}
           cors: true
 
+  AddGame:
+    handler: handlers/account.AddGame
+    events:
+      - http:
+          method: POST
+          path: /AddGame/Account/{ID}
+          cors: true
+
+  RemoveGame:
+    handler: handlers/account.RemoveGame
+    events:
+      - http:
+          method: POST
+          path: /RemoveGame/Account/{ID}
+          cors: true
+
   # game functions
   ViewGame:
     handler: handlers/game.ViewGame

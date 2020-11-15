@@ -2,6 +2,7 @@
 
 // Imports
 const AccountAPI = require("../services/AccountAPI");
+const GameAPI = require("../services/GameAPI");
 const moment = require("moment-timezone");
 const responseUtil = require("../utilities/response");
 const crypto = require("crypto");
@@ -215,6 +216,60 @@ module.exports = {
         }
     },
 
+    // ADD A GAME FROM ACCOUNT LIST //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    AddGame: async function (event) {
+        try {
+            if (!event)
+                return responseUtil.Build(204, "No information was sent");
+    
+            // get the event
+            let request = JSON.parse(event.body);
+            request.AccountID = event.pathParameters.ID;
+    
+            // check that the game ID is valid
+            if (!await GameAPI.Get(request.GameID))
+                return responseUtil.Build(204, "Invalid game!");
+
+            // check that the user ID is valid
+            let user = await AccountAPI.Get(request.AccountID); // save the user since we will the list of current games that they have for later
+            
+            if (!user) // if the user doesn't exist, throw an error
+                return responseUtil.Build(204, "Invalid user!");
+            
+            // check if the user already contains the game
+            if (AccountAPI.ContainsGame(user.Games, GameID)) // if it does exist, check if it has the game already
+                return responseUtil.Build(204, "Game already on the account list!");
+            
+            // if we got here then we can just add the game to the account's game list
+            let games = await AccountAPI.AddGame(AccountID, GameID);
+            
+            // if we returned with success
+            if (games) {
+                return responseUtil.Build(200, games); // then, send the result
+            } else return responseUtil.Build(500, { Message: "Adding Game To List Error" }); // else, return an error
+        } catch (err) {
+            console.log(err);
+            return responseUtil.Build(500, { Message: err.message });
+        }
+    },
+
+    // REMOVE A GAME FROM ACCOUNT LIST //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    RemoveGame: async function (event) {
+        try {
+            // return the account information
+            let games = await AccountAPI.RemoveGame();
+            
+            // if we returned with success
+            if (games) {
+                return responseUtil.Build(200, games); // then, send the result
+            } else return responseUtil.Build(500, { Message: "Removing Game From List Error" }); // else, return an error
+        } catch (err) {
+            console.log(err);
+            return responseUtil.Build(500, { Message: err.message });
+        }
+    },
+
+    // UPDATE FRIENDS LIST //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     UpdateFriends: async function(events) {
         if(!events){
             return responseUtil.Build(204, "No information was sent");
