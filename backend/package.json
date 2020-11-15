@@ -15,12 +15,12 @@
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "moment": "^2.29.1",
-    "moment-timezone": "^0.5.31",
-    "shortid": "^2.2.15",
+    "moment-timezone": "^0.5.32",
+    "shortid": "^2.2.16",
     "uuid": "^8.3.1"
   },
   "devDependencies": {
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.6"
   },
   "proxy": "http://localhost:5000"
 }
