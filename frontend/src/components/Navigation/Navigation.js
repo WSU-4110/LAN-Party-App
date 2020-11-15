@@ -23,8 +23,6 @@ const Navigation = (props) => {
     })
     cookies.remove("Token");
     cookies.remove("Avatar");
-
-    props.history.push("/");
   }
 
   const renderUserNavButton = () => (
@@ -72,8 +70,10 @@ const Navigation = (props) => {
                 <Nav.Link>
                   <NavLink to="/user"style={{color:"#fff"}}>User</NavLink>
                 </Nav.Link>
-                <Nav.Link href="/" style={{color:"#fff"}} onClick={logout}>
-                  Logout
+                <Nav.Link>
+                  <NavLink to="/login" style={{color:"#fff"}} onClick={logout}>
+                    Logout
+                  </NavLink>
                 </Nav.Link>
                 <Nav.Link>
                   <NavLink to="/SearchUser"style={{color:"#fff"}}>SearchUser</NavLink>
