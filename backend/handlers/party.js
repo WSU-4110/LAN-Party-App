@@ -4,10 +4,9 @@
 const PartyAPI = require("../services/PartyAPI");
 const AccountAPI = require("../services/AccountAPI");
 const responseUtil = require("../utilities/response");
-const nameUtil = require("../utilities/PartyCheck");
+const PartyUtil = require("../utilities/PartyCheck");
 const shortid = require("shortid");
 const moment = require("moment-timezone");
-const { invalid } = require("moment-timezone");
 
 module.exports = {
 
@@ -22,21 +21,34 @@ module.exports = {
     //Create prototype party
     let required = ['PartyName', 'PartyLocation', 'Host', 'PartyTime'];
     
-    let missingKey = false;
+    let badKey = false;
 
     //If it's missing a required key, store which one it is and call return false
     required.forEach((key) => {
       if(!request.hasOwnProperty(key)){
-        missingKey = key;
+        badKey = "Missing Key: " + key;
+      } else {
+        let objVal = PartyUtil.validPartyKeys(key, request[key]);
+        if(objVal.isValid === false){
+          badKey = "Key value not valid: " + key + "   " + request[key];
+        }
+
+        else {
+          if(key === 'Host'){
+            request.HostUsername = objVal.value.HostUsername; 
+          } else {
+            request[key] = objVal.value;
+          }
+        }
       }
     });
 
-    if (missingKey !== false){
-      return responseUtil.Build(403, "Missing key: " + missingKey);
+    if (badKey !== false){
+      return responseUtil.Build(403, badKey);
     }
 
     let defaults = {
-      Intent: 'casual',
+      Intent: 'Casual',
       Games: [],
       AgeGate: false
     }
@@ -47,34 +59,13 @@ module.exports = {
       }
     });
 
-    //Update the name to make sure it is valid
-    request.PartyName = nameUtil.isValidParty(request.PartyName);
-
-    if(request.PartyName === false){
-      return responseUtil.Build(403, "Party name not valid");
-    }
-
-    // ensure that the party has a location
-    if (request.PartyLocation === "")
-      return responseUtil.Build(403, "Party must have a location");
-
     // add a time that the party was created
     request.CreateDate = moment().toISOString();
-
-    // check that the host exists
-    try {
-      request.HostUsername = await AccountAPI.Get(request.Host);
-      request.HostUsername = request.HostUsername.Username;
-    } catch (err){
-      return responseUtil.Build(403, "Host ID invalid");
-    }
 
     request.Attendees = [{
       ID: request.Host,
       Username: request.HostUsername
     }];
-
-    
 
     let response = await PartyAPI.Save(shortid.generate(), request);
 
@@ -111,7 +102,7 @@ module.exports = {
     //Check if the name is exists
     if(request.hasOwnProperty('PartyName')){
       //Update the name to make sure it's valid
-      request.PartyName = nameUtil.isValidParty(request.PartyName);
+      request.PartyName = PartyUtil.isValidParty(request.PartyName);
 
       //Check if the name is valid 
       if(request.PartyName === false){
