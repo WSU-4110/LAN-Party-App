@@ -318,7 +318,8 @@ module.exports = {
             //Values to store in the sender's table.
             let storeVal = {
                 ID: requested.ID,
-                Username: requested.Username
+                Username: requested.Username,
+                Avatar: requested.Avatar
             }
             //Insert the friend such that it's sorted by ID
             if(!sender.hasOwnProperty("Friends") || sender.Friends === []){
@@ -354,7 +355,8 @@ module.exports = {
                         
                     let storeVal = {
                         ID: sender.ID,
-                        Username: sender.Username
+                        Username: sender.Username,
+                        Avatar: sender.Avatar
                     }
 
                     console.log('Post-splice')
