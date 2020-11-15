@@ -19,16 +19,16 @@ module.exports = {
     let request = JSON.parse(events.body);
 
     //Create prototype party
-    let required = ['PartyName', 'PartyLocation', 'Host', 'PartyTime'];
+    const required = ['PartyName', 'PartyLocation', 'Host', 'PartyTime'];
     
     let badKey = false;
 
     //If it's missing a required key, store which one it is and call return false
-    required.forEach((key) => {
+    required.forEach(async function (key){
       if(!request.hasOwnProperty(key)){
         badKey = "Missing Key: " + key;
       } else {
-        let objVal = PartyUtil.validPartyKeys(key, request[key]);
+        let objVal = await PartyUtil.validPartyKeys(key, request[key]);
         if(objVal.isValid === false){
           badKey = "Key value not valid: " + key + "   " + request[key];
         }
@@ -47,7 +47,7 @@ module.exports = {
       return responseUtil.Build(403, badKey);
     }
 
-    let defaults = {
+    const defaults = {
       Intent: 'Casual',
       Games: [],
       AgeGate: false
