@@ -271,12 +271,6 @@ resources:
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
-          - IndexName: PartyLocation
-            KeySchema:
-              - AttributeName: PartyLocation
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
           - IndexName: PartyTime
             KeySchema:
               - AttributeName: PartyTime
