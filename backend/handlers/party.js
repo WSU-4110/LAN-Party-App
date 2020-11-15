@@ -28,16 +28,16 @@ module.exports = {
       if(!request.hasOwnProperty(key)){
         badKey = "Missing Key: " + key;
       } else {
-        let objVal = await PartyUtil.validPartyKeys(key, request[key]);
-        if(objVal.isValid === false){
+        let curObj = await PartyUtil.validPartyKeys(key, request[key]);
+        if(curObj.isValid === false){
           badKey = "Key value not valid: " + key + "   " + request[key];
         }
 
         else {
           if(key === 'Host'){
-            request.HostUsername = objVal.value.HostUsername; 
+            request.HostUsername = curObj.value.HostUsername; 
           } else {
-            request[key] = objVal.value;
+            request[key] = curObj.value;
           }
         }
       }
@@ -53,9 +53,16 @@ module.exports = {
       AgeGate: false
     }
 
-    Object.keys(defaults).forEach((key) =>{
+    Object.keys(defaults).forEach(async function (key){
       if(!request.hasOwnProperty(key)){
         request[key] = defaults[key];
+      } else {
+        let curObj = await PartyUtil.validPartyKeys(key, request[key]);
+        if(curObj.isValid === false){
+          request[key] = defaults[key];
+        } else {
+          request[key] = curObj.value;
+        }
       }
     });
 
