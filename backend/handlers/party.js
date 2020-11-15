@@ -22,11 +22,19 @@ module.exports = {
     //Create prototype party
     let required = ['PartyName', 'PartyLocation', 'Host', 'PartyTime'];
     
-    required.forEach((key, index) => {
+    let missingKey = false;
+
+    //If it's missing a required key, store which one it is and call return false
+    required.forEach((key) => {
       if(!request.hasOwnProperty(key)){
-        return responseUtil.Build(403, 'Missing attribute: ' + key);
+        missingKey = key;
+        return false;
       }
     });
+
+    if (missingKey !== false){
+      return responseUtil.Build(403, "Missing key: " + missingKey);
+    }
 
     let defaults = {
       Intent: 'casual',
@@ -34,7 +42,7 @@ module.exports = {
       AgeGate: false
     }
 
-    Object.keys(defaults).forEach((key, index) =>{
+    Object.keys(defaults).forEach((key) =>{
       if(!request.hasOwnProperty(key)){
         request[key] = defaults[key];
       }
