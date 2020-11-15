@@ -231,6 +231,14 @@ module.exports = {
       updateValues[':a'] = party.Attendees;
     }
 
+    //If the LocChange has been removed or loc has been changed
+    if(request.hasOwnProperty('RequestLocationChange') || 
+        updateValues.hasOwnProperty(':l')){
+          curExpressions.push('RequestLocationChange = :x');
+          updateValues[':x'] = null;
+        }
+
+
     //Check for hardware requirements
     if (request.hasOwnProperty('HardwareRequirements')){
       curExpressions = curExpressions.concat('HardwareRequirements = :r')
@@ -397,25 +405,33 @@ module.exports = {
     }
 
     //If there is already a request made for the party, we keep the original
-    if(party.hasOwnProperty(RequestLocationChange) 
-        && party.RequestLocationChange !== undefined){
+    if(party.hasOwnProperty('RequestLocationChange') 
+        && party.RequestLocationChange !== null){
       return responseUtil.Build(403, "There is a request already in progress");
     }
 
     //A prototype of the required fields of the required fields
-    let required = ['Title', 'Body', 'User', 'Location'];
+    let required = ['Title', 'Body', 'User', 'RequestLocation'];
 
+    let missingKey = false;
+
+    console.log(request);
     party.RequestLocationChange = {};
 
     //Check if each required key is present
     required.forEach((key) =>{
-      if(!request.hasOwnProperty(key)){
-        return responseUtil.Build(403, "Missing key: " + key);
+      console.log(key + '   ' +request.hasOwnProperty(key));
+      if(request.hasOwnProperty(key) === false){
+        missingKey = key;
+        return false;
       }
       //Add the key to the new request
       party.RequestLocationChange[key] = request[key];
     });
 
+    if(missingKey !== false){
+      return responseUtil.Build(403, "Missing key: " + missingKey);
+    }
     //Make sure that a user is valid
     let user
     
