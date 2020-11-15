@@ -24,24 +24,25 @@ module.exports = {
     let badKey = false;
 
     //If it's missing a required key, store which one it is and call return false
-    required.forEach(async function (key){
-      if(!request.hasOwnProperty(key)){
-        badKey = "Missing Key: " + key;
+    for(let i = 0; i < required.length; i++){
+      if(!request.hasOwnProperty(required[i])){
+        badKey = "Missing Key: " + required[i];
       } else {
-        let curObj = await PartyUtil.validPartyKeys(key, request[key]);
+        let curObj = await PartyUtil.validPartyKeys(required[i], request[required[i]]);
         if(curObj.isValid === false){
-          badKey = "Key value not valid: " + key + "   " + request[key];
+          badKey = "Key value not valid: " + required[i] + "   " + request[required[i]];
         }
 
         else {
-          if(key === 'Host'){
-            request.HostUsername = curObj.value.HostUsername; 
+          if(required[i] === 'Host'){
+            console.log(curObj);
+            request['HostUsername'] = curObj.value.HostUsername; 
           } else {
-            request[key] = curObj.value;
+            request[required[i]] = curObj.value;
           }
         }
       }
-    });
+    };
 
     if (badKey !== false){
       return responseUtil.Build(403, badKey);
@@ -53,22 +54,25 @@ module.exports = {
       AgeGate: false
     }
 
-    Object.keys(defaults).forEach(async function (key){
-      if(!request.hasOwnProperty(key)){
-        request[key] = defaults[key];
+    let keys = Object.keys(defaults);
+
+    for(let i = 0; i < keys.length; i++){
+      if(!request.hasOwnProperty(keys[i])){
+        request[keys[i]] = defaults[keys[i]];
       } else {
-        let curObj = await PartyUtil.validPartyKeys(key, request[key]);
+        let curObj = await PartyUtil.validPartyKeys(keys[i], request[keys[i]]);
         if(curObj.isValid === false){
-          request[key] = defaults[key];
+          request[keys[i]] = defaults[keys[i]];
         } else {
-          request[key] = curObj.value;
+          request[keys[i]] = curObj.value;
         }
       }
-    });
+    };
 
     // add a time that the party was created
     request.CreateDate = moment().toISOString();
 
+    console.log(request.HostUsername);
     request.Attendees = [{
       ID: request.Host,
       Username: request.HostUsername
@@ -82,6 +86,21 @@ module.exports = {
 
   // UPDATE A PARTY //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   Update: async function (events) {
+    
+    //Constant object for modifyable objects
+    let modifyable = {
+      PartyName: ':n',
+      PartyLocation:  ':l',
+      Host: ':h',
+      HostUsername: ":u",
+      PartyTime: ':t',
+      HardwareRequirements: ':r',
+      Games: ':g',
+      AgeGate: ':b',
+      Intent: ':i',
+      RequestLocationChange: ':x'
+    }
+    
     //Check if the event exists
     if(!events){
       return responseUtil.Build(204, 'event is empty');
@@ -98,14 +117,40 @@ module.exports = {
       return responseUtil.Build(403, "Party ID not valid");
     }
 
-    console.log(request);
+    let badKey = false;
+
     //A string for the updates
     let updateExpression = 'set ';
 
-    let curExpressions = [];
+    var curExpressions = [];
     
-    let updateValues = {};
+    var updateValues = {};
 
+    let keys = Object.keys(modifyable);
+
+    for(let i = 0; i < keys.length; i++){
+      if(request.hasOwnProperty(keys[i])){
+        let curObj = await PartyUtil.validPartyKeys(keys[i], request[keys[i]], party);
+        if(curObj.isValid === false){
+          badKey = keys[i];
+        } else {
+          if (keys[i] === 'Host'){
+            curExpressions.push('HostUsername =' + modifyable['HostUsername']);
+            updateValues[modifyable['HostUsername']] = curObj.value.HostUsername;
+            curObj.value = curObj.value.Host;
+          }
+          
+          curExpressions.push(keys[i] + '=' + modifyable[keys[i]]);
+          updateValues[modifyable[keys[i]]] = curObj.value;
+        }
+      }
+    };
+
+    if(badKey !== false){
+      responseUtil.Build(403, "Requested value for " + badKey +" not valid: " + request[badKey]);
+    }
+   
+    /*
     //Check if the name is exists
     if(request.hasOwnProperty('PartyName')){
       //Update the name to make sure it's valid
@@ -153,6 +198,7 @@ module.exports = {
       curExpressions = curExpressions.concat('PartyTime = :t')
       updateValues[':t'] = request.PartyTime;
     }
+    */
 
     //Check attendees
     if (request.hasOwnProperty('Attendees')){
@@ -236,6 +282,7 @@ module.exports = {
       updateValues[':a'] = party.Attendees;
     }
 
+    /*
     //If the LocChange has been removed or loc has been changed
     if(request.hasOwnProperty('RequestLocationChange') || 
         updateValues.hasOwnProperty(':l')){
@@ -268,9 +315,11 @@ module.exports = {
       updateValues[':i'] = request.Intent;
     }
 
+    */
+   
     curExpressions = curExpressions.join(', ');
     updateExpression = updateExpression.concat(curExpressions);
-    
+    console.log(updateValues);
     let response = await PartyAPI.Update(request.ID, updateValues, updateExpression);
 
     if(!response){
@@ -424,15 +473,15 @@ module.exports = {
     party.RequestLocationChange = {};
 
     //Check if each required key is present
-    required.forEach((key) => {
-      console.log(key + '   ' +request.hasOwnProperty(key));
-      if(request.hasOwnProperty(key) === false){
-        missingKey = key;
+    for(let i = 0; i < required.length; i++){
+      console.log(keys[i] + '   ' +request.hasOwnProperty(keys[i]));
+      if(request.hasOwnProperty(keys[i]) === false){
+        missingKey = keys[i];
         return false;
       }
       //Add the key to the new request
-      party.RequestLocationChange[key] = request[key];
-    });
+      party.RequestLocationChange[keys[i]] = request[keys[i]];
+    };
 
     if(missingKey !== false){
       return responseUtil.Build(403, "Missing key: " + missingKey);
