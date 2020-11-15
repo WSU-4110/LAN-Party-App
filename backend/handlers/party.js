@@ -28,7 +28,6 @@ module.exports = {
     required.forEach((key) => {
       if(!request.hasOwnProperty(key)){
         missingKey = key;
-        return false;
       }
     });
 
@@ -427,7 +426,7 @@ module.exports = {
     party.RequestLocationChange = {};
 
     //Check if each required key is present
-    required.forEach((key) =>{
+    required.forEach((key) => {
       console.log(key + '   ' +request.hasOwnProperty(key));
       if(request.hasOwnProperty(key) === false){
         missingKey = key;
