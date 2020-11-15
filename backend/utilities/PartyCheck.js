@@ -4,7 +4,7 @@ const moment = require("moment-timezone");
 const AccountAPI = require("../services/AccountAPI");
 
 module.exports = {
-    validPartyKeys: function(key, value, context){
+    validPartyKeys: async function(key, value, context){
         output = {};
         
         switch (key) {
