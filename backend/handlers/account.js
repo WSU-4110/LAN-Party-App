@@ -237,11 +237,13 @@ module.exports = {
                 return responseUtil.Build(204, "Invalid user!");
             
             // check if the user already contains the game
-            if (AccountAPI.ContainsGame(user.Games, GameID)) // if it does exist, check if it has the game already
-                return responseUtil.Build(204, "Game already on the account list!");
+            for(let i = 0; i < user.Games.length; i++) {
+                if (user.Games[i] == GameID)
+                    return responseUtil.Build(204, "Game already on the account list!");
+            }
             
             // if we got here then we can just add the game to the account's game list
-            let games = await AccountAPI.AddGame(AccountID, GameID);
+            let games = await AccountAPI.AddGame(request.AccountID, request.GameID);
             
             // if we returned with success
             if (games) {
@@ -256,8 +258,19 @@ module.exports = {
     // REMOVE A GAME FROM ACCOUNT LIST //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     RemoveGame: async function (event) {
         try {
-            // return the account information
-            let games = await AccountAPI.RemoveGame();
+            if (!event)
+                return responseUtil.Build(204, "No information was sent");
+    
+            // get the event
+            let request = JSON.parse(event.body);
+            request.AccountID = event.pathParameters.ID;
+
+            // check that the user ID is valid            
+            if (!(await AccountAPI.Get(request.AccountID))) // if the user doesn't exist, throw an error
+                return responseUtil.Build(204, "Invalid user!");
+            
+            // if we got here then we can just add the game to the account's game list
+            let games = await AccountAPI.RemvoeGame(request.AccountID, request.GameID);
             
             // if we returned with success
             if (games) {
@@ -341,8 +354,7 @@ module.exports = {
             } catch (err) {
                 return responseUtil.Build(500, "Could not update friends list");
             }
-        } 
-        
+        }
         
         else if (request.hasOwnProperty("Confirm")){ 
 
