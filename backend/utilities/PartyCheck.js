@@ -5,17 +5,19 @@ const AccountAPI = require("../services/AccountAPI");
 
 module.exports = {
     validPartyKeys: async function(key, value, context){
-        output = {};
+        let output = {};
         
         switch (key) {
-            case PartyName:
+            case 'PartyName':
                 output.value = this.isValidParty(value);
                 output.isValid = (output.value !== false);
                 return output;
 
-            case PartyLocation:
+            case 'PartyLocation':
                 let reqs = ['Longitude', 'Latitude', 'Name'];
 
+                output.value = {};
+                
                 let missingKey = false;
 
                 reqs.forEach(key => {
@@ -29,7 +31,7 @@ module.exports = {
                 output.isValid = (missingKey !== false);
                 return output;
 
-            case Host:
+            case 'Host':
                 let account;
                 try {
                     account = await AccountAPI.Get(value);
@@ -47,9 +49,12 @@ module.exports = {
                     HostUsername: account.Username
                 };
                 output.isValid = true;
+                
+                console.log(output);
+
                 return output;
 
-            case PartyTime:
+            case 'PartyTime':
                 output.value = value;
                 try {
                 output.isValid = value.isAfter(moment.now());
@@ -58,17 +63,17 @@ module.exports = {
                 }
                 return output;
 
-            case AgeGate:
+            case 'AgeGate':
                 output.value = value;
                 output.isValid = (typeof value === Boolean)
                 return output;
 
-            case Intent:
+            case 'Intent':
                 output.value = value;
                 output.isValid = (value === "Casual" || value === "Competative");
                 return output;
 
-            case RequestLocationChange:
+            case 'RequestLocationChange':
                 output.value = null;
                 output.isValid = true;
                 return output;
