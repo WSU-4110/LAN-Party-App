@@ -251,7 +251,14 @@ module.exports = {
             //If the sender has no friends, make sure the item is at least initialized
             if(!sender.hasOwnProperty("FriendRequests")){
                 sender.FriendRequests = [];
+            } else { //If the user already has a friend request w/ them, prevent them
+                if(sender.FriendRequests.findIndex(FrenReq => {
+                    FrenReq.ID === requested.ID
+                }) !== -1){
+                    return responseUtil.Build(403, "Already requested that friend");
+                }
             }
+            
             let updateValues = {
                 ':f': sender.FriendRequests.concat({
                     ID: requested.ID,
