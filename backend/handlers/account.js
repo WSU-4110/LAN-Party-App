@@ -257,6 +257,9 @@ module.exports = {
                 })
             }
             
+            console.log(sender.ID);
+
+
             try {
                 let result = await AccountAPI.Update(sender.ID, updateValues, updateExpression);
 
