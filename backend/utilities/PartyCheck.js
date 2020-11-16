@@ -9,29 +9,12 @@ module.exports = {
         
         switch (key) {
             case 'PartyName':
-                output.value = this.isValidParty(value);
+                output.value = await this.isValidParty(value);
                 output.isValid = (output.value !== false);
                 return output;
 
             case 'PartyLocation':
-                let reqs = ['Longitude', 'Latitude', 'Name'];
-
-                output.value = {};
-
-                let missingKey = false;
-
-                for(let i = 0; i < reqs.length; i++){
-                    if(!value.hasOwnProperty(reqs[i])){
-                        missingKey = reqs[i];
-                        break;
-                    } else {
-                        output.value[reqs[i]] = value[reqs[i]];
-                    }
-                }
-                
-                //Valid if there was no missing key
-                output.isValid = (missingKey === false);
-                return output;
+                return this.isValidParty(value);
 
             case 'Host':
                 let account;
@@ -69,7 +52,7 @@ module.exports = {
 
             case 'AgeGate':
                 output.value = value;
-                output.isValid = (typeof value === Boolean)
+                output.isValid = (typeof value === "boolean")
                 return output;
 
             case 'Intent':
@@ -89,8 +72,31 @@ module.exports = {
         }
     },
 
+    //Checks if incoming location is valid
+    isValidLocation: async function (location){
+        const reqs = ['Longitude', 'Latitude', 'Name'];
+
+        output.value = {};
+
+        let missingKey = false;
+
+        for(let i = 0; i < reqs.length; i++){
+            if(!location.hasOwnProperty(reqs[i])){
+                missingKey = reqs[i];
+                break;
+            } else {
+                output.value[reqs[i]] = value[reqs[i]];
+            }
+        }
+        
+        //Valid if there was no missing key
+        output.isValid = (missingKey === false);
+        
+        return output;
+    },
+
     //Check if a name is valid
-    isValidParty: function (name){
+    isValidParty: async function (name){
         //Trim the string of whitespace 
         name = name.trim();
 
