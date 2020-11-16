@@ -27,6 +27,7 @@ module.exports = {
     for(let i = 0; i < required.length; i++){
       if(!request.hasOwnProperty(required[i])){
         badKey = "Missing Key: " + required[i];
+        break;
       } else {
         let curObj = await PartyUtil.validPartyKeys(required[i], request[required[i]]);
         if(curObj.isValid === false){
@@ -129,10 +130,12 @@ module.exports = {
     let keys = Object.keys(modifyable);
 
     for(let i = 0; i < keys.length; i++){
+      
       if(request.hasOwnProperty(keys[i])){
         let curObj = await PartyUtil.validPartyKeys(keys[i], request[keys[i]], party);
         if(curObj.isValid === false){
           badKey = keys[i];
+          break;
         } else {
           if (keys[i] === 'Host'){
             curExpressions.push('HostUsername =' + modifyable['HostUsername']);
@@ -147,7 +150,7 @@ module.exports = {
     };
 
     if(badKey !== false){
-      responseUtil.Build(403, "Requested value for " + badKey +" not valid: " + request[badKey]);
+      return responseUtil.Build(403, "Requested value for " + badKey +" not valid: " + request[badKey]);
     }
    
     /*
@@ -319,11 +322,10 @@ module.exports = {
    
     curExpressions = curExpressions.join(', ');
     updateExpression = updateExpression.concat(curExpressions);
-    console.log(updateValues);
     let response = await PartyAPI.Update(request.ID, updateValues, updateExpression);
 
     if(!response){
-      return responseUtil.Build(403, 'Party creation failed ');
+      return responseUtil.Build(403, 'Party Update Failed');
     } else {
       response.Message = "Party Created";
       return responseUtil.Build(200, response);
