@@ -10,6 +10,8 @@ import Geocode from 'react-geocode';
 import { UserContext } from '../../context/UserContext'
 import { HomeRenderContext } from '../../context/HomeRenderContext'
 import "react-datepicker/dist/react-datepicker.css"
+import './HostParty.css'
+import moment from 'moment';
 
 Geocode.setApiKey(process.env.REACT_APP_MAP_GEOCODE_KEY);
 Geocode.setLanguage("en");
@@ -24,6 +26,7 @@ const HostParty = (props) => {
   // const [minutes, setMinutes] = useState();
   // const [startDate, setStartDate] = useState(setHours(setMinutes(new Date(), 30), 16));
   const [startDate, setStartDate] = useState(new Date());
+  const handleDateChange = (date) => {setStartDate(date); console.log(startDate)};
 
   const getLatitude = async (address) => {
     let loc = await Geocode.fromAddress(address);
@@ -46,7 +49,7 @@ const HostParty = (props) => {
       PartyLocation: data.Location,
       Latitude: latitude,
       Longitude: longitude,
-      PartyTime: startDate,
+      PartyTime: moment(startDate).format('MMMM DD, yyyy hh:mm a'),
       HardwareReq: data.Hardware,
       MinAge: data.Age,
       Notes: data.Notes
@@ -105,19 +108,26 @@ const HostParty = (props) => {
             <Form.Label>Set Location</Form.Label>
             <br/>
             <DatePicker
+              id="party-time-picker"
               name="something"
               ref={register({ required: true })}
               selected={startDate}
               onChange={date => setStartDate(date)}
               showTimeSelect
               excludeTimes={[
-                setHours(setMinutes(new Date(), 0), 17),
-                setHours(setMinutes(new Date(), 30), 18),
-                setHours(setMinutes(new Date(), 30), 19),
-                setHours(setMinutes(new Date(), 30), 17)
+                // setHours(setMinutes(new Date(), 0), 17),
+                // setHours(setMinutes(new Date(), 30), 18),
+                // setHours(setMinutes(new Date(), 30), 19),
+                // setHours(setMinutes(new Date(), 30), 17)
               ]}
-              dateFormat="MMMM d, yyyy h:mm aa"
+              dateFormat="MMMM dd, yyyy h:mm a"
             />
+            {/* <DateTimePicker
+              value={startDate}
+              onChange={handleDateChange}
+              name="endDate"
+              id="endDate"
+            /> */}
           </Form.Group>
 
           {/* Hardware Requirements */}

@@ -1,0 +1,22 @@
+#party-time-picker {
+  width: 230px;
+  border: none;
+  padding: 5px 10px;
+}
+#party-time-picker:hover {
+  color: #fff;
+}
+.react-datepicker {
+  background-color: #2C2F33;
+}
+.react-datepicker__month {
+  background-color: #2C2F33;
+}
+.react-datepicker__day {
+  color: #fff;
+}
+.react-datepicker__time-box{
+  background-color: #2C2F33;
+  color: #fff;
+  border-right: .1px solid white;
+}
