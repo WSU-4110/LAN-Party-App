@@ -153,55 +153,6 @@ module.exports = {
       return responseUtil.Build(403, "Requested value for " + badKey +" not valid: " + request[badKey]);
     }
    
-    /*
-    //Check if the name is exists
-    if(request.hasOwnProperty('PartyName')){
-      //Update the name to make sure it's valid
-      request.PartyName = PartyUtil.isValidParty(request.PartyName);
-
-      //Check if the name is valid 
-      if(request.PartyName === false){
-        responseUtil.Build(403, "Party name not valid");
-      }
-
-      //Update the expressions
-      curExpressions = curExpressions.concat('PartyName = :n');
-      updateValues[':n'] = request.PartyName;
-    }
-
-    // ensure that the party has a location
-    if (request.hasOwnProperty('PartyLocation')
-      && request.PartyLocation !== ""){
-        
-      //Update the expressions
-      curExpressions = curExpressions.concat('PartyLocation = :l')
-      updateValues[':l'] = request.PartyLocation;
-    }
-
-    // ensure that there is a host
-    if (request.hasOwnProperty('Host')){
-      // check that the host exists
-      try {
-        request.HostUsername = await AccountAPI.Get(request.Host);
-        request.HostUsername = request.HostUsername.Username
-      } catch (err){
-        return responseUtil.Build(403, "Host doesn't exist!");
-      }
-  
-      //Update the expressions
-      curExpressions = curExpressions.concat('Host = :h, HostUsername = :u')
-      updateValues[':h'] = request.Host;
-      updateValues[':u'] = request.HostUsername;
-    }
-    
-
-    //Check times
-    if (request.hasOwnProperty('PartyTime')){
-      //Update the expressions
-      curExpressions = curExpressions.concat('PartyTime = :t')
-      updateValues[':t'] = request.PartyTime;
-    }
-    */
 
     //Check attendees
     if (request.hasOwnProperty('Attendees')){
@@ -285,40 +236,6 @@ module.exports = {
       updateValues[':a'] = party.Attendees;
     }
 
-    /*
-    //If the LocChange has been removed or loc has been changed
-    if(request.hasOwnProperty('RequestLocationChange') || 
-        updateValues.hasOwnProperty(':l')){
-          curExpressions.push('RequestLocationChange = :x');
-          updateValues[':x'] = null;
-        }
-
-
-    //Check for hardware requirements
-    if (request.hasOwnProperty('HardwareRequirements')){
-      curExpressions = curExpressions.concat('HardwareRequirements = :r')
-      updateValues[':r'] = request.HardwareRequirements;
-    }
-
-    //Check for ageGate
-    if(request.hasOwnProperty('AgeGate')){
-      curExpressions = curExpressions.concat('AgeGate = :g');
-      updateValues[':g'] = request.AgeGate;
-    }
-    
-    //Check for games
-    if(request.hasOwnProperty('Games')){
-      curExpressions = curExpressions.concat('Games = :m');
-      updateValues[':m'] = request.Games;
-    }
-
-    //Check for intent
-    if(request.hasOwnProperty('Intent')){
-      curExpressions = curExpressions.concat('Intent = :i');
-      updateValues[':i'] = request.Intent;
-    }
-
-    */
    
     curExpressions = curExpressions.join(', ');
     updateExpression = updateExpression.concat(curExpressions);
