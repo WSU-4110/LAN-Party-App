@@ -29,13 +29,15 @@ module.exports = {
         badKey = "Missing Key: " + required[i];
         break;
       } else {
+        //Check that the value at the key is valid
         let curObj = await PartyUtil.validPartyKeys(required[i], request[required[i]]);
         if(curObj.isValid === false){
           badKey = "Key value not valid: " + required[i] + "   " + request[required[i]];
         }
-
+        //Is valid
         else {
           if(required[i] === 'Host'){
+            //If its the host, store the username
             console.log(curObj);
             request['HostUsername'] = curObj.value.HostUsername; 
           } else {
@@ -57,14 +59,19 @@ module.exports = {
 
     let keys = Object.keys(defaults);
 
+    //Go through the optional keys
     for(let i = 0; i < keys.length; i++){
+      
+      //If the object doesn't have it, set it to the default
       if(!request.hasOwnProperty(keys[i])){
         request[keys[i]] = defaults[keys[i]];
       } else {
         let curObj = await PartyUtil.validPartyKeys(keys[i], request[keys[i]]);
+        //If the current key for the optional key isn't valid, set it to default
         if(curObj.isValid === false){
           request[keys[i]] = defaults[keys[i]];
         } else {
+          //If the key is valid, use it.
           request[keys[i]] = curObj.value;
         }
       }
@@ -129,14 +136,16 @@ module.exports = {
 
     let keys = Object.keys(modifyable);
 
+    //Go through the modifiable attributes
     for(let i = 0; i < keys.length; i++){
-      
+      //If it's trying to be modified, check if it's valid
       if(request.hasOwnProperty(keys[i])){
         let curObj = await PartyUtil.validPartyKeys(keys[i], request[keys[i]], party);
-        if(curObj.isValid === false){
+        //If not valid, set the bad key and break the update.
+        if(curObj.isValid === false){ 
           badKey = keys[i];
           break;
-        } else {
+        } else { 
           if (keys[i] === 'Host'){
             curExpressions.push('HostUsername =' + modifyable['HostUsername']);
             updateValues[modifyable['HostUsername']] = curObj.value.HostUsername;
@@ -191,18 +200,15 @@ module.exports = {
 
         //Check that it isn't in the list already
         else if(party.Attendees.findIndex(attendee => attendee.ID === saveItem.ID) !== -1){
-          console.log(party.Attendees.findIndex(attendee => attendee.ID === saveItem.ID));
           return responseUtil.Build(403, "Attendee already registered");
         }
 
         //Check that they aren't the new highest member
         else if(party.Attendees[party.Attendees.length - 1].ID < saveItem.ID){
-          console.log(party.Attendees.findIndex(attendee => attendee.ID === saveItem.ID));
           party.Attendees.push(saveItem);
         } 
 
-        else {
-          console.log(party.Attendees.findIndex(attendee => attendee.ID === saveItem.ID));
+        else {     
           try{
             let i = 0; 
             while (party.Attendees[i].ID > saveItem.ID){
@@ -388,12 +394,11 @@ module.exports = {
 
     let missingKey = false;
 
-    console.log(request);
     party.RequestLocationChange = {};
 
     //Check if each required key is present
     for(let i = 0; i < required.length; i++){
-      console.log(keys[i] + '   ' +request.hasOwnProperty(keys[i]));
+
       if(request.hasOwnProperty(keys[i]) === false){
         missingKey = keys[i];
         return false;
