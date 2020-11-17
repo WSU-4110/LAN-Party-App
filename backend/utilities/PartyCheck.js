@@ -9,12 +9,12 @@ module.exports = {
         
         switch (key) {
             case 'PartyName':
-                output.value = await this.isValidParty(value);
+                output.value = await this.isValidPartyName(value);
                 output.isValid = (output.value !== false);
                 return output;
 
             case 'PartyLocation':
-                return this.isValidParty(value);
+                return this.isValidPartyName(value);
 
             case 'Host':
                 let account;
@@ -95,8 +95,30 @@ module.exports = {
         return output;
     },
 
+    isInSortedList: async function(item, list, sortedKey){
+        let left = 0;
+        let right = list.length - 1;
+        try {
+            while (right > left){
+                let middle = (left + right) / 2;
+                if(list[middle][sortedKey] === item){
+                    return middle;
+                } else if (list[middle][sortedKey] < item){
+                    left = middle + 1;
+                } else {
+                    right = middle - 1;
+                }
+            }
+
+            return false;
+        } catch (err) {
+            return false;
+        }
+        
+    },
+
     //Check if a name is valid
-    isValidParty: async function (name){
+    isValidPartyName: async function (name){
         //Trim the string of whitespace 
         name = name.trim();
 
