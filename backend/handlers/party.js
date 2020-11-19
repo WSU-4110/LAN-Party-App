@@ -36,13 +36,10 @@ module.exports = {
         }
         //Is valid
         else {
-          if(required[i] === 'Host'){
-            //If its the host, store the username
-            console.log(curObj);
-            request['HostUsername'] = curObj.value.HostUsername; 
-          } else {
-            request[required[i]] = curObj.value;
-          }
+          //Go through the returned value's keys
+          Object.keys(curObj.value).forEach( responseKey => {
+            request[responseKey] = curObj.value[responseKey];
+          })
         }
       }
     };
@@ -71,8 +68,10 @@ module.exports = {
         if(curObj.isValid === false){
           request[keys[i]] = defaults[keys[i]];
         } else {
-          //If the key is valid, use it.
-          request[keys[i]] = curObj.value;
+          //Go through the returned value's keys
+          Object.keys(curObj.value).forEach( responseKey => {
+            request[responseKey] = curObj.value[responseKey];
+          })
         }
       }
     };
@@ -146,14 +145,11 @@ module.exports = {
           badKey = keys[i];
           break;
         } else { 
-          if (keys[i] === 'Host'){
-            curExpressions.push('HostUsername =' + modifyable['HostUsername']);
-            updateValues[modifyable['HostUsername']] = curObj.value.HostUsername;
-            curObj.value = curObj.value.Host;
-          }
-          
-          curExpressions.push(keys[i] + '=' + modifyable[keys[i]]);
-          updateValues[modifyable[keys[i]]] = curObj.value;
+          //Go through the returned value's keys
+          Object.keys(curObj.value).forEach( responseKey => {
+            curExpressions.push(responseKey + '=' + modifyable[responseKey]);
+            updateValues[modifyable[responseKey]] = curObj.value;
+          })
         }
       }
     };
