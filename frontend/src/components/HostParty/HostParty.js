@@ -1,44 +1,98 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext } from "react";
 import { useForm } from "react-hook-form";
-import { Form, Button } from 'react-bootstrap';
+import { Form, Button } from "react-bootstrap";
 import DatePicker from "react-datepicker";
-import setHours from "date-fns/setHours";
-import setMinutes from "date-fns/setMinutes";
-import cookies from 'js-cookie';
-import axios from 'axios';
-import Geocode from 'react-geocode';
-import { UserContext } from '../../context/UserContext'
-import { HomeRenderContext } from '../../context/HomeRenderContext'
-import "react-datepicker/dist/react-datepicker.css"
-import './HostParty.css'
-import moment from 'moment';
+import axios from "axios";
+import Geocode from "react-geocode";
+import { UserContext } from "../../context/UserContext";
+import { HomeRenderContext } from "../../context/HomeRenderContext";
+import "react-datepicker/dist/react-datepicker.css";
+import "./HostParty.css";
+import moment from "moment";
+
+import usePlacesAutocomplete, {
+  getGeocode,
+  getLatLng,
+} from "use-places-autocomplete";
+import {
+  Combobox,
+  ComboboxInput,
+  ComboboxPopover,
+  ComboboxList,
+  ComboboxOption,
+} from "@reach/combobox";
+import "@reach/combobox/styles.css";
 
 Geocode.setApiKey(process.env.REACT_APP_MAP_GEOCODE_KEY);
 Geocode.setLanguage("en");
 Geocode.enableDebug();
+
+const SearchPlacesInput = () => {
+  const {
+    ready,
+    value,
+    suggestions: { status, data },
+    setValue,
+    clearSuggestions,
+  } = usePlacesAutocomplete({
+    requestOptions: {
+      location: { lat: () => 42.331429, lng: () => -83.045753 },
+      radius: 200 * 1000, // 200m
+    },
+  });
+
+  return (
+    <Combobox
+      onSelect={async (address) => {
+        setValue(address, false);
+        clearSuggestions();
+        try {
+          const results = await getGeocode({address});
+          const {lat, lng} = await getLatLng(results[0]);
+          // console.log(lat, lng)
+        } catch(error) {
+          console.log("error: ", error);
+        }
+        console.log(address);
+      }}
+    >
+      <ComboboxInput
+        id="places-input-box"
+        name="places-input"
+        value={value}
+        onChange={(e) => {
+          setValue(e.target.value);
+        }}
+        disabled={!ready}
+        placeholder="Enter an address"
+      />
+      <ComboboxPopover>
+        {status === "OK" &&
+          data.map(({ id, description }) => (
+            <ComboboxOption key={id} value={description} />
+          ))}
+      </ComboboxPopover>
+    </Combobox>
+  );
+}
 
 const HostParty = (props) => {
   const { REACT_APP_URL } = process.env;
   const [user, setUser] = useContext(UserContext);
   const [homeRender, setHomeRender] = useContext(HomeRenderContext);
   const { register, handleSubmit, errors } = useForm();
-  // const [hours, setHours] = useState();
-  // const [minutes, setMinutes] = useState();
-  // const [startDate, setStartDate] = useState(setHours(setMinutes(new Date(), 30), 16));
   const [startDate, setStartDate] = useState(new Date());
-  const handleDateChange = (date) => {setStartDate(date); console.log(startDate)};
 
   const getLatitude = async (address) => {
     let loc = await Geocode.fromAddress(address);
     return loc.results[0].geometry.location.lat;
-  }
+  };
   const getLongitude = async (address) => {
     let loc = await Geocode.fromAddress(address);
     return loc.results[0].geometry.location.lng;
-  }
+  };
 
   const onSubmit = async (data) => {
-    
     let latitude = await getLatitude(data.Location);
     let longitude = await getLongitude(data.Location);
 
@@ -46,13 +100,15 @@ const HostParty = (props) => {
       Host: user.ID,
       HostUsername: user.Username,
       PartyName: data.Title,
-      PartyLocation: data.Location,
-      Latitude: latitude,
-      Longitude: longitude,
-      PartyTime: moment(startDate).format('MMMM DD, yyyy hh:mm a'),
+      PartyLocation: {
+        Name: data.Location,
+        Latitude: latitude,
+        Longitude: longitude,
+      },
+      PartyTime: moment(startDate).format("MMMM DD, yyyy hh:mm a"),
       HardwareReq: data.Hardware,
       MinAge: data.Age,
-      Notes: data.Notes
+      Notes: data.Notes,
     };
     const headers = {
       headers: {
@@ -62,128 +118,149 @@ const HostParty = (props) => {
     const link = `${REACT_APP_URL}CreateParty`;
     axios
       .post(link, payload, headers)
-      .then(res => {
+      .then((res) => {
         console.log(res);
-        setHomeRender({ render: !homeRender.render })
+        setHomeRender({ render: !homeRender.render });
       })
       .catch((error) => console.log(error));
 
     console.log(payload);
 
     props.history.push("/");
-  }
+  };
 
-  return(
+  return (
     <div className="form-container">
       <div className="form-content">
-      <div className="component-header">
+        <div className="component-header">
           <h2>Create Party</h2>
         </div>
-        <Form onSubmit={handleSubmit(onSubmit)}>
-          <Form.Group controlId="formEmail">
+        <Form onSubmit={handleSubmit(onSubmit)} autocomplete="off">
+          <Form.Group controlId="formTitle">
             <Form.Label>Party Title</Form.Label>
-            <Form.Control 
-              type="text" 
-              placeholder="Enter Party Title" 
+            <Form.Control
+              type="text"
+              placeholder="Enter Party Title"
               name="Title"
               aria-describedby="titleReq"
-              ref={register({ required: true })} />
-            {errors.email && <Form.Text className="text-danger" id="emailReq">Required</Form.Text>}
+              ref={register({ required: true })}
+            />
+            {errors.email && (
+              <Form.Text className="text-danger" id="emailReq">
+                Required
+              </Form.Text>
+            )}
           </Form.Group>
 
           {/* Location */}
           <Form.Group controlId="formEmail">
             <Form.Label>Set Location</Form.Label>
-            <Form.Control 
-              type="text" 
-              placeholder="Set Location" 
+            <SearchPlacesInput />
+            {/* <Form.Control
+              type="text"
+              placeholder="Set Location"
               name="Location"
               aria-describedby="locationReq"
-              ref={register({ required: true })} />
-            {errors.email && <Form.Text className="text-danger" id="locationReq">Required</Form.Text>}
+              ref={register({ required: true })}
+            /> */}
+            {/* {errors.email && (
+              <Form.Text className="text-danger" id="locationReq">
+                Required
+              </Form.Text>
+            )} */}
           </Form.Group>
-          
+
           {/* Date */}
-          <Form.Group controlId="formEmail">
-            <Form.Label>Set Location</Form.Label>
-            <br/>
+          <Form.Group controlId="formDate">
+            <Form.Label>Set Date</Form.Label>
+            <br />
             <DatePicker
               id="party-time-picker"
               name="something"
               ref={register({ required: true })}
               selected={startDate}
-              onChange={date => setStartDate(date)}
+              onChange={(date) => setStartDate(date)}
               showTimeSelect
-              excludeTimes={[
-                // setHours(setMinutes(new Date(), 0), 17),
-                // setHours(setMinutes(new Date(), 30), 18),
-                // setHours(setMinutes(new Date(), 30), 19),
-                // setHours(setMinutes(new Date(), 30), 17)
-              ]}
+              excludeTimes={
+                [
+                  // setHours(setMinutes(new Date(), 0), 17),
+                  // setHours(setMinutes(new Date(), 30), 18),
+                  // setHours(setMinutes(new Date(), 30), 19),
+                  // setHours(setMinutes(new Date(), 30), 17)
+                ]
+              }
               dateFormat="MMMM dd, yyyy h:mm a"
             />
-            {/* <DateTimePicker
-              value={startDate}
-              onChange={handleDateChange}
-              name="endDate"
-              id="endDate"
-            /> */}
           </Form.Group>
 
           {/* Hardware Requirements */}
-          <Form.Group controlId="formEmail"> 
+          <Form.Group controlId="formRequirements">
             <Form.Label>Set Hardware Requirements</Form.Label>
-            <Form.Control 
+            <Form.Control
               type="text"
               rows={3}
-              placeholder="Set Hardware Requirements" 
+              placeholder="Set Hardware Requirements"
               name="Hardware"
               aria-describedby="hardwareReq"
-              ref={register({ required: true })} />
-            {errors.email && <Form.Text className="text-danger" id="hardwareReq">Required</Form.Text>}
-          </Form.Group>
-          
-          {/* Minimum Age */}
-          <Form.Group controlId="formEmail">
-            <Form.Label>Minimum Age</Form.Label>
-            <Form.Control 
-              type="number"
-              min="16"
-              max="100" 
-              placeholder="Set Minimum Age" 
-              name="Age"
-              aria-describedby="ageReq"
-              ref={register({ required: true })} />
-            {errors.email && <Form.Text className="text-danger" id="ageReq">Required</Form.Text>}
+              ref={register({ required: true })}
+            />
+            {errors.email && (
+              <Form.Text className="text-danger" id="hardwareReq">
+                Required
+              </Form.Text>
+            )}
           </Form.Group>
 
-            {/* Additional Notes */}
-            <Form.Group controlId="formEmail"> 
+          {/* Minimum Age */}
+          <Form.Group controlId="formMinAge">
+            <Form.Label>Minimum Age</Form.Label>
+            <Form.Control
+              type="number"
+              min="16"
+              max="100"
+              placeholder="Set Minimum Age"
+              name="Age"
+              aria-describedby="ageReq"
+              ref={register({ required: true })}
+            />
+            {errors.email && (
+              <Form.Text className="text-danger" id="ageReq">
+                Required
+              </Form.Text>
+            )}
+          </Form.Group>
+
+          {/* Additional Notes */}
+          <Form.Group controlId="formAdditionalNotes">
             <Form.Label>Additional Notes</Form.Label>
-            <Form.Control 
+            <Form.Control
               type="text"
-              placeholder="Any additional notes?" 
+              placeholder="Any additional notes?"
               name="Notes"
               aria-describedby="notesReq"
-              ref={register({ required: false })} />
-            {errors.email && <Form.Text className="text-danger" id="notesReq">Required</Form.Text>}
+              ref={register({ required: false })}
+            />
+            {errors.email && (
+              <Form.Text className="text-danger" id="notesReq">
+                Required
+              </Form.Text>
+            )}
           </Form.Group>
-          
-          <div style={{textAlign:"center"}}>
+
+          <div style={{ textAlign: "center" }}>
             <Button variant="primary" type="submit">
               Submit
             </Button>
           </div>
-          
+
           {/* Restrictions */}
-            {/* Age, Alcohol */}
+          {/* Age, Alcohol */}
           {/* Party Size */}
           {/* Casual / Ranked */}
-          
         </Form>
       </div>
     </div>
-  )
-}
+  );
+};
 
 export default HostParty;
