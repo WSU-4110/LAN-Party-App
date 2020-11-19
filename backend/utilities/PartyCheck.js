@@ -5,11 +5,13 @@ const AccountAPI = require("../services/AccountAPI");
 
 module.exports = {
     validPartyKeys: async function(key, value, context){
-        let output = {};
+        let output = {
+            key: {}
+        };
         
         switch (key) {
             case 'PartyName':
-                output.value = await this.isValidPartyName(value);
+                output.value[key] = await this.isValidPartyName(value);
                 output.isValid = (output.value !== false);
                 return output;
 
@@ -34,12 +36,19 @@ module.exports = {
                     HostUsername: account.Username
                 };
                 output.isValid = true;
+                
+                //If context is present, it's an update. Make sure new host is attending
+                if(context !== undefined){
+                    if(this.isInSortedList(account, context.Attendees, 'ID') === false){
+                        //Insert the user into the list such that it is sorted.
 
+                    }
+                }
                 return output;
 
             case 'PartyTime':
                 let curTime = moment();
-                output.value = value;
+                output.value[key] = value;
                 value = moment(value, ["MMMM D, yyyy h:mm a", "MMMM DD, yyyy h:mm a",
                                         "MMMM D, yyyy hh:mm a", "MMMM DD, yyyy hh:mm a"], true);
                 try {
@@ -51,22 +60,22 @@ module.exports = {
                 return output;
 
             case 'AgeGate':
-                output.value = value;
+                output.value[key] = value;
                 output.isValid = (typeof value === "boolean")
                 return output;
 
             case 'Intent':
-                output.value = value;
+                output.value[key] = value;
                 output.isValid = (value === "Casual" || value === "Competative");
                 return output;
 
             case 'RequestLocationChange':
-                output.value = null;
+                output.value[key] = null;
                 output.isValid = true;
                 return output;
 
             default:
-                output.value = value;
+                output.value[key] = value;
                 output.isValid = true;
                 return output;
         }
@@ -76,7 +85,9 @@ module.exports = {
     isValidLocation: async function (location){
         const reqs = ['Longitude', 'Latitude', 'Name'];
 
-        output.value = {};
+        output.value = {
+            PartyLocation: {}
+        };
 
         let missingKey = false;
 
@@ -85,7 +96,7 @@ module.exports = {
                 missingKey = reqs[i];
                 break;
             } else {
-                output.value[reqs[i]] = value[reqs[i]];
+                output.value.PartyLocation[reqs[i]] = value[reqs[i]];
             }
         }
         
@@ -101,9 +112,9 @@ module.exports = {
         try {
             while (right > left){
                 let middle = (left + right) / 2;
-                if(list[middle][sortedKey] === item){
+                if(list[middle][sortedKey] === item[sortedKey]){
                     return middle;
-                } else if (list[middle][sortedKey] < item){
+                } else if (list[middle][sortedKey] < item[sortedKey]){
                     left = middle + 1;
                 } else {
                     right = middle - 1;
@@ -115,6 +126,23 @@ module.exports = {
             return false;
         }
         
+    },
+
+    insertSorted: async function (insertItem, list, sortKey){
+        //Make sure that the list isn't empty
+        if(list === undefined || list.length === 0){
+            list = [insertItem];
+        }
+        
+        //If the first item is greater than the new item, put the item in the front
+        else if(list[0][sortKey] > insertItem[sortKey]){
+            list.unshift(insertItem);
+        } 
+        
+        //If the last item is less than the new item, put the item in the back
+        else if(list[list.length - 1][sortKey] < insertItem[sortKey]){
+            
+        }
     },
 
     //Check if a name is valid
