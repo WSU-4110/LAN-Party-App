@@ -6,6 +6,10 @@ module.exports = {
     // returns the index if it's present, false if not
     //=====================================================================
     isInSortedList: async function(item, list, sortedKey = "ID"){
+        if(list === undefined || list.length === 0){
+            return false;
+        }
+        
         let left = 0;
         let right = list.length - 1;
         try {
