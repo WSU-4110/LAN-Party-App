@@ -44,9 +44,9 @@ module.exports = {
                         ID: account.ID,
                         Username: account.Username
                     }
-                    if(await genUtils.isInSortedList(account, context.Attendees, 'ID') === false){
+                    if(await genUtils.isInSortedList(account, context.Attendees) === false){
                         //Insert the user into the list such that it is sorted.
-                        output.value.Attendees = await genUtils.insertSorted(saveItem, context.Attendees, 'ID');
+                        output.value.Attendees = await genUtils.insertSorted(saveItem, context.Attendees);
                         if(output.value.Attendees === false){
                             output.isValid = false;
                         }
@@ -100,7 +100,7 @@ module.exports = {
                     }
 
                     //Check if the user is in the array
-                    if(await genUtils.isInSortedList(user, context.Attendees, 'ID') !== false){
+                    if(await genUtils.isInSortedList(user, context.Attendees) !== false){
                         output.isValid = false;
                         return output;
                     }
@@ -111,7 +111,7 @@ module.exports = {
                     }
 
                     //Insert them into the array
-                    let result = await genUtils.insertSorted(saveItem, context.Attendees, 'ID');
+                    let result = await genUtils.insertSorted(saveItem, context.Attendees);
                     console.log(context);
                     //If invites exist, check if they're in them
                     if(context.hasOwnProperty("Invited")){
@@ -138,7 +138,7 @@ module.exports = {
                     value.Remove = {
                         ID: remove
                     }
-                    let index = await genUtils.isInSortedList(value.Remove, context.Attendees, 'ID');
+                    let index = await genUtils.isInSortedList(value.Remove, context.Attendees);
                     
                     console.log(index);
                     if(index === false){
