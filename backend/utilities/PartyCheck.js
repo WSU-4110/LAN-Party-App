@@ -28,7 +28,7 @@ module.exports = {
                     }
                 } catch (err) {
                     output.isValid = false;
-                        return output;
+                    return output;
                 }
 
                 output.value = {
@@ -59,11 +59,12 @@ module.exports = {
                 value = moment(value, ["MMMM D, yyyy h:mm a", "MMMM DD, yyyy h:mm a",
                                         "MMMM D, yyyy hh:mm a", "MMMM DD, yyyy hh:mm a"], true);
                 try {
-                    output.isValid = value.isAfter(curTime);
+                    //output.isValid = value.isAfter(curTime);
                 } catch (err){
                     output.isValid = false;
                     console.log("error: " + err);
                 }
+                output.isValid = true;
                 return output;
 
             case 'AgeGate':
