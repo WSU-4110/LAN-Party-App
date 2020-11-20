@@ -27,6 +27,8 @@ module.exports = {
         NewAccount.Password = hash; // assign the has to the password
       }
 
+      NewAccount.Friends = { }; // initialize every new account with an empty friends list
+
       // we will be sending this file to the database
       const parameters = {
         TableName: tableName,

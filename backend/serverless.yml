@@ -97,20 +97,12 @@ functions:
           path: /Account/{ID}
           cors: true
 
-  AddGame:
-    handler: handlers/account.AddGame
+  UpdateGames:
+    handler: handlers/account.UpdateGames
     events:
       - http:
-          method: POST
-          path: /AddGame/Account/{ID}
-          cors: true
-
-  RemoveGame:
-    handler: handlers/account.RemoveGame
-    events:
-      - http:
-          method: DELETE
-          path: /RemoveGame/Account/{ID}
+          method: PATCH
+          path: /UpdateGames/Account/{ID}
           cors: true
 
   # game functions
