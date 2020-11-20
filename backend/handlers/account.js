@@ -5,6 +5,7 @@ const AccountAPI = require("../services/AccountAPI");
 const moment = require("moment-timezone");
 const responseUtil = require("../utilities/response");
 const crypto = require("crypto");
+const genUtils = require("../utilities/generalUtils");
 
 module.exports = {
 
@@ -234,17 +235,21 @@ module.exports = {
 
         //Check if the request had request
         if(request.hasOwnProperty("Requested")){
-            if(sender.ID === request.Requested)
+            if(sender.ID === request.Requested){
                 return responseUtil.Build(403, "Cannot friend self");
+            }
+            
             //Check if the requested id is valid
+            let requested;
             try {
-                var requested = await AccountAPI.Get(request.Requested);
+                requested = await AccountAPI.Get(request.Requested);
                 if(requested === false){
                     return responseUtil.Build(403, "Requested ID not valid!");
                 }
             } catch (err){
                 return responseUtil.Build(403, "Requested ID not valid!");
             }
+
             //Save the request to the sender's account
             let updateExpression = 'set FriendRequests = :f';
 
@@ -266,36 +271,38 @@ module.exports = {
                     Sender: true
                 })
             }
+            let result;
             
             try {
-                let result = await AccountAPI.Update(sender.ID, updateValues, updateExpression);
-
-                if(!result){
-                    return responseUtil.Build(500, "Could not update friends list");
-                } else {
-                    //Repeat for the recipient
-                    if(!requested.hasOwnProperty('FriendRequests')){
-                        requested.FriendRequests = [];
-                    }
-
-                    updateValues = {
-                        ':f': requested.FriendRequests.concat({
-                            ID: sender.ID,
-                            Username: sender.Username,
-                            Sender: false
-                        })
-                    };
-                    result = await AccountAPI.Update(requested.ID, updateValues, updateExpression);
-
-                    if(!result){
-                        return responseUtil.Build(500, "Could not update friends list");
-                    } else {
-                        return responseUtil.Build(200, "Request sent");
-                    }
-                }
+                result = await AccountAPI.Update(sender.ID, updateValues, updateExpression);
             } catch (err) {
                 return responseUtil.Build(500, "Could not update friends list");
             }
+            if(!result){
+                return responseUtil.Build(500, "Could not update friends list");
+            }
+            
+            //Repeat for the recipient
+            if(!requested.hasOwnProperty('FriendRequests')){
+                requested.FriendRequests = [];
+            }
+
+            updateValues = {
+                ':f': requested.FriendRequests.concat({
+                    ID: sender.ID,
+                    Username: sender.Username,
+                    Sender: false
+                })
+            };
+
+            result = await AccountAPI.Update(requested.ID, updateValues, updateExpression);
+
+            if(!result){
+                return responseUtil.Build(500, "Could not update friends list");
+            } else {
+                return responseUtil.Build(200, "Request sent");
+            }
+        
         } 
         
         
@@ -315,13 +322,13 @@ module.exports = {
                 return responseUtil.Build(403, "Requested ID invalid");
             }
 
-            try {
-                //Remove the confirmed item from the sender's friend request 
-                sender.FriendRequests.splice(
-                    sender.FriendRequests.findIndex((element) =>{ element.ID === requested.ID}), 1);
-            } catch(err) {
-                return responseUtil.Build(403, "Requested ID not found in sender's friend requests");
+            let friendReqInd = await genUtils.isInSortedList(requested, sender.FriendRequests);
+            if(friendReqInd === false){
+                return responseUtil.Build(403, "Requested user not in sender's FriendRequests");
             }
+
+            sender.FriendRequests.splice(friendReqInd, 1);
+
             //Values to store in the sender's table.
             let storeVal = {
                 ID: requested.ID,
@@ -329,83 +336,62 @@ module.exports = {
                 Avatar: requested.Avatar
             }
             //Insert the friend such that it's sorted by ID
-            if(!sender.hasOwnProperty("Friends") || sender.Friends === []){
-                sender.Friends = [storeVal]
-            } else if (sender.Friends[0].ID > requested.ID){ //Insert at the beginning
-                sender.Friends.unshift(storeVal);
-            } else if (sender.Friends[sender.Friends.length - 1].ID < requested.ID){ //Insert at the end
-                sender.Friends.push(storeVal);
-            } else { //Insert in the middle
-                let i = 1;
-                while (i < sender.Friends.length && sender.Friends[i].ID > requested.ID){
-                    i++;
-                }
-
-                sender.Friends.splice(i, 0, storeVal);
-            }
+            sender.Friends = await genUtils.insertSorted(storeVal, sender.FriendRequests);
 
             let updateValues = {
                 ':f' : sender.Friends,
                 ':r' : sender.FriendRequests
             }
+            
+            let response;
 
             try {
-                let response = await AccountAPI.Update(sender.ID, updateValues, updateExpression);
-                if(response === false){
-                    return responseUtil.Build(500, "Could not add friend");
-                } else {
-                    console.log(requested);
-
-                    
-                    requested.FriendRequests.splice(
-                        requested.FriendRequests.findIndex((element) =>{ element.ID === sender.ID}), 1);
-                        
-                    let storeVal = {
-                        ID: sender.ID,
-                        Username: sender.Username,
-                        Avatar: sender.Avatar
-                    }
-
-                    console.log('Post-splice')
-                    console.log(requested);
-
-                    console.log(storeVal);
-
-                    //Insert the friend such that it's sorted by ID
-                    if(!requested.hasOwnProperty("Friends") || requested.Friends === []){
-                        requested.Friends = [storeVal]
-                    } else if (requested.Friends[0].ID > requested.ID){ //Insert at the beginning
-                        requested.Friends.unshift(storeVal);
-                    } else if (requested.Friends[requested.Friends.length - 1].ID < sender.ID){ //Insert at the end
-                        requested.Friends.push(storeVal);
-                    } else { //Insert in the middle
-                        let i = 1;
-                        while (i < requested.Friends.length && requested.Friends[i].ID > sender.ID){
-                            i++;
-                        }
-        
-                        requested.Friends.splice(i, 0, storeVal);
-                    }
-
-                    console.log(requested);
-
-
-                    updateValues = {
-                        ':f' : requested.Friends,
-                        ':r' : requested.FriendRequests
-                    }
-
-                    response = await AccountAPI.Update(requested.ID, updateValues, updateExpression);
-                    if(response === false){
-                        return responseUtil.Build(500, "Could not add friend");
-                    } else {
-                        return responseUtil.Build(200, "Friend added!");
-                    }
-                    
-                }
+                response = await AccountAPI.Update(sender.ID, updateValues, updateExpression);
             } catch (err) {
                 return responseUtil.Build(500, "Could not add friend");
             }
+            if(response === false){
+                return responseUtil.Build(500, "Could not add friend");
+            } else {
+                console.log(requested);
+
+                friendReqInd = await genUtils.isInSortedList(sender, requested.FriendRequests);
+                if(friendReqInd === false){
+                    return (403, "Sender not in requested friend requests array");
+                }
+
+                requested.FriendRequests.splice(friendReqInd, 1);
+                    
+                let storeVal = {
+                    ID: sender.ID,
+                    Username: sender.Username,
+                    Avatar: sender.Avatar
+                }
+
+                console.log('Post-splice')
+                console.log(requested);
+
+                console.log(storeVal);
+
+                requested.Friends = await genUtils.insertSorted(storeVal, requested.Friends);
+
+                console.log(requested);
+
+
+                updateValues = {
+                    ':f' : requested.Friends,
+                    ':r' : requested.FriendRequests
+                }
+
+                response = await AccountAPI.Update(requested.ID, updateValues, updateExpression);
+                if(response === false){
+                    return responseUtil.Build(500, "Could not add friend");
+                } else {
+                    return responseUtil.Build(200, "Friend added!");
+                }
+                
+            }
+            
         }
     }
 };
