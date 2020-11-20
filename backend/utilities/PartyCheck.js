@@ -2,6 +2,7 @@
 
 const moment = require("moment-timezone");
 const AccountAPI = require("../services/AccountAPI");
+const genUtils = require("./generalUtils")
 
 module.exports = {
     validPartyKeys: async function(key, value, context){
@@ -43,9 +44,9 @@ module.exports = {
                         ID: account.ID,
                         Username: account.Username
                     }
-                    if(await this.isInSortedList(account, context.Attendees, 'ID') === false){
+                    if(await genUtils.isInSortedList(account, context.Attendees, 'ID') === false){
                         //Insert the user into the list such that it is sorted.
-                        output.value.Attendees = await this.insertSorted(saveItem, context.Attendees, 'ID');
+                        output.value.Attendees = await genUtils.insertSorted(saveItem, context.Attendees, 'ID');
                         if(output.value.Attendees === false){
                             output.isValid = false;
                         }
@@ -99,7 +100,7 @@ module.exports = {
                     }
 
                     //Check if the user is in the array
-                    if(await this.isInSortedList(user, context.Attendees, 'ID') !== false){
+                    if(await genUtils.isInSortedList(user, context.Attendees, 'ID') !== false){
                         output.isValid = false;
                         return output;
                     }
@@ -110,7 +111,7 @@ module.exports = {
                     }
 
                     //Insert them into the array
-                    let result = await this.insertSorted(saveItem, context.Attendees, 'ID');
+                    let result = await genUtils.insertSorted(saveItem, context.Attendees, 'ID');
                     console.log(context);
                     //If invites exist, check if they're in them
                     if(context.hasOwnProperty("Invited")){
@@ -137,7 +138,7 @@ module.exports = {
                     value.Remove = {
                         ID: remove
                     }
-                    let index = await this.isInSortedList(value.Remove, context.Attendees, 'ID');
+                    let index = await genUtils.isInSortedList(value.Remove, context.Attendees, 'ID');
                     
                     console.log(index);
                     if(index === false){
@@ -182,92 +183,6 @@ module.exports = {
         output.isValid = (missingKey === false);
         
         return output;
-    },
-
-    isInSortedList: async function(item, list, sortedKey){
-        let left = 0;
-        let right = list.length - 1;
-        console.log(item);
-        try {
-            console.log(left + " | " + right);
-            while (right >= left){
-                let middle = Math.round((left + right) / 2);
-                console.log(middle);
-                console.log(list[middle][sortedKey] + " " + item[sortedKey]);
-                if(list[middle][sortedKey] === item[sortedKey]){
-                    return middle;
-                } else if (list[middle][sortedKey] < item[sortedKey]){
-                    left = middle + 1;
-                } else {
-                    right = middle - 1;
-                }
-            }
-
-            return false;
-        } catch (err) {
-            return false;
-        }
-        
-    },
-
-    insertSorted: async function (insertItem, list, sortKey){
-        //Make sure that the list isn't empty
-        if(list === undefined || list.length === 0){
-            list = [insertItem];
-            return list;
-        }
-        
-        //If the first item is greater than the new item, put the item in the front
-        else if(list[0][sortKey] > insertItem[sortKey]){
-            list.unshift(insertItem);
-            return list;
-        } 
-        
-        //If the last item is less than the new item, put the item in the back
-        else if(list[list.length - 1][sortKey] < insertItem[sortKey]){
-            list.push(insertItem);
-            return list;
-        }
-
-        //It's somewhere in the middle
-        else {
-            let left = 0;
-            let right = list.length - 1;
-            while(left < right){
-                let middle = Math.round((left + right) / 2);
-
-                //If the current middle is greater
-                if(list[middle][sortKey] > insertItem[sortKey]){
-                    //If the one below is lesser, insert between
-                    if(list[middle - 1][sortKey] < insertItem[sortKey]){
-                        list.splice(middle, 0, insertItem);
-                        return list;
-                    }
-                    
-                    //Otherwise, move earlier in the list
-                    else {
-                        right = middle - 1;
-                    }
-                }
-
-                //If the current middle is lesser
-                else {
-                    //If the next item is greater, insert between
-                    if(list[middle + 1][sortKey] > insertItem[sortKey]){
-                        list.splice(middle + 1, 0, insertItem);
-                        return list;
-                    }
-
-                    //Otherwise, move to later in the list
-                    else {
-                        left = middle + 1;
-                    }
-                }
-            }
-        }
-
-        //If it couldn't be inserted, return false
-        return false;
     },
 
     isValidLocationRequest: async function (value, key){
