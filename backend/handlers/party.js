@@ -7,6 +7,7 @@ const responseUtil = require("../utilities/response");
 const PartyUtil = require("../utilities/PartyCheck");
 const shortid = require("shortid");
 const moment = require("moment-timezone");
+const { insertSorted } = require("../utilities/PartyCheck");
 
 module.exports = {
 
@@ -190,9 +191,9 @@ module.exports = {
 
     try{
       user = await AccountAPI.Get(request.User);
-        if(user === false){
-          return responseUtil.Build(403, "User ID not valid");
-        }
+      if(user === false){
+        return responseUtil.Build(403, "User ID not valid");
+      }
     } catch (err){
       return responseUtil.Build(403, "User ID not valid");
     }
@@ -202,8 +203,6 @@ module.exports = {
     if (party === false){
       return responseUtil.Build(403, "Party ID not valid");
     }
-
-    
 
     //Check that the user isn't in the party
     if(party.Attendees.findIndex(attendee => attendee.ID ===user.ID) !== -1){
@@ -217,23 +216,7 @@ module.exports = {
     }
 
     //If there is no invite list, create one
-    if(!party.hasOwnProperty('Invited') || party.Invited.length === 0){
-      party.Invited = [saveItem];
-    } else {
-      try {
-        let i = 0;
-        while(party.Invited[i].ID > saveItem.ID){
-          i++;
-        }
-        if(party.Invited[i].ID === saveItem.ID){
-          return responseUtil.Build(403, "User already invited");
-        } else {
-          party.Invited.splice(i, 0, saveItem);
-        }
-      } catch (err){
-        party.Invited.push(saveItem);
-      }
-    }
+    party.Invited = PartyUtil.insertSorted(saveItem, party.Invited, 'ID')
 
     //Create the save expressions
     let expression = 'Set Invited = :I'
@@ -241,46 +224,51 @@ module.exports = {
       ':I': party.Invited
     };
 
-    try{
+    let response;
+
+    try {
       //Try to save the item
-      let response = await PartyAPI.Update(request.ID, values, expression);
-      if (response !== false){
-        //Set the save item to include values of party ID and Name
-        saveItem = {
-          ID: party.ID,
-          PartyName: party.PartyName
-        }
-
-        //Check if the invites exist on the user
-        if(!user.hasOwnProperty('Invites') || user.Invites.length === 0){
-          user.Invites = [saveItem];
-        } else {
-          //Append it to the front
-          user.Invites.unshift(saveItem);
-        }
-
-        expression = 'Set Invites = :I'
-        values = {
-          ':I': user.Invites
-        }
-
-        try{
-          response = await AccountAPI.Update(user.ID, values, expression);
-          if(response !== false){
-            response.Message = 'Invite successful'
-            return responseUtil.Build(200, response);
-          } else {
-            return responseUtil.Build(403, "Could not add party to user invites")
-          }
-        } catch (err) {
-          return responseUtil.Build(403, "Could not add party to user invites")
-        }
-      } else {
-        return responseUtil.Build(403, 'Could not invite to party');
-      }
+      response = await PartyAPI.Update(request.ID, values, expression);
     } catch (err) {
-      return responseUtil.Build(403, err);
+      return responseUtil.Build(403, "Cant set invite on party");
     }
+
+    if (response === false){
+      return responseUtil.Build(403, 'Could not invite to party');
+    }
+
+    //Set the save item to include values of party ID and Name
+    saveItem = {
+      ID: party.ID,
+      PartyName: party.PartyName
+    }
+
+    //Check if the invites exist on the user
+    if (!user.hasOwnProperty('Invites') || user.Invites.length === 0){
+      user.Invites = [saveItem];
+    } else {
+      //Append it to the front
+      user.Invites.unshift(saveItem);
+    }
+
+    expression = 'Set Invites = :I'
+    values = {
+      ':I': user.Invites
+    }
+
+    try {
+      response = await AccountAPI.Update(user.ID, values, expression);
+    } catch (err) {
+      return responseUtil.Build(403, "Could not add party to user invites")
+    }
+    
+    if(response !== false){
+      response.Message = 'Invite successful'
+      return responseUtil.Build(200, response);
+    } else {
+      return responseUtil.Build(403, "Could not add party to user invites")
+    }  
+
     
   },
 
