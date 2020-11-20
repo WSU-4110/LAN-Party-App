@@ -7,7 +7,6 @@ const responseUtil = require("../utilities/response");
 const PartyUtil = require("../utilities/PartyCheck");
 const shortid = require("shortid");
 const moment = require("moment-timezone");
-const { insertSorted } = require("../utilities/PartyCheck");
 
 module.exports = {
 
@@ -297,7 +296,7 @@ module.exports = {
     //A prototype of the required fields of the required fields
     let required = ['Title', 'Body', 'User', 'RequestLocation'];
 
-    let missingKey = false;
+    let badKey = false;
 
     party.RequestLocationChange = {};
 
@@ -305,32 +304,26 @@ module.exports = {
     for(let i = 0; i < required.length; i++){
 
       if(request.hasOwnProperty(keys[i]) === false){
-        missingKey = keys[i];
-        return false;
+        badKey = keys[i];
+        break;
+      } else {
+        let validate = await PartyUtil.isValidLocationRequest(request[keys[i]]);
+        if(validate.isValid === false){
+          badKey = keys[i];
+          break;
+        } else {
+          Object.keys(validate.value).forEach(key =>{
+            party.RequestLocationChange[key] = validate[key];
+          })
+        }
       }
-      //Add the key to the new request
-      party.RequestLocationChange[keys[i]] = request[keys[i]];
+      
     };
 
-    if(missingKey !== false){
-      return responseUtil.Build(403, "Missing key: " + missingKey);
+    if(badKey !== false){
+      return responseUtil.Build(403, "Bad key: " + badKey);
     }
-    //Make sure that a user is valid
-    let user
     
-    try {
-      user = await AccountAPI.Get(request.User);
-      if(user === false){
-        return responseUtil.Build(403, "User not valid");
-      }
-    } catch (err){
-      return responseUtil.Build(403, "User not valid")
-    }
-
-    party.RequestLocationChange.User = {
-      ID: user.ID,
-      Username: user.Username
-    }
     //Create a new update expression
     let updateExpression = 'Set RequestLocationChange = :R';
     let expressionValues = {
