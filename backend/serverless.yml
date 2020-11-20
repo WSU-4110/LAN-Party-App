@@ -109,7 +109,7 @@ functions:
     handler: handlers/account.RemoveGame
     events:
       - http:
-          method: POST
+          method: DELETE
           path: /RemoveGame/Account/{ID}
           cors: true
 
@@ -138,6 +138,15 @@ functions:
           path: /CreateGame
           cors: true
 
+  # reports functions
+  ReportAccount:
+    handler: utilities/report.NewReport
+    events: 
+      - http:
+          method: POST
+          path: /ReportAccount
+          cors: true
+  
   # party functions
   CreateParty:
     handler: handlers/party.Create
@@ -237,6 +246,28 @@ resources:
           - IndexName: Genre
             KeySchema:
               - AttributeName: Genre
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+
+    # reports table
+    reports:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: REPORTS-LAN
+        AttributeDefinitions:
+          - AttributeName: ID
+            AttributeType: S
+          - AttributeName: AccountID
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ID
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: AccountID
+            KeySchema:
+              - AttributeName: AccountID
                 KeyType: HASH
             Projection:
               ProjectionType: ALL

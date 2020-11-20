@@ -211,9 +211,27 @@ module.exports = {
       let params = {
         TableName: tableName,
         Key: {ID: AccountID},
-        UpdateExpression: "GameID",
-        ExpressionAttributeValues: "Values",
+        IndexName: "Games",
+        UpdateExpression: "SET Game=:g",
+        ExpressionAttributeNames: {
+          "#key": "Email",
+        },
+        ExpressionAttributeValues: {
+          ":em": Email,
+        },
         ReturnValues:"UPDATED_NEW"
+      };
+
+      let params = {
+        TableName: tableName,
+        IndexName: "Email",
+        KeyConditionExpression: "#key = :em",
+        ExpressionAttributeNames: {
+          "#key": "Email",
+        },
+        ExpressionAttributeValues: {
+          ":em": Email,
+        },
       };
 
       let result = await dynamoDB.update(params).promise(); // update the entry in the database
@@ -241,7 +259,7 @@ module.exports = {
         ReturnValues:"UPDATED_NEW"
       };
 
-      let result = await dynamoDB.update(params).promise(); // update the entry in the database
+      let result = await dynamoDB.delete(params).promise(); // update the entry in the database
       
       return result ? result : false;
     } catch (err) {
