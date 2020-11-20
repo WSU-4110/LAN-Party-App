@@ -95,7 +95,7 @@ module.exports = {
   Update: async function (events) {
     
     //Constant object for modifyable objects
-    let modifyable = {
+    const modifyable = {
       PartyName: ':n',
       PartyLocation:  ':l',
       Host: ':h',
@@ -105,7 +105,9 @@ module.exports = {
       Games: ':g',
       AgeGate: ':b',
       Intent: ':i',
-      RequestLocationChange: ':x'
+      RequestLocationChange: ':x',
+      Attendees: ":a",
+      Invited: ":z"
     }
     
     //Check if the event exists
@@ -148,7 +150,7 @@ module.exports = {
           //Go through the returned value's keys
           Object.keys(curObj.value).forEach( responseKey => {
             curExpressions.push(responseKey + '=' + modifyable[responseKey]);
-            updateValues[modifyable[responseKey]] = curObj.value;
+            updateValues[modifyable[responseKey]] = curObj.value[responseKey];
           })
         }
       }
@@ -158,87 +160,6 @@ module.exports = {
       return responseUtil.Build(403, "Requested value for " + badKey +" not valid: " + request[badKey]);
     }
    
-
-    //Check attendees
-    if (request.hasOwnProperty('Attendees')){
-      //Check if we're adding users
-      if(request.Attendees.hasOwnProperty('Add')){
-        //Make sure that the account exists
-        try {
-          var newAttendee = await AccountAPI.Get(request.Attendees.Add);
-          if (newAttendee === false){
-            return responseUtil.Build(403, "New attendee does not exist");
-          }
-        } catch (err) {
-          return responseUtil.Build(403, "New attendee could not be found");
-        }
-
-        let saveItem = {
-          Username : newAttendee.Username,
-          ID : newAttendee.ID
-        }
-        
-        //If the new attendee is currently in the invites, take them out
-        if(party.hasOwnProperty('Invited')){
-          let locOfInvite = party.Invited.findIndex(attendee => attendee.ID === newAttendee.ID);
-          if(locOfInvite !== -1){
-            party.Invited.splice(locOfInvite, 1);
-    
-            curExpressions.push('Invited = :z')
-            updateValues[':z'] = party.Invited;
-          }
-        }
-        
-        //Insert it into the list
-        if(!party.hasOwnProperty('Attendees') || party.Attendees.length === 0){
-          party.Attendees = [saveItem];
-        }
-
-        //Check that it isn't in the list already
-        else if(party.Attendees.findIndex(attendee => attendee.ID === saveItem.ID) !== -1){
-          return responseUtil.Build(403, "Attendee already registered");
-        }
-
-        //Check that they aren't the new highest member
-        else if(party.Attendees[party.Attendees.length - 1].ID < saveItem.ID){
-          party.Attendees.push(saveItem);
-        } 
-
-        else {     
-          try{
-            let i = 0; 
-            while (party.Attendees[i].ID > saveItem.ID){
-              console.log(i + ' | ' + party.Attendees[i]);
-              i++
-            }
-
-            party.Attendees.splice(i, 0, saveItem);
-          } catch(err){
-            party.Attendees.push(saveItem);
-          }
-        }
-
-      }
-      
-      //If there was a remove
-      if(request.Attendees.hasOwnProperty("Remove")){
-        //Check if the ID is present in the array
-        let i = party.Attendees.findIndex(attendee => attendee.ID === request.Attendees.Remove);
-
-        if(i === -1){
-          return responseUtil.Build(403, "User not in party already");
-        } else {
-          party.Attendees.splice(i, 1);
-        }
-      }
-
-
-      //Update the expressions
-      curExpressions = curExpressions.concat('Attendees = :a')
-      updateValues[':a'] = party.Attendees;
-    }
-
-   
     curExpressions = curExpressions.join(', ');
     updateExpression = updateExpression.concat(curExpressions);
     let response = await PartyAPI.Update(request.ID, updateValues, updateExpression);
@@ -246,7 +167,7 @@ module.exports = {
     if(!response){
       return responseUtil.Build(403, 'Party Update Failed');
     } else {
-      response.Message = "Party Created";
+      response.Message = "Party Updated";
       return responseUtil.Build(200, response);
     }
   },
