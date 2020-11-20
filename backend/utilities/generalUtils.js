@@ -1,16 +1,16 @@
 'use strict'
 
 module.exports = {
+    //=====================================================================
+    // Checks if item is in a list that's sorted by sortedKey
+    // returns the index if it's present, false if not
+    //=====================================================================
     isInSortedList: async function(item, list, sortedKey){
         let left = 0;
         let right = list.length - 1;
-        console.log(item);
         try {
-            console.log(left + " | " + right);
             while (right >= left){
                 let middle = Math.round((left + right) / 2);
-                console.log(middle);
-                console.log(list[middle][sortedKey] + " " + item[sortedKey]);
                 if(list[middle][sortedKey] === item[sortedKey]){
                     return middle;
                 } else if (list[middle][sortedKey] < item[sortedKey]){
@@ -26,7 +26,12 @@ module.exports = {
         }
         
     },
-
+    
+    //================================================================================
+    // Inserts an item such that it's sorted in ascending order by sortKey
+    // returns the list if it was inserted, false if not.
+    // False probably indicates an item with the same value at sortKey
+    //================================================================================
     insertSorted: async function (insertItem, list, sortKey){
         //Make sure that the list isn't empty
         if(list === undefined || list.length === 0){
@@ -82,7 +87,6 @@ module.exports = {
                 }
             }
         }
-
         //If it couldn't be inserted, return false
         return false;
     }
