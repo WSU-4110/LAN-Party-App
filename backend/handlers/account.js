@@ -392,6 +392,75 @@ module.exports = {
                 
             }
             
+        } else if (request.hasOwnProperty("Remove")){
+            let requested
+            try {
+            requested = await AccountAPI.Get(request.Remove);
+            } catch (err){
+                return responseUtil.Build(403, "Requested Account does not exist");
+            }
+
+            if(requested === false){
+                return responseUtil.Build(403, "Requested Account does not exist");
+            }
+
+            //If the requested user is not in the sender's friends, 403
+            let friendLoc = await genUtils.isInSortedList(requested, sender.Friends);
+
+            if(friendLoc === false){
+                return responseUtil.Build(403, "User not in Sender's friend array");
+            }
+
+            //Remove the user from the sender's friends
+            sender.Friends.splice(friendLoc, 1);
+            //Set the request statement
+            let requestExpression = 'Set Friends = :f'
+            //Set the expression value
+            let expressionValue = {
+                ':f': sender.Friends
+            }
+
+            let response;
+            
+            //Save to the account
+            try {
+                response = await AccountAPI.Update(sender.ID, expressionValue, requestExpression);
+            
+            //Any errors saving to the account
+            } catch (err) {
+                return responseUtil.Build(500, "Error saving to the sender")
+            }
+            if(response === false){
+                return responseUtil.Build(500, "Error saving to the sender")
+            }
+
+            //Set up for removing from the other account
+            friendLoc = genUtils.isInSortedList(sender, requested.Friends);
+
+            if(friendLoc === false){
+                return responseUtil.Build(403, "Sender not in requested friends");
+            }
+
+            //Remove the item
+            requested.Friends.splice(friendLoc, 1);
+
+            //Update the values
+            expressionValue[':f'] = requested.Friends;
+            //Save to the account
+            try {
+                response = await AccountAPI.Update(requested.ID, expressionValue, requestExpression);
+
+            //Any errors saving to the account
+            } catch (err) {
+                return responseUtil.Build(500, "Error saving to the requested")
+            }
+            if(response === false){
+                return responseUtil.Build(500, "Error saving to the requested")
+            }
+
+            return responseUtil.Build(200, response);
+        } else if (request.hasOwnProperty("RemoveRequest")){
+        
         }
     }
 };
