@@ -458,9 +458,69 @@ module.exports = {
                 return responseUtil.Build(500, "Error saving to the requested")
             }
 
-            return responseUtil.Build(200, response);
-        } else if (request.hasOwnProperty("RemoveRequest")){
+            return responseUtil.Build(200, "Friend removed");
         
+        
+        } else if (request.hasOwnProperty("RemoveRequest")){
+            const updateExpression = "Set FriendRequests=:r"
+            //Get the requested user
+            let requested
+            try {
+                requested = await AccountAPI.Get(request.RemoveRequest);
+            } catch (err){
+                return responseUtil.Build(403, "Requested user does not exist");
+            }
+
+            //splice the requested out of the friend request list
+            let reqIndex = sender.FriendRequests.findIndex(sentReq => sentReq.ID === requested.ID);
+            if(reqIndex === -1){
+                return responseUtil.Build(403, "Requested not in sender's friend requests");
+            }
+
+            sender.FriendRequests.splice(reqIndex, 1);
+
+            //Update the values
+            let updateValues = {
+                ':r': sender.FriendRequests
+            };
+
+            //Save the item
+            let response
+            try {
+                response = await AccountAPI.Update(sender.ID, updateValues, updateExpression);
+                //If it could not save
+            } catch (err) {
+                return responseUtil.Build(500, "Could not save to sender");
+            }
+            if (response === false){
+                return responseUtil.Build(500, "Could not save to sender");
+            }
+
+            //Repeat on the other user
+            reqIndex = requested.FriendRequests.findIndex(i => i.ID === sender.ID);
+
+            if(reqIndex === -1){
+                return responseUtil.Build (403, "Sender not in requested friend requests");
+            }
+            
+            requested.FriendRequests.splice(reqIndex, 1);
+
+            //Update the values
+            updateValues = {
+                ':r': requested.FriendRequests
+            };
+
+            //Try to save it
+            try {
+                response = await AccountAPI.Update(requested.ID, updateValues, updateExpression);
+            } catch (err) {
+                return responseUtil.Build(500, "Cannot save to requested");
+            }
+            if (response === false){
+                return responseUtil.Build(500, "Cannot save to requested");
+            }
+
+            return responseUtil.Build(200, "Friend requests removed");
         }
     }
 };
