@@ -6,7 +6,7 @@ const AccountAPI = require("../services/AccountAPI");
 module.exports = {
     validPartyKeys: async function(key, value, context){
         let output = {
-            key: {}
+            value: {}
         };
         
         switch (key) {
@@ -16,7 +16,7 @@ module.exports = {
                 return output;
 
             case 'PartyLocation':
-                return this.isValidPartyName(value);
+                return this.isValidLocation(value);
 
             case 'Host':
                 let account;
@@ -39,9 +39,16 @@ module.exports = {
                 
                 //If context is present, it's an update. Make sure new host is attending
                 if(context !== undefined){
-                    if(this.isInSortedList(account, context.Attendees, 'ID') === false){
+                    let saveItem = {
+                        ID: account.ID,
+                        Username: account.Username
+                    }
+                    if(await this.isInSortedList(account, context.Attendees, 'ID') === false){
                         //Insert the user into the list such that it is sorted.
-
+                        output.value.Attendees = await this.insertSorted(saveItem, context.Attendees, 'ID');
+                        if(output.value.Attendees === false){
+                            output.isValid = false;
+                        }
                     }
                 }
                 return output;
@@ -74,9 +81,77 @@ module.exports = {
                 output.isValid = true;
                 return output;
 
+            case 'Attendees':
+                if(value.hasOwnProperty("Add")){
+                    let user;
+                    
+                    //Make sure that the user is valid
+                    try {
+                        user = await AccountAPI.Get(value.Add);
+                        if(user === false){
+                            output.isValid = false;
+                            return output;
+                        } 
+                    } catch (err){
+                        output.isValid = false;
+                        return output;
+                    }
+
+                    //Check if the user is in the array
+                    if(await this.isInSortedList(user, context.Attendees, 'ID') !== false){
+                        output.isValid = false;
+                        return output;
+                    }
+
+                    let saveItem = {
+                        ID: user.ID,
+                        Username: user.Username
+                    }
+
+                    //Insert them into the array
+                    let result = await this.insertSorted(saveItem, context.Attendees, 'ID');
+                    console.log(context);
+                    //If invites exist, check if they're in them
+                    if(context.hasOwnProperty("Invited")){
+                        console.log(context.Invited);
+                        console.log(user.ID);
+                        
+                        for(let i = 0 ; i < context.Invited.length; i++){
+
+                            if(context.Invited[i].ID === user.ID){
+                                context.Invited.splice(i, 1);
+                                output.value.Invited = context.Invited;
+                                break;
+                            }
+                        }
+                    }
+                    console.log(output);
+                    output.isValid = (result !== false);
+                    output.value.Attendees = result;
+                } 
+
+                else if (value.hasOwnProperty("Remove")){
+                    //Try to find the spot that they are in
+                    let remove = value.Remove;
+                    value.Remove = {
+                        ID: remove
+                    }
+                    let index = await this.isInSortedList(value.Remove, context.Attendees, 'ID');
+                    
+                    console.log(index);
+                    if(index === false){
+                        output.isValid = false;
+                    } else {
+                        context.Attendees.splice(index, 1);
+                        output.value.Attendees = context.Attendees;
+                        output.isValid = true;
+                    }
+                }
+                return output;  
+            
             default:
                 output.value[key] = value;
-                output.isValid = true;
+                output.isValid = (typeof(value) === 'string');
                 return output;
         }
     },
@@ -84,11 +159,13 @@ module.exports = {
     //Checks if incoming location is valid
     isValidLocation: async function (location){
         const reqs = ['Longitude', 'Latitude', 'Name'];
-
-        output.value = {
-            PartyLocation: {}
-        };
-
+        
+        let output = {
+            value: {
+                PartyLocation: {}
+            }
+        }
+        
         let missingKey = false;
 
         for(let i = 0; i < reqs.length; i++){
@@ -96,7 +173,7 @@ module.exports = {
                 missingKey = reqs[i];
                 break;
             } else {
-                output.value.PartyLocation[reqs[i]] = value[reqs[i]];
+                output.value.PartyLocation[reqs[i]] = location[reqs[i]];
             }
         }
         
@@ -109,9 +186,13 @@ module.exports = {
     isInSortedList: async function(item, list, sortedKey){
         let left = 0;
         let right = list.length - 1;
+        console.log(item);
         try {
-            while (right > left){
-                let middle = (left + right) / 2;
+            console.log(left + " | " + right);
+            while (right >= left){
+                let middle = Math.round((left + right) / 2);
+                console.log(middle);
+                console.log(list[middle][sortedKey] + " " + item[sortedKey]);
                 if(list[middle][sortedKey] === item[sortedKey]){
                     return middle;
                 } else if (list[middle][sortedKey] < item[sortedKey]){
@@ -152,7 +233,7 @@ module.exports = {
             let left = 0;
             let right = list.length - 1;
             while(left < right){
-                let middle = (left + right) / 2;
+                let middle = Math.Round((left + right) / 2);
 
                 //If the current middle is greater
                 if(list[middle][sortKey] > insertItem[sortKey]){
