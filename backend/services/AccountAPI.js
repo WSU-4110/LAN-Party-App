@@ -202,71 +202,71 @@ module.exports = {
       console.log(err.message);
       throw new Error("Account Update Error");
     }
-  },
-
-  // ADD A GAME TO THE ACCOUNT LIST /////////////////////////////////////////////////////////////////////////////////////////////
-  AddGame: async function (AccountID, GameID) {
-    try {
-      let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); // connect to the database
-
-      // create the parameters for the update
-      let params = {
-        TableName: tableName,
-        Key: {ID: AccountID},
-        IndexName: "Games",
-        UpdateExpression: "SET Game=:g",
-        ExpressionAttributeNames: {
-          "#key": "Email",
-        },
-        ExpressionAttributeValues: {
-          ":em": Email,
-        },
-        ReturnValues:"UPDATED_NEW"
-      };
-
-      let params = {
-        TableName: tableName,
-        IndexName: "Email",
-        KeyConditionExpression: "#key = :em",
-        ExpressionAttributeNames: {
-          "#key": "Email",
-        },
-        ExpressionAttributeValues: {
-          ":em": Email,
-        },
-      };
-
-      let result = await dynamoDB.update(params).promise(); // update the entry in the database
-      
-      return result ? result : false;
-    } catch (err) {
-      console.log(err.message);
-      throw new Error("Add Game to Account Error");
-    }
-  },
-
-  // REMOVE A GAME FROM THE ACCOUNT LIST /////////////////////////////////////////////////////////////////////////////////////////////
-  RemoveGame: async function (account, Values, updateExpression) {
-    try {
-      let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); // connect to the database
-
-      let ID = account.ID;
-
-      // create the parameters for the update
-      let params = {
-        TableName: tableName,
-        Key: {ID: ID},
-        UpdateExpression: updateExpression,
-        ExpressionAttributeValues: Values,
-        ReturnValues:"UPDATED_NEW"
-      };
-
-      let result = await dynamoDB.delete(params).promise(); // update the entry in the database
-      
-      return result ? result : false;
-    } catch (err) {
-      console.log(err.message);
-      throw new Error("Account Update Error");
-    }
   }
+
+  // // ADD A GAME TO THE ACCOUNT LIST /////////////////////////////////////////////////////////////////////////////////////////////
+  // AddGame: async function (AccountID, GameID) {
+  //   try {
+  //     let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); // connect to the database
+
+  //     // create the parameters for the update
+  //     let params = {
+  //       TableName: tableName,
+  //       Key: {ID: AccountID},
+  //       IndexName: "Games",
+  //       UpdateExpression: "SET Game=:g",
+  //       ExpressionAttributeNames: {
+  //         "#key": "Email",
+  //       },
+  //       ExpressionAttributeValues: {
+  //         ":em": Email,
+  //       },
+  //       ReturnValues:"UPDATED_NEW"
+  //     };
+
+  //     let params = {
+  //       TableName: tableName,
+  //       IndexName: "Email",
+  //       KeyConditionExpression: "#key = :em",
+  //       ExpressionAttributeNames: {
+  //         "#key": "Email",
+  //       },
+  //       ExpressionAttributeValues: {
+  //         ":em": Email,
+  //       },
+  //     };
+
+  //     let result = await dynamoDB.update(params).promise(); // update the entry in the database
+      
+  //     return result ? result : false;
+  //   } catch (err) {
+  //     console.log(err.message);
+  //     throw new Error("Add Game to Account Error");
+  //   }
+  // },
+
+  // // REMOVE A GAME FROM THE ACCOUNT LIST /////////////////////////////////////////////////////////////////////////////////////////////
+  // RemoveGame: async function (account, Values, updateExpression) {
+  //   try {
+  //     let dynamoDB = new AWS.DynamoDB.DocumentClient({ apiVersion: "2012-08-10" }); // connect to the database
+
+  //     let ID = account.ID;
+
+  //     // create the parameters for the update
+  //     let params = {
+  //       TableName: tableName,
+  //       Key: {ID: ID},
+  //       UpdateExpression: updateExpression,
+  //       ExpressionAttributeValues: Values,
+  //       ReturnValues:"UPDATED_NEW"
+  //     };
+
+  //     let result = await dynamoDB.delete(params).promise(); // update the entry in the database
+      
+  //     return result ? result : false;
+  //   } catch (err) {
+  //     console.log(err.message);
+  //     throw new Error("Account Update Error");
+  //   }
+  // }
 };
