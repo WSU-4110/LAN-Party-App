@@ -269,6 +269,44 @@ module.exports = {
         return false;
     },
 
+    isValidLocationRequest: async function (value, key){
+        let output = {
+            value: {}
+        }
+        switch(key){
+            case 'Title':
+                output.value.Title = this.isValidPartyName(value);
+                output.isValid = output.value.Title !== false;
+                return output;
+
+            case 'RequestLocation':
+                return this.isValidLocation(value);
+
+            case 'User':
+                try {
+                    let user = await AccountAPI.Get(value);
+                } catch (err){
+                    output.value = false;
+                    return output;
+                }
+                if (user === false){
+                    output.value = false;
+                    return output;
+                }
+
+                output.value.User = {
+                    ID: user.ID,
+                    Username: user.Username
+                }
+                output.isValid = true
+                return output;
+
+            default:
+                output.value.key = value;
+                output.isValid = (typeof(value) === 'string');
+        }
+    },
+
     //Check if a name is valid
     isValidPartyName: async function (name){
         //Trim the string of whitespace 
