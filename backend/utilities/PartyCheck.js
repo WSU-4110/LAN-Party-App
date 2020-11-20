@@ -233,7 +233,7 @@ module.exports = {
             let left = 0;
             let right = list.length - 1;
             while(left < right){
-                let middle = Math.Round((left + right) / 2);
+                let middle = Math.round((left + right) / 2);
 
                 //If the current middle is greater
                 if(list[middle][sortKey] > insertItem[sortKey]){
