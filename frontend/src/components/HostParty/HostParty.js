@@ -58,7 +58,7 @@ const SearchPlacesInput = () => {
     >
       <ComboboxInput
         id="places-input-box"
-        name="places-input"
+        name="placesInput"
         value={value}
         onChange={(e) => {
           setValue(e.target.value);
@@ -92,16 +92,16 @@ const HostParty = (props) => {
     return loc.results[0].geometry.location.lng;
   };
 
-  const onSubmit = async (data) => {
-    let latitude = await getLatitude(data.Location);
-    let longitude = await getLongitude(data.Location);
+  const onSubmit = async (data, e) => {
+    let latitude = await getLatitude(e.target.placesInput.value);
+    let longitude = await getLongitude(e.target.placesInput.value);
 
     const payload = {
       Host: user.ID,
       HostUsername: user.Username,
       PartyName: data.Title,
       PartyLocation: {
-        Name: data.Location,
+        Name: e.target.placesInput.value,
         Latitude: latitude,
         Longitude: longitude,
       },
