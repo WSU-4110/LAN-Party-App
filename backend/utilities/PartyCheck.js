@@ -70,7 +70,7 @@ module.exports = {
 
             case 'AgeGate':
                 output.value[key] = value;
-                output.isValid = (typeof value === "boolean")
+                output.isValid = true;//(typeof value === "boolean")
                 return output;
 
             case 'Intent':

@@ -147,22 +147,22 @@ const User = (props) => {
     // PATCH URL
     const Link = `${REACT_APP_URL}Account/${user.ID}`;
     const payload = {
-      Email: data.email
+      NewEmail: data.email
     }
 
     console.log("email payload", data.email);
-    // axios
-    //   .patch(Link, payload, headers)
-    //   .then((res) => {
-    //     console.log("patch res: ", res);
-    //     setUser({
-    //       ...res.data,
-    //       Token: cookies.get("Token"),
-    //       LoggedIn: true
-    //     })
-    //     cookies.set("Avatar", res.data.Avatar);
-    //   })
-    //   .catch((error) => console.log(error));
+    axios
+      .patch(Link, payload, headers)
+      .then((res) => {
+        console.log("patch res: ", res);
+        setUser({
+          ...res.data,
+          Token: cookies.get("Token"),
+          LoggedIn: true
+        })
+        cookies.set("Avatar", res.data.Avatar);
+      })
+      .catch((error) => console.log(error));
 
     setEditEmail(false);
   }
@@ -189,23 +189,22 @@ const User = (props) => {
     // PATCH URL
     const Link = `${REACT_APP_URL}Account/${user.ID}`;
     const payload = {
-      old: data.oldpassword,
-      new: data.newpassword
+      NewPassword: data.newpassword
     }
 
     console.log("password payload", payload);
-    // axios
-    //   .patch(Link, payload, headers)
-    //   .then((res) => {
-    //     console.log("patch res: ", res);
-    //     setUser({
-    //       ...res.data,
-    //       Token: cookies.get("Token"),
-    //       LoggedIn: true
-    //     })
-    //     cookies.set("Avatar", res.data.Avatar);
-    //   })
-    //   .catch((error) => console.log(error));
+    axios
+      .patch(Link, payload, headers)
+      .then((res) => {
+        console.log("patch res: ", res);
+        setUser({
+          ...res.data,
+          Token: cookies.get("Token"),
+          LoggedIn: true
+        })
+        cookies.set("Avatar", res.data.Avatar);
+      })
+      .catch((error) => console.log(error));
 
     setEditPassword(false);
   }
@@ -259,13 +258,13 @@ const User = (props) => {
     if (editPassword) {
       return (
         <Form onSubmit={handleSubmit(changePassword)}>
-          <Form.Control 
+          {/* <Form.Control 
             className="mb-2" 
             size="sm" 
             type="password"
             name="oldpassword"
             placeholder="current password"
-            ref={register({ required: true })} />
+            ref={register({ required: true })} /> */}
           <Form.Control 
             size="sm" 
             type="password" 

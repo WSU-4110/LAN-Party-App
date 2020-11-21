@@ -6,6 +6,7 @@ import { UserContext } from '../../context/UserContext'
 import { PartiesContext } from '../../context/PartiesContext'
 import { HomeRenderContext } from '../../context/HomeRenderContext'
 import axios from 'axios';
+import { hoistStatics } from 'recompose';
 
 //temporary metadata until we can pull it from the DB
 
@@ -91,17 +92,15 @@ const ViewParty=(props)=>{
         </tbody>
       </Table>
 
-      {cookies.get("Token")
-        ? attendees.some(att => att.ID.includes(props.user.ID))
-          ? <Button variant="danger" onClick={leaveParty}>Leave Party</Button>
+      {cookies.get("Token") //if logged in
+        ? attendees.some(att => att.ID.includes(props.user.ID)) //if in the party
+          ? user.ID === props.hostID //if host, then can't leave party
+            ? <Button variant="danger" onClick={leaveParty} disabled>Leave Party</Button>
+            : <Button variant="danger" onClick={leaveParty}>Leave Party</Button>
           : <Button variant="success" onClick={joinParty}>Join Party</Button>
         : <Button onClick={props.toLogin}>Login to join</Button>
-      }
-
-
+      } 
     </div>
-
-
   )
 }
 export default ViewParty;

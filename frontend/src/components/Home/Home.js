@@ -94,7 +94,8 @@ const Home = (props) => {
                 party = {p}
                 location={p.Location} 
                 name={p.Name}
-                host={p.HostUsername} 
+                host={p.HostUsername}
+                hostID = {p.Host}
                 date={p.Date}
                 Attendees = {p.Attendees}
                 user={user}
