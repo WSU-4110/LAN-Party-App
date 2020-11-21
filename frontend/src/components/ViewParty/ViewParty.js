@@ -123,8 +123,6 @@ const ViewParty=(props)=>{
         ? attendees.some(att => att.ID.includes(props.user.ID)) //if in the party
           ? user.ID === props.hostID //if host, then can't leave party
             ? <Button variant="danger" onClick={leaveParty} disabled>Leave Party</Button>
-              ? <Button variant="danger" onClick={removeMember}>Boot</Button>
-              : <Button variant="danger" onClick={removeMember}>Boot</Button>
             : <Button variant="danger" onClick={leaveParty}>Leave Party</Button>
           : <Button variant="success" onClick={ageGate}>Join Party</Button>
         : <Button onClick={props.toLogin}>Login to join</Button>
