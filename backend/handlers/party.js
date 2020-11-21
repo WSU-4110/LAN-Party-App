@@ -29,18 +29,17 @@ module.exports = {
         badKey = "Missing Key: " + required[i];
         break;
       } else {
+        //Check that the value at the key is valid
         let curObj = await PartyUtil.validPartyKeys(required[i], request[required[i]]);
         if(curObj.isValid === false){
           badKey = "Key value not valid: " + required[i] + "   " + request[required[i]];
         }
-
+        //Is valid
         else {
-          if(required[i] === 'Host'){
-            console.log(curObj);
-            request['HostUsername'] = curObj.value.HostUsername; 
-          } else {
-            request[required[i]] = curObj.value;
-          }
+          //Go through the returned value's keys
+          Object.keys(curObj.value).forEach( responseKey => {
+            request[responseKey] = curObj.value[responseKey];
+          })
         }
       }
     };
@@ -57,15 +56,22 @@ module.exports = {
 
     let keys = Object.keys(defaults);
 
+    //Go through the optional keys
     for(let i = 0; i < keys.length; i++){
+      
+      //If the object doesn't have it, set it to the default
       if(!request.hasOwnProperty(keys[i])){
         request[keys[i]] = defaults[keys[i]];
       } else {
         let curObj = await PartyUtil.validPartyKeys(keys[i], request[keys[i]]);
+        //If the current key for the optional key isn't valid, set it to default
         if(curObj.isValid === false){
           request[keys[i]] = defaults[keys[i]];
         } else {
-          request[keys[i]] = curObj.value;
+          //Go through the returned value's keys
+          Object.keys(curObj.value).forEach( responseKey => {
+            request[responseKey] = curObj.value[responseKey];
+          })
         }
       }
     };
@@ -89,7 +95,7 @@ module.exports = {
   Update: async function (events) {
     
     //Constant object for modifyable objects
-    let modifyable = {
+    const modifyable = {
       PartyName: ':n',
       PartyLocation:  ':l',
       Host: ':h',
@@ -99,7 +105,9 @@ module.exports = {
       Games: ':g',
       AgeGate: ':b',
       Intent: ':i',
-      RequestLocationChange: ':x'
+      RequestLocationChange: ':x',
+      Attendees: ":a",
+      Invited: ":z"
     }
     
     //Check if the event exists
@@ -129,22 +137,21 @@ module.exports = {
 
     let keys = Object.keys(modifyable);
 
+    //Go through the modifiable attributes
     for(let i = 0; i < keys.length; i++){
-      
+      //If it's trying to be modified, check if it's valid
       if(request.hasOwnProperty(keys[i])){
         let curObj = await PartyUtil.validPartyKeys(keys[i], request[keys[i]], party);
-        if(curObj.isValid === false){
+        //If not valid, set the bad key and break the update.
+        if(curObj.isValid === false){ 
           badKey = keys[i];
           break;
-        } else {
-          if (keys[i] === 'Host'){
-            curExpressions.push('HostUsername =' + modifyable['HostUsername']);
-            updateValues[modifyable['HostUsername']] = curObj.value.HostUsername;
-            curObj.value = curObj.value.Host;
-          }
-          
-          curExpressions.push(keys[i] + '=' + modifyable[keys[i]]);
-          updateValues[modifyable[keys[i]]] = curObj.value;
+        } else { 
+          //Go through the returned value's keys
+          Object.keys(curObj.value).forEach( responseKey => {
+            curExpressions.push(responseKey + '=' + modifyable[responseKey]);
+            updateValues[modifyable[responseKey]] = curObj.value[responseKey];
+          })
         }
       }
     };
@@ -153,90 +160,6 @@ module.exports = {
       return responseUtil.Build(403, "Requested value for " + badKey +" not valid: " + request[badKey]);
     }
    
-
-    //Check attendees
-    if (request.hasOwnProperty('Attendees')){
-      //Check if we're adding users
-      if(request.Attendees.hasOwnProperty('Add')){
-        //Make sure that the account exists
-        try {
-          var newAttendee = await AccountAPI.Get(request.Attendees.Add);
-          if (newAttendee === false){
-            return responseUtil.Build(403, "New attendee does not exist");
-          }
-        } catch (err) {
-          return responseUtil.Build(403, "New attendee could not be found");
-        }
-
-        let saveItem = {
-          Username : newAttendee.Username,
-          ID : newAttendee.ID
-        }
-        
-        //If the new attendee is currently in the invites, take them out
-        if(party.hasOwnProperty('Invited')){
-          let locOfInvite = party.Invited.findIndex(attendee => attendee.ID === newAttendee.ID);
-          if(locOfInvite !== -1){
-            party.Invited.splice(locOfInvite, 1);
-    
-            curExpressions.push('Invited = :z')
-            updateValues[':z'] = party.Invited;
-          }
-        }
-        
-        //Insert it into the list
-        if(!party.hasOwnProperty('Attendees') || party.Attendees.length === 0){
-          party.Attendees = [saveItem];
-        }
-
-        //Check that it isn't in the list already
-        else if(party.Attendees.findIndex(attendee => attendee.ID === saveItem.ID) !== -1){
-          console.log(party.Attendees.findIndex(attendee => attendee.ID === saveItem.ID));
-          return responseUtil.Build(403, "Attendee already registered");
-        }
-
-        //Check that they aren't the new highest member
-        else if(party.Attendees[party.Attendees.length - 1].ID < saveItem.ID){
-          console.log(party.Attendees.findIndex(attendee => attendee.ID === saveItem.ID));
-          party.Attendees.push(saveItem);
-        } 
-
-        else {
-          console.log(party.Attendees.findIndex(attendee => attendee.ID === saveItem.ID));
-          try{
-            let i = 0; 
-            while (party.Attendees[i].ID > saveItem.ID){
-              console.log(i + ' | ' + party.Attendees[i]);
-              i++
-            }
-
-            party.Attendees.splice(i, 0, saveItem);
-          } catch(err){
-            party.Attendees.push(saveItem);
-          }
-        }
-
-      }
-      
-      //If there was a remove
-      if(request.Attendees.hasOwnProperty("Remove")){
-        //Check if the ID is present in the array
-        let i = party.Attendees.findIndex(attendee => attendee.ID === request.Attendees.Remove);
-
-        if(i === -1){
-          return responseUtil.Build(403, "User not in party already");
-        } else {
-          party.Attendees.splice(i, 1);
-        }
-      }
-
-
-      //Update the expressions
-      curExpressions = curExpressions.concat('Attendees = :a')
-      updateValues[':a'] = party.Attendees;
-    }
-
-   
     curExpressions = curExpressions.join(', ');
     updateExpression = updateExpression.concat(curExpressions);
     let response = await PartyAPI.Update(request.ID, updateValues, updateExpression);
@@ -244,7 +167,7 @@ module.exports = {
     if(!response){
       return responseUtil.Build(403, 'Party Update Failed');
     } else {
-      response.Message = "Party Created";
+      response.Message = "Party Updated";
       return responseUtil.Build(200, response);
     }
   },
@@ -267,9 +190,9 @@ module.exports = {
 
     try{
       user = await AccountAPI.Get(request.User);
-        if(user === false){
-          return responseUtil.Build(403, "User ID not valid");
-        }
+      if(user === false){
+        return responseUtil.Build(403, "User ID not valid");
+      }
     } catch (err){
       return responseUtil.Build(403, "User ID not valid");
     }
@@ -279,8 +202,6 @@ module.exports = {
     if (party === false){
       return responseUtil.Build(403, "Party ID not valid");
     }
-
-    
 
     //Check that the user isn't in the party
     if(party.Attendees.findIndex(attendee => attendee.ID ===user.ID) !== -1){
@@ -294,23 +215,7 @@ module.exports = {
     }
 
     //If there is no invite list, create one
-    if(!party.hasOwnProperty('Invited') || party.Invited.length === 0){
-      party.Invited = [saveItem];
-    } else {
-      try {
-        let i = 0;
-        while(party.Invited[i].ID > saveItem.ID){
-          i++;
-        }
-        if(party.Invited[i].ID === saveItem.ID){
-          return responseUtil.Build(403, "User already invited");
-        } else {
-          party.Invited.splice(i, 0, saveItem);
-        }
-      } catch (err){
-        party.Invited.push(saveItem);
-      }
-    }
+    party.Invited = PartyUtil.insertSorted(saveItem, party.Invited, 'ID')
 
     //Create the save expressions
     let expression = 'Set Invited = :I'
@@ -318,46 +223,51 @@ module.exports = {
       ':I': party.Invited
     };
 
-    try{
+    let response;
+
+    try {
       //Try to save the item
-      let response = await PartyAPI.Update(request.ID, values, expression);
-      if (response !== false){
-        //Set the save item to include values of party ID and Name
-        saveItem = {
-          ID: party.ID,
-          PartyName: party.PartyName
-        }
-
-        //Check if the invites exist on the user
-        if(!user.hasOwnProperty('Invites') || user.Invites.length === 0){
-          user.Invites = [saveItem];
-        } else {
-          //Append it to the front
-          user.Invites.unshift(saveItem);
-        }
-
-        expression = 'Set Invites = :I'
-        values = {
-          ':I': user.Invites
-        }
-
-        try{
-          response = await AccountAPI.Update(user.ID, values, expression);
-          if(response !== false){
-            response.Message = 'Invite successful'
-            return responseUtil.Build(200, response);
-          } else {
-            return responseUtil.Build(403, "Could not add party to user invites")
-          }
-        } catch (err) {
-          return responseUtil.Build(403, "Could not add party to user invites")
-        }
-      } else {
-        return responseUtil.Build(403, 'Could not invite to party');
-      }
+      response = await PartyAPI.Update(request.ID, values, expression);
     } catch (err) {
-      return responseUtil.Build(403, err);
+      return responseUtil.Build(403, "Cant set invite on party");
     }
+
+    if (response === false){
+      return responseUtil.Build(403, 'Could not invite to party');
+    }
+
+    //Set the save item to include values of party ID and Name
+    saveItem = {
+      ID: party.ID,
+      PartyName: party.PartyName
+    }
+
+    //Check if the invites exist on the user
+    if (!user.hasOwnProperty('Invites') || user.Invites.length === 0){
+      user.Invites = [saveItem];
+    } else {
+      //Append it to the front
+      user.Invites.unshift(saveItem);
+    }
+
+    expression = 'Set Invites = :I'
+    values = {
+      ':I': user.Invites
+    }
+
+    try {
+      response = await AccountAPI.Update(user.ID, values, expression);
+    } catch (err) {
+      return responseUtil.Build(403, "Could not add party to user invites")
+    }
+    
+    if(response !== false){
+      response.Message = 'Invite successful'
+      return responseUtil.Build(200, response);
+    } else {
+      return responseUtil.Build(403, "Could not add party to user invites")
+    }  
+
     
   },
 
@@ -386,41 +296,34 @@ module.exports = {
     //A prototype of the required fields of the required fields
     let required = ['Title', 'Body', 'User', 'RequestLocation'];
 
-    let missingKey = false;
+    let badKey = false;
 
-    console.log(request);
     party.RequestLocationChange = {};
 
     //Check if each required key is present
     for(let i = 0; i < required.length; i++){
-      console.log(keys[i] + '   ' +request.hasOwnProperty(keys[i]));
+
       if(request.hasOwnProperty(keys[i]) === false){
-        missingKey = keys[i];
-        return false;
+        badKey = keys[i];
+        break;
+      } else {
+        let validate = await PartyUtil.isValidLocationRequest(request[keys[i]]);
+        if(validate.isValid === false){
+          badKey = keys[i];
+          break;
+        } else {
+          Object.keys(validate.value).forEach(key =>{
+            party.RequestLocationChange[key] = validate[key];
+          })
+        }
       }
-      //Add the key to the new request
-      party.RequestLocationChange[keys[i]] = request[keys[i]];
+      
     };
 
-    if(missingKey !== false){
-      return responseUtil.Build(403, "Missing key: " + missingKey);
+    if(badKey !== false){
+      return responseUtil.Build(403, "Bad key: " + badKey);
     }
-    //Make sure that a user is valid
-    let user
     
-    try {
-      user = await AccountAPI.Get(request.User);
-      if(user === false){
-        return responseUtil.Build(403, "User not valid");
-      }
-    } catch (err){
-      return responseUtil.Build(403, "User not valid")
-    }
-
-    party.RequestLocationChange.User = {
-      ID: user.ID,
-      Username: user.Username
-    }
     //Create a new update expression
     let updateExpression = 'Set RequestLocationChange = :R';
     let expressionValues = {
