@@ -338,11 +338,17 @@ const User = (props) => {
             }
           </div>
         </div>
+      
         <div className="desc-section">
           {user.Username}
           {renderEditEmail()}
           {renderEditPassword()}
         </div>
+
+        <div className="desc-section">
+        {user.About}
+        </div>
+
       </div>
       
 
