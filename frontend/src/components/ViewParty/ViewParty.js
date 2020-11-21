@@ -34,31 +34,46 @@ const ViewParty=(props)=>{
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res);
-      let current = attendees.concat(res.data.Attributes.Attendees.reverse()[0]);
-      setAttendees(current);
+      setAttendees(res.data.Attributes.Attendees);
     })
     .catch((error) => console.log(error));
   }
 
-    const leaveParty=() =>{
-      const headers = {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      };
-    const Link = `${process.env.REACT_APP_URL}Party/${party.ID}`;
+  const leaveParty=() =>{
+    const headers = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const link = `${process.env.REACT_APP_URL}Party/${party.ID}`;
     const payload={
       Attendees: {
         Remove: props.user.ID
       }
     }
     axios
-    .patch(Link, payload, headers)
+    .patch(link, payload, headers)
       .then((res) => {
         console.log("patch res: ", res);
         setAttendees(res.data.Attributes.Attendees);
       })
       .catch((error) => console.log(error));    
+  }
+
+  const requestNewLocation = () => {
+    const headers = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const link = `${process.env.REACT_APP_URL}Party/RequestLocation/${party.ID}`;
+    const payload = {
+      Name: '',
+      Latitude: '',
+      Longitude: ''
+    }
+
+    console.log("location request called")
   }
 
   
@@ -99,7 +114,18 @@ const ViewParty=(props)=>{
             : <Button variant="danger" onClick={leaveParty}>Leave Party</Button>
           : <Button variant="success" onClick={joinParty}>Join Party</Button>
         : <Button onClick={props.toLogin}>Login to join</Button>
-      } 
+      }
+      {/* 1. logged in */}
+      {/* 2. is a part of party */}
+      {/* 3. is not party leader */}
+      {cookies.get("Token") //if logged in
+        ? attendees.some(att => att.ID.includes(props.user.ID)) //if in party
+          ? party.Host !== props.user.ID //and you're not the host
+            ? <Button className="ml-1" variant="warning" onClick={requestNewLocation}>Request New Location</Button>
+            : <p>you're the host</p>
+          : <p>not in party</p>
+        : <p>not logged in</p>
+      }
     </div>
   )
 }
