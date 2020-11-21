@@ -1,7 +1,8 @@
 #party-time-picker {
-  width: 230px;
+  width: 235px;
   border: none;
-  padding: 5px 10px;
+  padding: .375rem .75rem;
+  border-radius: .25rem;
 }
 #party-time-picker:hover {
   color: #fff;
@@ -19,4 +20,32 @@
   background-color: #2C2F33;
   color: #fff;
   border-right: .1px solid white;
+}
+
+#places-input-box {
+  background-color: #4a4c51;
+  color: #fff;
+
+  /* .form-control */
+  display: block;
+  width: 100%;
+  height: calc(1.5em + .75rem + 2px);
+  padding: .375rem .75rem;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  background-clip: padding-box;
+  border: none;
+  border-radius: .25rem;
+  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+#places-input-box:focus {
+  filter: brightness(1);
+  background-color: #CCCDCD;
+  color: #000;
+}
+
+.form-content input:focus {
+  border: none;
+  outline: none !important;
 }
