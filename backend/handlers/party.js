@@ -4,7 +4,7 @@
 const PartyAPI = require("../services/PartyAPI");
 const AccountAPI = require("../services/AccountAPI");
 const responseUtil = require("../utilities/response");
-const nameUtil = require("../utilities/nameCheck");
+const PartyUtil = require("../utilities/PartyCheck");
 const shortid = require("shortid");
 const moment = require("moment-timezone");
 
@@ -17,54 +17,73 @@ module.exports = {
       return responseUtil.Build(204, "Event is empty");
 
     let request = JSON.parse(events.body);
+
+    //Create prototype party
+    const required = ['PartyName', 'PartyLocation', 'Host', 'PartyTime'];
     
-    //Must have a name
-    if (!request.hasOwnProperty("PartyName"))
-      return responseUtil.Build(403, "Party must have a name");
+    let badKey = false;
 
-    //Update the name to make sure it is valid
-    request.PartyName = nameUtil.isValidParty(request.PartyName);
+    //If it's missing a required key, store which one it is and call return false
+    for(let i = 0; i < required.length; i++){
+      if(!request.hasOwnProperty(required[i])){
+        badKey = "Missing Key: " + required[i];
+        break;
+      } else {
+        //Check that the value at the key is valid
+        let curObj = await PartyUtil.validPartyKeys(required[i], request[required[i]]);
+        if(curObj.isValid === false){
+          badKey = "Key value not valid: " + required[i] + "   " + request[required[i]];
+        }
+        //Is valid
+        else {
+          //Go through the returned value's keys
+          Object.keys(curObj.value).forEach( responseKey => {
+            request[responseKey] = curObj.value[responseKey];
+          })
+        }
+      }
+    };
 
-    if(request.PartyName === false){
-      return responseUtil.Build(403, "Party name not valid");
+    if (badKey !== false){
+      return responseUtil.Build(403, badKey);
     }
 
-    // ensure that the party has a location
-    if (!request.hasOwnProperty("PartyLocation") 
-    || request.PartyLocation === "")
-      return responseUtil.Build(403, "Party must have a location");
+    const defaults = {
+      Intent: 'Casual',
+      Games: [],
+      AgeGate: false
+    }
+
+    let keys = Object.keys(defaults);
+
+    //Go through the optional keys
+    for(let i = 0; i < keys.length; i++){
+      
+      //If the object doesn't have it, set it to the default
+      if(!request.hasOwnProperty(keys[i])){
+        request[keys[i]] = defaults[keys[i]];
+      } else {
+        let curObj = await PartyUtil.validPartyKeys(keys[i], request[keys[i]]);
+        //If the current key for the optional key isn't valid, set it to default
+        if(curObj.isValid === false){
+          request[keys[i]] = defaults[keys[i]];
+        } else {
+          //Go through the returned value's keys
+          Object.keys(curObj.value).forEach( responseKey => {
+            request[responseKey] = curObj.value[responseKey];
+          })
+        }
+      }
+    };
 
     // add a time that the party was created
     request.CreateDate = moment().toISOString();
 
-    // ensure that there is a host
-    if (!request.hasOwnProperty("Host"))
-      return responseUtil.Build(403, "Please send a host ID!");
-
-    // check that the host exists
-    try {
-      request.HostUsername = await AccountAPI.Get(request.Host);
-      request.HostUsername = request.HostUsername.Username;
-    } catch (err){
-      return responseUtil.Build(403, "Host ID invalid");
-    }
-    
-    //If there was no intent attached, assume casual
-    if(!request.hasOwnProperty("Intent")){
-      request.Intent = "Casual";
-    }
-
-    //If there were games attached, add them. Otherwise, make the list blank
-    if(!request.hasOwnProperty("Games")){
-      request.Games = [];
-    }
-
+    console.log(request.HostUsername);
     request.Attendees = [{
       ID: request.Host,
       Username: request.HostUsername
     }];
-
-    
 
     let response = await PartyAPI.Save(shortid.generate(), request);
 
@@ -74,6 +93,23 @@ module.exports = {
 
   // UPDATE A PARTY //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   Update: async function (events) {
+    
+    //Constant object for modifyable objects
+    const modifyable = {
+      PartyName: ':n',
+      PartyLocation:  ':l',
+      Host: ':h',
+      HostUsername: ":u",
+      PartyTime: ':t',
+      HardwareRequirements: ':r',
+      Games: ':g',
+      AgeGate: ':b',
+      Intent: ':i',
+      RequestLocationChange: ':x',
+      Attendees: ":a",
+      Invited: ":z"
+    }
+    
     //Check if the event exists
     if(!events){
       return responseUtil.Build(204, 'event is empty');
@@ -90,167 +126,219 @@ module.exports = {
       return responseUtil.Build(403, "Party ID not valid");
     }
 
-    console.log(request);
+    let badKey = false;
+
     //A string for the updates
     let updateExpression = 'set ';
 
-    let curExpressions = [];
+    var curExpressions = [];
     
-    let updateValues = {};
+    var updateValues = {};
 
-    //Check if the name is exists
-    if(request.hasOwnProperty('PartyName')){
-      //Update the name to make sure it's valid
-      request.PartyName = nameUtil.isValidParty(request.PartyName);
+    let keys = Object.keys(modifyable);
 
-      //Check if the name is valid 
-      if(request.PartyName === false){
-        responseUtil.Build(403, "Party name not valid");
-      }
-
-      //Update the expressions
-      curExpressions = curExpressions.concat('PartyName = :n');
-      updateValues[':n'] = request.PartyName;
-    }
-
-    // ensure that the party has a location
-    if (request.hasOwnProperty('PartyLocation')
-      && request.PartyLocation !== ""){
-        
-      //Update the expressions
-      curExpressions = curExpressions.concat('PartyLocation = :l')
-      updateValues[':l'] = request.PartyLocation;
-    }
-
-    // ensure that there is a host
-    if (request.hasOwnProperty('Host')){
-      // check that the host exists
-      try {
-        request.HostUsername = await AccountAPI.Get(request.Host);
-        request.HostUsername = request.HostUsername.Username
-      } catch (err){
-        return responseUtil.Build(403, "Host doesn't exist!");
-      }
-  
-      //Update the expressions
-      curExpressions = curExpressions.concat('Host = :h, HostUsername = :u')
-      updateValues[':h'] = request.Host;
-      updateValues[':u'] = request.HostUsername;
-    }
-    
-
-    //Check times
-    if (request.hasOwnProperty('PartyTime')){
-      //Update the expressions
-      curExpressions = curExpressions.concat('PartyTime = :t')
-      updateValues[':t'] = request.PartyTime;
-    }
-
-    //Check attendees
-    if (request.hasOwnProperty('Attendees')){
-      //Check if we're adding users
-      if(request.Attendees.hasOwnProperty('Add')){
-        //Make sure that the account exists
-        try {
-          var newAttendee = await AccountAPI.Get(request.Attendees.Add);
-          if (newAttendee === false){
-            return responseUtil.Build(403, "New attendee does not exist");
-          }
-        } catch (err) {
-          return responseUtil.Build(403, "New attendee could not be found");
-        }
-
-        let saveItem = {
-          Username : newAttendee.Username,
-          ID : newAttendee.ID
-        }
-        
-        //Insert it into the list
-        if(!party.hasOwnProperty('Attendees') || party.Attendees.length === 0){
-          party.Attendees = [saveItem];
-        }
-
-        //Check that it isn't in the list already
-        else if(party.Attendees.findIndex(attendee => attendee.ID === saveItem.ID) !== -1){
-          console.log(party.Attendees.findIndex(attendee => attendee.ID === saveItem.ID));
-          return responseUtil.Build(403, "Attendee already registered");
-        }
-
-        //Check that they aren't the new highest member
-        else if(party.Attendees[party.Attendees.length - 1].ID < saveItem.ID){
-          console.log(party.Attendees.findIndex(attendee => attendee.ID === saveItem.ID));
-          party.Attendees.push(saveItem);
-        } 
-
-        else {
-          console.log(party.Attendees.findIndex(attendee => attendee.ID === saveItem.ID));
-          try{
-            let i = 0; 
-            while (party.Attendees[i].ID > saveItem.ID){
-              console.log(i + ' | ' + party.Attendees[i]);
-              i++
-            }
-
-            party.Attendees.splice(i, 0, saveItem);
-          } catch(err){
-            party.Attendees.push(saveItem);
-          }
-        }
-
-      }
-      
-      //If there was a remove
-      if(request.Attendees.hasOwnProperty("Remove")){
-        //Check if the ID is present in the array
-        let i = party.Attendees.findIndex(attendee => attendee.ID === request.Attendees.Remove);
-
-        if(typeof i === -1){
-          return responseUtil.Build(403, "User not in party already");
-        } else {
-          party.Attendees.splice(i, 1);
+    //Go through the modifiable attributes
+    for(let i = 0; i < keys.length; i++){
+      //If it's trying to be modified, check if it's valid
+      if(request.hasOwnProperty(keys[i])){
+        let curObj = await PartyUtil.validPartyKeys(keys[i], request[keys[i]], party);
+        //If not valid, set the bad key and break the update.
+        if(curObj.isValid === false){ 
+          badKey = keys[i];
+          break;
+        } else { 
+          //Go through the returned value's keys
+          Object.keys(curObj.value).forEach( responseKey => {
+            curExpressions.push(responseKey + '=' + modifyable[responseKey]);
+            updateValues[modifyable[responseKey]] = curObj.value[responseKey];
+          })
         }
       }
+    };
 
-
-      //Update the expressions
-      curExpressions = curExpressions.concat('Attendees = :a')
-      updateValues[':a'] = party.Attendees;
+    if(badKey !== false){
+      return responseUtil.Build(403, "Requested value for " + badKey +" not valid: " + request[badKey]);
     }
-
-    //Check for hardware requirements
-    if (request.hasOwnProperty('HardwareRequirements')){
-      curExpressions = curExpressions.concat('HardwareRequirements = :r')
-      updateValues[':r'] = request.HardwareRequirements;
-    }
-
-    //Check for ageGate
-    if(request.hasOwnProperty('AgeGate')){
-      curExpressions = curExpressions.concat('AgeGate = :g');
-      updateValues[':g'] = request.AgeGate;
-    }
-    
-    //Check for games
-    if(request.hasOwnProperty('Games')){
-      curExpressions = curExpressions.concat('Games = :m');
-      updateValues[':m'] = request.Games;
-    }
-
-    //Check for intent
-    if(request.hasOwnProperty('Intent')){
-      curExpressions = curExpressions.concat('Intent = :i');
-      updateValues[':i'] = request.Intent;
-    }
-
+   
     curExpressions = curExpressions.join(', ');
     updateExpression = updateExpression.concat(curExpressions);
-    
     let response = await PartyAPI.Update(request.ID, updateValues, updateExpression);
 
     if(!response){
-      return responseUtil.Build(403, 'Party creation failed ');
+      return responseUtil.Build(403, 'Party Update Failed');
     } else {
-      response.Message = "Party Created";
+      response.Message = "Party Updated";
       return responseUtil.Build(200, response);
+    }
+  },
+
+  // INVITE USER TO PARTY //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  Invite: async function(events){
+    if(!events){
+      return responseUtil.Build(204, "Events is empty");
+    }
+
+    let request = JSON.parse(events.body);
+    request.ID = events.pathParameters.ID;
+
+    //Check that we have a userID in the event
+    if(!request.hasOwnProperty('ID')){
+      return responseUtil.Build(204, "No user ID provided")
+    }
+    
+    let user
+
+    try{
+      user = await AccountAPI.Get(request.User);
+      if(user === false){
+        return responseUtil.Build(403, "User ID not valid");
+      }
+    } catch (err){
+      return responseUtil.Build(403, "User ID not valid");
+    }
+
+    let party = await PartyAPI.Get(request.ID);
+
+    if (party === false){
+      return responseUtil.Build(403, "Party ID not valid");
+    }
+
+    //Check that the user isn't in the party
+    if(party.Attendees.findIndex(attendee => attendee.ID ===user.ID) !== -1){
+      return responseUtil.Build(403, "User already in party");
+    }
+
+    //Create an item to save in the list
+    let saveItem = {
+      ID: user.ID,
+      Username: user.Username
+    }
+
+    //If there is no invite list, create one
+    party.Invited = PartyUtil.insertSorted(saveItem, party.Invited, 'ID')
+
+    //Create the save expressions
+    let expression = 'Set Invited = :I'
+    let values = {
+      ':I': party.Invited
+    };
+
+    let response;
+
+    try {
+      //Try to save the item
+      response = await PartyAPI.Update(request.ID, values, expression);
+    } catch (err) {
+      return responseUtil.Build(403, "Cant set invite on party");
+    }
+
+    if (response === false){
+      return responseUtil.Build(403, 'Could not invite to party');
+    }
+
+    //Set the save item to include values of party ID and Name
+    saveItem = {
+      ID: party.ID,
+      PartyName: party.PartyName
+    }
+
+    //Check if the invites exist on the user
+    if (!user.hasOwnProperty('Invites') || user.Invites.length === 0){
+      user.Invites = [saveItem];
+    } else {
+      //Append it to the front
+      user.Invites.unshift(saveItem);
+    }
+
+    expression = 'Set Invites = :I'
+    values = {
+      ':I': user.Invites
+    }
+
+    try {
+      response = await AccountAPI.Update(user.ID, values, expression);
+    } catch (err) {
+      return responseUtil.Build(403, "Could not add party to user invites")
+    }
+    
+    if(response !== false){
+      response.Message = 'Invite successful'
+      return responseUtil.Build(200, response);
+    } else {
+      return responseUtil.Build(403, "Could not add party to user invites")
+    }  
+
+    
+  },
+
+  // REQUEST LOCATION CHANGE //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  RequestLocationChange: async function (events){
+    if(!events){
+      return responseUtil.Build(204, "Events is empty");
+    }
+
+    let request = JSON.parse(events.body)
+    request.ID = events.pathParameters.ID;
+
+    //Retrieve the party
+    let party = await PartyAPI.Get(request.ID);
+    
+    if(party === false) {
+      return responseUtil.Build(403, 'Party ID not valid');
+    }
+
+    //If there is already a request made for the party, we keep the original
+    if(party.hasOwnProperty('RequestLocationChange') 
+        && party.RequestLocationChange !== null){
+      return responseUtil.Build(403, "There is a request already in progress");
+    }
+
+    //A prototype of the required fields of the required fields
+    let required = ['Title', 'Body', 'User', 'RequestLocation'];
+
+    let badKey = false;
+
+    party.RequestLocationChange = {};
+
+    //Check if each required key is present
+    for(let i = 0; i < required.length; i++){
+
+      if(request.hasOwnProperty(keys[i]) === false){
+        badKey = keys[i];
+        break;
+      } else {
+        let validate = await PartyUtil.isValidLocationRequest(request[keys[i]]);
+        if(validate.isValid === false){
+          badKey = keys[i];
+          break;
+        } else {
+          Object.keys(validate.value).forEach(key =>{
+            party.RequestLocationChange[key] = validate[key];
+          })
+        }
+      }
+      
+    };
+
+    if(badKey !== false){
+      return responseUtil.Build(403, "Bad key: " + badKey);
+    }
+    
+    //Create a new update expression
+    let updateExpression = 'Set RequestLocationChange = :R';
+    let expressionValues = {
+      ':R': party.RequestLocationChange
+    }
+    
+    try{
+      let response = await PartyAPI.Update(request.ID, expressionValues, updateExpression);
+      if (response !== false){
+        return responseUtil.Build(200, response);
+      } else {
+        return responseUtil.Build(500, "Could not fulfil update request")
+      }
+    } catch (err) {
+      return responseUtil.Build(500, "Could not fulfil update request")
     }
   },
 
