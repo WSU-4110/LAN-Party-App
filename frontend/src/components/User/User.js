@@ -324,9 +324,11 @@ const User = (props) => {
     }
     // regular mode
     return (
-      <p>
-        <Badge style={{cursor:'pointer'}} className="change-about" variant="secondary" onClick={() => setEditAbout(true)}>Edit About Me</Badge>
-      </p>
+      <Button
+      size="sm"
+      onClick={() => setEditAbout(true)} >
+      Edit About
+    </Button>
     )
   }
 
