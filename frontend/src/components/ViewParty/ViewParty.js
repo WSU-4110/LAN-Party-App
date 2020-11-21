@@ -114,7 +114,6 @@ const ViewParty=(props)=>{
             <tr>
               <td>{index+1}</td>
               <td>{attendee.Username}</td>
-              <Button variant="danger" onClick={removeMember} disabled>Boot</Button>
             </tr>
           ))}
         </tbody>
@@ -124,6 +123,8 @@ const ViewParty=(props)=>{
         ? attendees.some(att => att.ID.includes(props.user.ID)) //if in the party
           ? user.ID === props.hostID //if host, then can't leave party
             ? <Button variant="danger" onClick={leaveParty} disabled>Leave Party</Button>
+              ? <Button variant="danger" onClick={removeMember}>Boot</Button>
+              : <Button variant="danger" onClick={removeMember}>Boot</Button>
             : <Button variant="danger" onClick={leaveParty}>Leave Party</Button>
           : <Button variant="success" onClick={ageGate}>Join Party</Button>
         : <Button onClick={props.toLogin}>Login to join</Button>

@@ -324,11 +324,7 @@ const User = (props) => {
     }
     // regular mode
     return (
-      <Button
-      size="sm"
-      onClick={() => setEditAbout(true)} >
-      Edit About
-    </Button>
+      <Button size="sm" onClick={() => setEditAbout(true)} >Edit About</Button>
     )
   }
 
