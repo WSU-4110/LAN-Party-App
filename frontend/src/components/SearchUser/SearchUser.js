@@ -16,6 +16,7 @@ const SearchUser=(props)=>{
   const [homeRender, setHomeRender] = useContext(HomeRenderContext);
   const [search, setSearch] = useState('');
   const [friendReqSent, setfriendReqSent] = useState([]);
+  const [userIsFriend, setuserIsFriend] = useState([]);
 
   function shallowEqual(object1, object2) {
     const keys1 = Object.keys(object1);
@@ -46,6 +47,19 @@ const SearchUser=(props)=>{
     getAllUsers();
     if (user.ID !== "") {
       setfriendReqSent(user.FriendRequests);
+    }
+  }, [])
+
+  useEffect(()=>{
+    setuserIsFriend(user.Friends);
+  }, [user])
+
+  useEffect(() => {
+    if (!cookies.get("Token"))
+      props.history.push("/login");
+    getAllUsers();
+    if (user.ID !== "") {
+      setuserIsFriend(user.Friends);
     }
   }, [])
   
@@ -139,20 +153,20 @@ const SearchUser=(props)=>{
         if (friendReqSent.some(att => shallowEqual(att, {ID:pid, Sender:true, Username:username})))
           return <Button variant="outline-success" onClick={() => undoFriend(pid)}>Request Sent</Button>
         else
-        {
           return <Button variant="outline-success" onClick={() => confirmFriend(pid)} >Accept Request</Button>
-        }
       }
       else
         return <Button variant="outline-primary" onClick={() => addFriend(pid)}>Add Friend</Button>
     }
-    else
-      return <p>empty</p>
+    else if (userIsFriend)
+      return <Button variant="outline-primary" onClick={() => removeFriend(pid)}>Remove Friend</Button>
+    else 
+      return <p>uh, this shouldn't be here, oh god, oh jeez</p>
   }
 
   const renderEXButton = (pid, username) => {
      if (friendReqSent.some(att => shallowEqual(att, {ID:pid, Sender:false, Username:username})))
-      return <Button variant="outline-success" onClick={() => confirmFriend(pid)} >Reject Request</Button> 
+      return <Button variant="outline-success" onClick={() => undoFriend(pid)} >Reject Request</Button> 
     else
       return <p></p>
   }
