@@ -19,7 +19,7 @@ const ViewParty=(props)=>{
   const [attendees, setAttendees] = useState(props.party.Attendees);
 
   const ageGate=() =>{
-    if (window.confirm("By joining this party, you agree that you meet the minimum age requirement.")){
+    if (window.confirm("By joining this party, you agree that you meet the minimum age requirement and that you won't sue us over anything.")){
       joinParty();
    }
 }
