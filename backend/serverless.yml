@@ -19,6 +19,9 @@ provider:
   versionFunctions: false
   runtime: nodejs12.x
   region: us-east-2
+  apiGateway:
+    shouldStartNameWithService: true
+  
   # enviroment:
   #   S3_ACCESS_ID: ${ssm:only-lans-s3-id~true}
   #   S3_ACCESS_SECRET: ${ssm:only-lans-s3-secret~true}
@@ -154,6 +157,22 @@ functions:
           method: PATCH
           path: /Party/{ID}
           cors: true
+  
+  InviteToParty:
+    handler: handlers/party.Invite
+    events:
+      - http:
+          method: PATCH
+          path: Invite/Party/{ID}
+          cors: true
+  
+  RequestLocationChange:
+    handler: handlers/party.RequestLocationChange
+    events:
+      - http:
+          method: PATCH
+          path: Party/RequestLocation/{ID}
+          cors: true
 
   # image functions
   UploadImage:
@@ -249,12 +268,6 @@ resources:
           - IndexName: PartyName
             KeySchema:
               - AttributeName: PartyName
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-          - IndexName: PartyLocation
-            KeySchema:
-              - AttributeName: PartyLocation
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
