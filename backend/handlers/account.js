@@ -6,6 +6,7 @@ const moment = require("moment-timezone");
 const responseUtil = require("../utilities/response");
 const crypto = require("crypto");
 const genUtils = require("../utilities/generalUtils");
+const { isUndefined } = require("util");
 
 module.exports = {
 
@@ -263,13 +264,20 @@ module.exports = {
                     return responseUtil.Build(403, "Already requested that friend");
                 }
             }
-            
+
+            let saveItem = {
+                ID: requested.ID,
+                Username: requested.Username,
+                Sender: true
+            }
+
+            sender.FriendRequests = await genUtils.insertSorted(saveItem, sender.FriendRequests);
+            if(sender.FriendRequests === false){
+                return responseUtil.Build(403, "Could not add user to sender list");
+            }
+
             let updateValues = {
-                ':f': sender.FriendRequests.concat({
-                    ID: requested.ID,
-                    Username: requested.Username,
-                    Sender: true
-                })
+                ':f': sender.FriendRequests
             }
             let result;
             
@@ -287,12 +295,21 @@ module.exports = {
                 requested.FriendRequests = [];
             }
 
+            saveItem = {
+                ID: sender.ID,
+                Username: sender.Username,
+                Sender: false
+            }
+
+
+            requested.FriendRequests = await genUtils.insertSorted(saveItem, requested.FriendRequests);
+
+            if(requested.FriendRequests === false){
+                return responseUtil.Build(403, "Could not insert into requested list");
+            }
+
             updateValues = {
-                ':f': requested.FriendRequests.concat({
-                    ID: sender.ID,
-                    Username: sender.Username,
-                    Sender: false
-                })
+                ':f': requested.FriendRequests
             };
 
             result = await AccountAPI.Update(requested.ID, updateValues, updateExpression);
