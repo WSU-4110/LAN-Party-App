@@ -16,6 +16,7 @@ const User = (props) => {
   const [editMode, setEditMode] = useState(false);
   const [editEmail, setEditEmail] = useState(false);
   const [editPassword, setEditPassword] = useState(false);
+  const [editAbout, setEditAbout] = useState(false);
 
   const [chosenImage, setChosenImage] = useState('Choose Image');
 
@@ -168,6 +169,42 @@ const User = (props) => {
   }
 
   /**
+    * 
+    * CHANGE ABOUT
+    * 
+    */
+   const changeAbout = (data, e) => {
+    e.preventDefault();
+
+    const headers = {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    };
+    // PATCH URL
+    const Link = `${REACT_APP_URL}Account/${user.ID}`;
+    const payload = {
+      NewAbout: data.about
+    }
+
+    console.log("about payload", data.about);
+    axios
+      .patch(Link, payload, headers)
+      .then((res) => {
+        console.log("patch res: ", res);
+        setUser({
+          ...res.data,
+          Token: cookies.get("Token"),
+          LoggedIn: true
+        })
+        cookies.set("Avatar", res.data.Avatar);
+      })
+      .catch((error) => console.log(error));
+
+    setEditAbout(false);
+  }
+
+  /**
    * 
    * CHANGE PASSWORD
    * 
@@ -253,6 +290,46 @@ const User = (props) => {
       </p>
     )
   }
+
+
+  const renderEditAbout = () => {
+    // if in edit mode
+    if (editAbout) {
+      return (
+        <Form onSubmit={handleSubmit(changeAbout)}>
+            <Form.Row className="align-items-center">
+              <Col xs="auto">
+                <Form.Control
+                  size="sm"
+                  className="mb-2"
+                  type="text"
+                  name="about"
+                  placeholder={user.About}
+                  aria-describedby="aboutReq"
+                  ref={register({ required: true })}
+                />
+              </Col>
+              <Col xs="auto" style={{display:'flex', alignContent:'center', justifyContent:'center'}}>
+                <Button size="sm" type="submit" variant="secondary" className="mb-2">
+                  Change
+                </Button>
+                <Badge 
+                  style={{marginLeft:'5px'}}
+                  className="close-btn"
+                  onClick={()=>setEditAbout(false)}>X</Badge>
+              </Col>
+            </Form.Row>
+        </Form>
+      )
+    }
+    // regular mode
+    return (
+      <p>
+        <Badge style={{cursor:'pointer'}} className="change-about" variant="secondary" onClick={() => setEditAbout(true)}>Edit About Me</Badge>
+      </p>
+    )
+  }
+
 
   const renderEditPassword = () => {
     if (editPassword) {
@@ -346,7 +423,8 @@ const User = (props) => {
         </div>
 
         <div className="desc-section">
-        {user.About}
+          {user.About}
+          {renderEditAbout()}
         </div>
 
       </div>
