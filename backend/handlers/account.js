@@ -385,7 +385,7 @@ module.exports = {
 
             requested.FriendRequests.splice(friendReqInd, 1);
                 
-            let storeVal = {
+            storeVal = {
                 ID: sender.ID,
                 Username: sender.Username,
                 Avatar: sender.Avatar
