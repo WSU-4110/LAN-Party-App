@@ -427,6 +427,10 @@ const User = (props) => {
 
       </div>
       
+      <div className="desc-section">
+        {user.About}
+        {renderEditAbout()}
+      </div>
 
       <Accordion defaultActiveKey="0">
   <Card>
