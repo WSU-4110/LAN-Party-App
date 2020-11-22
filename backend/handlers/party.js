@@ -17,7 +17,15 @@ module.exports = {
       return responseUtil.Build(204, "Event is empty");
 
     let request = JSON.parse(events.body);
-
+    if(request.hasOwnProperty('PartyLocation') 
+      && typeof(request.PartyLocation) === 'string'){
+        let name = request.PartyLocation;
+        request.PartyLocation = {
+          Name: name,
+          Longitude: request.Longitude,
+          Latitude: request.Latitude
+        };
+      }
     //Create prototype party
     const required = ['PartyName', 'PartyLocation', 'Host', 'PartyTime'];
     
