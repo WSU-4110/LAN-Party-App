@@ -34,8 +34,7 @@ const ViewParty=(props)=>{
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res);
-      let current = attendees.concat(res.data.Attributes.Attendees.reverse()[0]);
-      setAttendees(current);
+      setAttendees(res.data.Attributes.Attendees);
     })
     .catch((error) => console.log(error));
   }
