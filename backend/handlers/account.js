@@ -322,8 +322,9 @@ module.exports = {
                 return responseUtil.Build(403, "Requested ID invalid");
             }
 
-            let friendReqInd = await genUtils.isInSortedList(requested, sender.FriendRequests);
-            if(friendReqInd === false){
+            //let friendReqInd = await genUtils.isInSortedList(requested, sender.FriendRequests);
+            let friendReqInd = sender.FriendRequests.findIndex(user => user.ID === requested.ID)
+            if(friendReqInd === -1){
                 return responseUtil.Build(403, "Requested user not in sender's FriendRequests");
             }
 
@@ -336,12 +337,14 @@ module.exports = {
                 Avatar: requested.Avatar
             }
             //Insert the friend such that it's sorted by ID
-            sender.Friends = await genUtils.insertSorted(storeVal, sender.FriendRequests);
+            sender.Friends = await genUtils.insertSorted(storeVal, sender.Friend);
 
             let updateValues = {
                 ':f' : sender.Friends,
                 ':r' : sender.FriendRequests
             }
+
+            console.log(updateValues);
             
             let response;
 
@@ -352,45 +355,52 @@ module.exports = {
             }
             if(response === false){
                 return responseUtil.Build(500, "Could not add friend");
-            } else {
-                console.log(requested);
+            } 
+            
+            console.log(requested);
 
-                friendReqInd = await genUtils.isInSortedList(sender, requested.FriendRequests);
-                if(friendReqInd === false){
-                    return (403, "Sender not in requested friend requests array");
-                }
+            //friendReqInd = await genUtils.isInSortedList(sender, requested.FriendRequests);
+            friendReqInd = requested.FriendRequests.findIndex(user => user.ID === sender.ID);
+            if(friendReqInd === -1){
+                console.log("Sender not in requested friend requests array");
+                return (403, "Sender not in requested friend requests array");
+            }
 
-                requested.FriendRequests.splice(friendReqInd, 1);
-                    
-                let storeVal = {
-                    ID: sender.ID,
-                    Username: sender.Username,
-                    Avatar: sender.Avatar
-                }
+            requested.FriendRequests.splice(friendReqInd, 1);
+                
+            let storeVal = {
+                ID: sender.ID,
+                Username: sender.Username,
+                Avatar: sender.Avatar
+            }
 
-                console.log('Post-splice')
-                console.log(requested);
+            console.log('Post-splice')
+            console.log(requested);
 
-                console.log(storeVal);
+            console.log(storeVal);
 
-                requested.Friends = await genUtils.insertSorted(storeVal, requested.Friends);
+            requested.Friends = await genUtils.insertSorted(storeVal, requested.Friends);
 
-                console.log(requested);
+            console.log(requested);
 
 
-                updateValues = {
-                    ':f' : requested.Friends,
-                    ':r' : requested.FriendRequests
-                }
+            updateValues = {
+                ':f' : requested.Friends,
+                ':r' : requested.FriendRequests
+            }
 
+            console.log(updateValues);
+            try {
                 response = await AccountAPI.Update(requested.ID, updateValues, updateExpression);
                 if(response === false){
                     return responseUtil.Build(500, "Could not add friend");
                 } else {
                     return responseUtil.Build(200, "Friend added!");
                 }
-                
+            } catch (err){
+                return response.Build(500, err);
             }
+        
             
         } else if (request.hasOwnProperty("Remove")){
             let requested
