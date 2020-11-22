@@ -6,7 +6,7 @@ module.exports = {
     // returns the index if it's present, false if not
     //=====================================================================
     isInSortedList: async function(item, list, sortedKey = "ID"){
-        if(list === undefined || list.length === 0){
+        if(list === undefined || !Array.isArray(list) || list.length === 0){
             return false;
         }
         
@@ -38,7 +38,8 @@ module.exports = {
     //================================================================================
     insertSorted: async function (insertItem, list, sortKey = "ID"){
         //Make sure that the list isn't empty
-        if(list === undefined || list.length === 0){
+        console.log(list);
+        if(list === undefined || !Array.isArray(list) ||list.length === 0){
             list = [insertItem];
             return list;
         }
