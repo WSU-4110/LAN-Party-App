@@ -420,11 +420,6 @@ const User = (props) => {
           {renderEditPassword()}
         </div>
 
-        <div className="desc-section">
-          {user.About}
-          {renderEditAbout()}
-        </div>
-
       </div>
       
       <div className="desc-section">
