@@ -85,7 +85,7 @@ const Home = (props) => {
             eventKey={p.ID}>
               {p.PartyName} <br/>
               Host: {p.HostUsername} <br/>
-              Location: {p.PartyLocation} <br/>
+              Location: {p.PartyLocation.hasOwnProperty("Name") ? p.PartyLocation.Name : p.PartyLocation} <br/>
               Date: {p.PartyTime} <br/>
             </Accordion.Toggle>
             <Accordion.Collapse eventKey={p.ID}>
