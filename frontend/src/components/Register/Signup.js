@@ -14,6 +14,7 @@ const Signup = (props) => {
       Username: data.username,
       Password: data.password,
       Email: data.email,
+      About: data.about, //RW
       Avatar: "https://images.unsplash.com/photo-1602254872083-22caf4166bd7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
     };
 
@@ -92,6 +93,17 @@ const Signup = (props) => {
               {errors.password && errors.password.type === "minLength" && (
                 <Form.Text className="text-danger" id="passwordReq">Minimum 8 characters</Form.Text>)}
           </Form.Group>
+
+          <Form.Group controlId="formAbout">
+            <Form.Label>About you</Form.Label>
+            <Form.Control 
+              type="text" 
+              placeholder="A little bit about yourself"
+              name="about"
+              aria-describedby="passwordReq"
+              ref={register({ required: false, maxLength: 255 })} />
+              </Form.Group>
+
           <div style={{textAlign:"center"}}>
             <Button variant="primary" type="submit">
               Submit
