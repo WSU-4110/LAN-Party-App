@@ -16,6 +16,7 @@ const User = (props) => {
   const [editMode, setEditMode] = useState(false);
   const [editEmail, setEditEmail] = useState(false);
   const [editPassword, setEditPassword] = useState(false);
+  const [editAbout, setEditAbout] = useState(false);
 
   const [chosenImage, setChosenImage] = useState('Choose Image');
 
@@ -147,24 +148,60 @@ const User = (props) => {
     // PATCH URL
     const Link = `${REACT_APP_URL}Account/${user.ID}`;
     const payload = {
-      Email: data.email
+      NewEmail: data.email
     }
 
     console.log("email payload", data.email);
-    // axios
-    //   .patch(Link, payload, headers)
-    //   .then((res) => {
-    //     console.log("patch res: ", res);
-    //     setUser({
-    //       ...res.data,
-    //       Token: cookies.get("Token"),
-    //       LoggedIn: true
-    //     })
-    //     cookies.set("Avatar", res.data.Avatar);
-    //   })
-    //   .catch((error) => console.log(error));
+    axios
+      .patch(Link, payload, headers)
+      .then((res) => {
+        console.log("patch res: ", res);
+        setUser({
+          ...res.data,
+          Token: cookies.get("Token"),
+          LoggedIn: true
+        })
+        cookies.set("Avatar", res.data.Avatar);
+      })
+      .catch((error) => console.log(error));
 
     setEditEmail(false);
+  }
+
+  /**
+    * 
+    * CHANGE ABOUT
+    * 
+    */
+   const changeAbout = (data, e) => {
+    e.preventDefault();
+
+    const headers = {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    };
+    // PATCH URL
+    const Link = `${REACT_APP_URL}Account/${user.ID}`;
+    const payload = {
+      NewAbout: data.about
+    }
+
+    console.log("about payload", data.about);
+    axios
+      .patch(Link, payload, headers)
+      .then((res) => {
+        console.log("patch res: ", res);
+        setUser({
+          ...res.data,
+          Token: cookies.get("Token"),
+          LoggedIn: true
+        })
+        cookies.set("Avatar", res.data.Avatar);
+      })
+      .catch((error) => console.log(error));
+
+    setEditAbout(false);
   }
 
   /**
@@ -189,23 +226,22 @@ const User = (props) => {
     // PATCH URL
     const Link = `${REACT_APP_URL}Account/${user.ID}`;
     const payload = {
-      old: data.oldpassword,
-      new: data.newpassword
+      NewPassword: data.newpassword
     }
 
     console.log("password payload", payload);
-    // axios
-    //   .patch(Link, payload, headers)
-    //   .then((res) => {
-    //     console.log("patch res: ", res);
-    //     setUser({
-    //       ...res.data,
-    //       Token: cookies.get("Token"),
-    //       LoggedIn: true
-    //     })
-    //     cookies.set("Avatar", res.data.Avatar);
-    //   })
-    //   .catch((error) => console.log(error));
+    axios
+      .patch(Link, payload, headers)
+      .then((res) => {
+        console.log("patch res: ", res);
+        setUser({
+          ...res.data,
+          Token: cookies.get("Token"),
+          LoggedIn: true
+        })
+        cookies.set("Avatar", res.data.Avatar);
+      })
+      .catch((error) => console.log(error));
 
     setEditPassword(false);
   }
@@ -255,17 +291,55 @@ const User = (props) => {
     )
   }
 
+
+  const renderEditAbout = () => {
+    // if in edit mode
+    if (editAbout) {
+      return (
+        <Form onSubmit={handleSubmit(changeAbout)}>
+            <Form.Row className="align-items-center">
+              <Col xs="auto">
+                <Form.Control
+                  size="sm"
+                  className="mb-2"
+                  type="text"
+                  name="about"
+                  placeholder={user.About}
+                  aria-describedby="aboutReq"
+                  ref={register({ required: true })}
+                />
+              </Col>
+              <Col xs="auto" style={{display:'flex', alignContent:'center', justifyContent:'center'}}>
+                <Button size="sm" type="submit" variant="secondary" className="mb-2">
+                  Change
+                </Button>
+                <Badge 
+                  style={{marginLeft:'5px'}}
+                  className="close-btn"
+                  onClick={()=>setEditAbout(false)}>X</Badge>
+              </Col>
+            </Form.Row>
+        </Form>
+      )
+    }
+    // regular mode
+    return (
+      <Button size="sm" onClick={() => setEditAbout(true)} >Edit About</Button>
+    )
+  }
+
+
   const renderEditPassword = () => {
     if (editPassword) {
       return (
         <Form onSubmit={handleSubmit(changePassword)}>
-          <Form.Control 
+          {/* <Form.Control 
             className="mb-2" 
             size="sm" 
             type="password"
             name="oldpassword"
             placeholder="current password"
-            ref={register({ required: true })} />
+            ref={register({ required: true })} /> */}
           <Form.Control 
             size="sm" 
             type="password" 
@@ -339,13 +413,19 @@ const User = (props) => {
             }
           </div>
         </div>
+      
         <div className="desc-section">
           {user.Username}
           {renderEditEmail()}
           {renderEditPassword()}
         </div>
+
       </div>
       
+      <div className="desc-section">
+        {user.About}
+        {renderEditAbout()}
+      </div>
 
       <Accordion defaultActiveKey="0">
   <Card>

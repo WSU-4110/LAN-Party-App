@@ -58,8 +58,7 @@ module.exports = {
 
     const defaults = {
       Intent: 'Casual',
-      Games: [],
-      AgeGate: false
+      Games: []
     }
 
     let keys = Object.keys(defaults);

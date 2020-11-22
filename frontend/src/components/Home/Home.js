@@ -94,9 +94,10 @@ const Home = (props) => {
               <Card.Body>
                 <ViewParty 
                 party = {p}
-                location={p.Location} 
+                location={p.PartyLocation} 
                 name={p.Name}
-                host={p.HostUsername} 
+                host={p.HostUsername}
+                hostID = {p.Host}
                 date={p.Date}
                 Attendees = {p.Attendees}
                 user={user}

@@ -29,16 +29,16 @@ const MapComponent = compose(
     {/* {
       // <Marker color="#cdcdcd" position={{ lat: 42.331429, lng: -83.045753 }} />
     } */}
-    {props.markerList.map((host, i) => {
-        if (host.Latitude && host.Longitude) {
+    {props.markerList.map((party, i) => {
+        if (party.PartyLocation.Latitude && party.PartyLocation.Longitude) {
           // console.log("TEST", host.Latitude);
          return(<Marker
             key={i}
             position={{
-              lat: host.Latitude,
-              lng: host.Longitude
+              lat: party.PartyLocation.Latitude,
+              lng: party.PartyLocation.Longitude
             }}
-            title={host.name}
+            title={party.name}
             pinColor={"#ffd1dc"}
           />)
         }
