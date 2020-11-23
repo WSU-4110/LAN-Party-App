@@ -5,8 +5,8 @@ import './ViewParty.css'
 import { UserContext } from '../../context/UserContext'
 import { PartiesContext } from '../../context/PartiesContext'
 import { HomeRenderContext } from '../../context/HomeRenderContext'
+import NewLocationModal from './NewLocationModal';
 import axios from 'axios';
-import { hoistStatics } from 'recompose';
 
 //temporary metadata until we can pull it from the DB
 
@@ -17,6 +17,11 @@ const ViewParty=(props)=>{
   const [homeRender, setHomeRender] = useContext(HomeRenderContext);
   const [party, setParty] = useState(props.party);
   const [attendees, setAttendees] = useState(props.party.Attendees);
+  
+  // Modal functions
+  const [showModal, setShowModal] = useState(false);
+  const openModal = () => setShowModal(true);
+  const closeModal = () => setShowModal(false);
 
   const joinParty=() =>{
     const headers = {
@@ -121,11 +126,14 @@ const ViewParty=(props)=>{
       {cookies.get("Token") //if logged in
         ? attendees.some(att => att.ID.includes(props.user.ID)) //if in party
           ? party.Host !== props.user.ID //and you're not the host
-            ? <Button className="ml-1" variant="warning" onClick={requestNewLocation}>Request New Location</Button>
+            ? <Button className="ml-1" variant="warning" onClick={openModal}>Request New Location</Button>
             : <p>you're the host</p>
           : <p>not in party</p>
         : <p>not logged in</p>
       }
+
+      {/* MODAL */}
+      <NewLocationModal show={showModal} onHide={closeModal} />
     </div>
   )
 }
