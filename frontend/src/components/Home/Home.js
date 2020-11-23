@@ -92,7 +92,7 @@ const Home = (props) => {
               <Card.Body>
                 <ViewParty 
                 party = {p}
-                location={p.Location} 
+                location={p.PartyLocation} 
                 name={p.Name}
                 host={p.HostUsername}
                 hostID = {p.Host}
