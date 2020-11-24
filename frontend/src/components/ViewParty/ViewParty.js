@@ -124,7 +124,7 @@ const ViewParty=(props)=>{
               {cookies.get("Token") //if logged in
               ? attendees.some(att => att.ID.includes(props.user.ID)) //if in the party
                 ? user.ID === props.hostID //if host, then can't leave party
-                  ? <Button variant="danger" disabled={attendee.ID === props.hostID ? true : false} onClick={() => removeMember(attendee.ID)}>Remove</Button>
+                  ? <Button variant="danger" disabled={attendee.ID === props.hostID ? true : false} onClick={() => removeMember(attendee.ID)}>Boot</Button>
                   : null
                 : null
               : null
