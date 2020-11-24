@@ -310,7 +310,7 @@ const User = (props) => {
                 />
               </Col>
               <Col xs="auto" style={{display:'flex', alignContent:'center', justifyContent:'center'}}>
-                <Button size="sm" type="submit" variant="secondary" className="mb-2">
+                <Button size="sm" type="submit" variant="secondary" className="mb-2" onClick={() => setEditAbout(true)}>
                   Change
                 </Button>
                 <Badge 
