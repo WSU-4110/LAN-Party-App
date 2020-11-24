@@ -2,15 +2,13 @@ import React, { useState, useEffect, useContext, FormControl } from 'react';
 import { NavLink } from 'react-router-dom';
 import Map from '../GoogleMap/GoogleMap';
 import cookies from 'js-cookie';
-import {Button, Accordion, Card, Dropdown} from 'react-bootstrap';
+import {Button, Accordion, Card} from 'react-bootstrap';
 import { UserContext } from '../../context/UserContext';
 import { PartiesContext } from '../../context/PartiesContext'
 import { HomeRenderContext } from '../../context/HomeRenderContext'
 import ViewParty from '../ViewParty/ViewParty';
 import axios from 'axios';
 
-// RIP CustomToggle, will try again to use it for search, but I failed for sprint 2
-// -James
 
 const Home = (props) => {
   const { REACT_APP_URL } = process.env;
@@ -25,10 +23,6 @@ const Home = (props) => {
 
   const toLogin = () => {
     props.history.push("/login");
-  }
-
-  const toViewParty = () => {
-    props.history.push("/ViewParty");
   }
 
   const getParties = () => {
@@ -51,7 +45,7 @@ const Home = (props) => {
   } , [homeRender])
 
   const filteredParties = parties.filter( parties => {
-    return parties.Name.toLowerCase().includes( search.toLowerCase() )
+    return parties.PartyName.toLowerCase().includes( search.toLowerCase() )
   } )
   
   return(
@@ -89,18 +83,26 @@ const Home = (props) => {
             }} 
             as={Card.Header} 
             eventKey={p.ID}>
-              {p.Name} <br/>
+              {p.PartyName} <br/>
               Host: {p.HostUsername} <br/>
-              Location: {p.Location} <br/>
-              Date: {p.Date} <br/>
+              Location: {p.PartyLocation.hasOwnProperty("Name") ? p.PartyLocation.Name : p.PartyLocation} <br/>
+              Date: {p.PartyTime} <br/>
             </Accordion.Toggle>
             <Accordion.Collapse eventKey={p.ID}>
               <Card.Body>
                 <ViewParty 
-                location={p.Location} 
+                party = {p}
+                location={p.PartyLocation} 
                 name={p.Name}
-                host={p.HostUsername} 
-                date={p.Date} />
+                host={p.HostUsername}
+                hostID = {p.Host}
+                date={p.Date}
+                Attendees = {p.Attendees}
+                user={user}
+                hardware={p.HardwareReq}
+                age={p.MinAge}
+                notes={p.Notes} 
+                toLogin = {toLogin}/>
               </Card.Body>
             </Accordion.Collapse>
           </Card>

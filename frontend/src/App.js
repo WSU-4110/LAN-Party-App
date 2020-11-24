@@ -8,6 +8,7 @@ import User from './components/User/User';
 import Host from './components/HostParty/HostParty'
 import ViewParty from './components/ViewParty/ViewParty';
 import PartySearch from './components/PartySearch/PartySearch';
+import SearchUser from './components/SearchUser/SearchUser';
 import cookies from 'js-cookie';
 import { UserContext } from './context/UserContext';
 import crypto from 'crypto-js'
@@ -66,6 +67,7 @@ function App() {
           <Route path="/host" exact component={Host} />
           <Route path="/viewParty" exact component={ViewParty} />
           <Route path="/PartySearch" exact component={PartySearch} />
+          <Route path="/SearchUser" exact component={SearchUser} />
         </Switch>
       </div>
     </Router>

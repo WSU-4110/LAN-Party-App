@@ -3,13 +3,91 @@ import { Table, Button, Accordion, Card } from 'react-bootstrap';
 import cookies from 'js-cookie';
 import './ViewParty.css'
 import { UserContext } from '../../context/UserContext'
+import { PartiesContext } from '../../context/PartiesContext'
+import { HomeRenderContext } from '../../context/HomeRenderContext'
 import axios from 'axios';
+import { hoistStatics } from 'recompose';
 
 //temporary metadata until we can pull it from the DB
 
 
 const ViewParty=(props)=>{
+  const { REACT_APP_URL } = process.env;
+  const [user, setUser] = useContext(UserContext);
+  const [homeRender, setHomeRender] = useContext(HomeRenderContext);
+  const [party, setParty] = useState(props.party);
+  const [attendees, setAttendees] = useState(props.party.Attendees);
 
+  const ageGate=() =>{
+    if (window.confirm("By joining this party, you agree that you meet the minimum age requirement and that you won't sue us over anything.")){
+      joinParty();
+   }
+}
+
+  const joinParty=() =>{
+    const headers = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const Link = `${process.env.REACT_APP_URL}Party/${party.ID}`;
+    const payload={
+      Attendees: {
+        Add: props.user.ID
+      }
+    }
+    axios
+    .patch(Link, payload, headers)
+    .then((res) => {
+      console.log("patch res: ", res);
+      setAttendees(res.data.Attributes.Attendees);
+    })
+    .catch((error) => console.log(error));
+  }
+
+    const leaveParty=() =>{
+      const headers = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+    const Link = `${process.env.REACT_APP_URL}Party/${party.ID}`;
+    const payload={
+      Attendees: {
+        Remove: props.user.ID
+      }
+    }
+    axios
+    .patch(Link, payload, headers)
+      .then((res) => {
+        console.log("patch res: ", res);
+        setAttendees(res.data.Attributes.Attendees);
+      })
+      .catch((error) => console.log(error));    
+  }
+
+  const removeMember=() =>{
+    const headers = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+  const Link = `${process.env.REACT_APP_URL}Party/${party.ID}`;
+  const payload={
+    Attendees: {
+      Remove: this.user.ID
+    }
+  }
+  axios
+  .patch(Link, payload, headers)
+    .then((res) => {
+      console.log("patch res: ", res);
+      setAttendees(res.data.Attributes.Attendees);
+    })
+    .catch((error) => console.log(error));    
+}
+
+  
   return(
     <div>
       <div 
@@ -18,11 +96,9 @@ const ViewParty=(props)=>{
           borderBottom:"2px solid #0C0C0D",
           backgroundColor: "#35373D"
         }}>
-        <h4>{props.name}</h4>
-        <h5>Host: {props.host}</h5>
-        Location: {props.location}
-        <br/>
-        <p>Date: {props.date}</p>
+        <p>Hardware: {props.hardware}</p>
+        <p>Minimum Age: {props.age}</p>
+        <p>Notes from Host: {props.notes}</p>
       </div>
       
       <Table striped bordered hover variant="dark">
@@ -30,27 +106,26 @@ const ViewParty=(props)=>{
           <tr>
             <th>#</th>
             <th>Participants</th>
-            <th>Game</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>1</td>
-            <td>35</td>
-            <td>Tekken 7</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>50</td>
-            <td>Street Fighter V</td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>300</td>
-            <td>Smash Bros. Melee</td>
-          </tr>
+          {attendees.map((attendee, index) =>(
+            <tr>
+              <td>{index+1}</td>
+              <td>{attendee.Username}</td>
+            </tr>
+          ))}
         </tbody>
       </Table>
+
+      {cookies.get("Token") //if logged in
+        ? attendees.some(att => att.ID.includes(props.user.ID)) //if in the party
+          ? user.ID === props.hostID //if host, then can't leave party
+            ? <Button variant="danger" onClick={leaveParty} disabled>Leave Party</Button>
+            : <Button variant="danger" onClick={leaveParty}>Leave Party</Button>
+          : <Button variant="success" onClick={ageGate}>Join Party</Button>
+        : <Button onClick={props.toLogin}>Login to join</Button>
+      } 
     </div>
   )
 }
