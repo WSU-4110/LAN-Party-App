@@ -8,7 +8,7 @@ const responseUtil = require("../utilities/response");
 module.exports = {
         
     // MAKE A NEW GAME  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    NewGame: async function (event) {
+    CreateGame: async function (event) {
         try {
             // if nothing was provided in the request, return a 204 HTTPS code (No content)
             if (!event)

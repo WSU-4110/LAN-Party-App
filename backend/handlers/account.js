@@ -247,16 +247,16 @@ module.exports = {
             }
             
             // TO DO: REMOVING A GAME ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (request.Remove) {
+            // if (request.Remove) {
 
-                let updateExpression = "REMOVE Games = :g"; 
-                let updateValues = { ':g': request.Remove };
+            //     let updateExpression = "REMOVE Games = :g"; 
+            //     let updateValues = { ':g': request.Remove };
 
-                let UpdatedAccount = await AccountAPI.Update(request.AccountID, updateValues, updateExpression);
+            //     let UpdatedAccount = await AccountAPI.Update(request.AccountID, updateValues, updateExpression);
 
-                if(!UpdatedAccount)
-                    throw new Error("Could not update account game list");
-            }
+            //     if(!UpdatedAccount)
+            //         throw new Error("Could not update account game list");
+            // }
 
             let result = await AccountAPI.Get(request.AccountID);
 

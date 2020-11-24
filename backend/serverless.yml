@@ -132,11 +132,27 @@ functions:
 
   # reports functions
   ReportAccount:
-    handler: utilities/report.NewReport
+    handler: handlers/report.NewReport
     events: 
       - http:
           method: POST
           path: /ReportAccount
+          cors: true
+
+  ViewReport:
+    handler: handlers/report.ViewReport
+    events:
+      - http:
+          method: GET
+          path: /Report/{ID}
+          cors: true
+
+  ViewAllReports:
+    handler: handlers/report.ViewAll
+    events:
+      - http:
+          method: GET
+          path: /Reports
           cors: true
   
   # party functions
