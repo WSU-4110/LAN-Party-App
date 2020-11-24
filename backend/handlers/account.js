@@ -264,8 +264,6 @@ module.exports = {
                 return responseUtil.Build(403, "Requested ID not valid!");
             }
 
-            //Set the users to the sender and requested
-            users = [sender, requested];
             //Sender has the sender val true, requested as false
             senderVals = [true, false];
 
@@ -311,9 +309,6 @@ module.exports = {
             if (requested === false){
                 return responseUtil.Build(403, "Requested ID not valid!");
             }
-            
-            //Initialize the users
-            users = [sender, requested];
 
             //Initialize the update function
             updateFunction = async function (user1, user2){
@@ -372,9 +367,6 @@ module.exports = {
             if(requested === false){
                 return responseUtil.Build(403, "Requested Account does not exist");
             }
-            
-            //Initialize the users as the sender and the requested
-            users = [sender, requested];
 
             //Initialize the update function
             updateFunction = async function (user1, user2){
@@ -420,9 +412,6 @@ module.exports = {
             if(requested === false){
                 return responseUtil.Build(403, "Requested Account does not exist");
             }
-            
-            //Initialize the users as the sender and the requested
-            users = [sender, requested];
 
             //Initialize the update function
             updateFunction = async function (user1, user2){
@@ -457,6 +446,9 @@ module.exports = {
             }
         }
 
+        //Initialize the users as the sender and the requested
+        users = [sender, requested];
+        
         //Send the request to update both users
         response = await generalUtils.mutualUpdate(users, updateFunction, senderVals);
 
