@@ -60,7 +60,7 @@ const SearchUser=(props)=>{
             </Accordion.Toggle>
             <Accordion.Collapse eventKey={p.ID}>
               <Card.Body>
-              {p.About}
+              <b>"{p.About}"</b>
               </Card.Body>
             </Accordion.Collapse>
           </Card>
