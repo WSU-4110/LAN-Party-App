@@ -94,5 +94,29 @@ module.exports = {
         }
         //If it couldn't be inserted, return false
         return false;
+    },
+
+    //=======================================================================
+    // Allows the use of a function to be applied to two separate items.
+    // Reduces the amount of code needed to be examined.
+    // Items must be of the same type. (Party, Game, User)
+    //=======================================================================
+    mutualUpdate: async function (updateItems, updateFunction, uniqueVals){
+        let response
+        if(uniqueVals !== undefined){
+            response = await updateFunction(updateItems[0], updateItems[1], uniqueVals[0]);
+            if(response !== true){
+                return response;
+            }
+            response = await updateFunction(updateItems[1], updateItems[0], uniqueVals[1]);
+        } else {
+            response = await updateFunction(updateItems[0], updateItems[1]);
+            if(response !== true){
+                return response;
+            }
+            response = await updateFunction(updateItems[1], updateItems[0]);
+        }
+
+        return true;
     }
 }
