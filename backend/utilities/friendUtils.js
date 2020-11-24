@@ -5,18 +5,18 @@ module.exports = {
     // Takes in two users, adds user 2 to user 1's Friend Request array.
     // If user 1 is the user1, then make sure user1 is true
     // Otherwise, make sure it's false.
-    // Returns false if user 2 not in user 1's friend request array
+    // Returns false if user 2 in user 1's friend request array
     // Otherwise, returns user 1's new friend request array
     //=========================================================================
     addToFriendRequests: async function (user1, user2, sender){
         //If the user1 has no friends, make sure the item is at least initialized
         if(!user1.hasOwnProperty('FriendRequests')){
             user1.FriendRequests = [];
-        } else { //If the user already has a friend request w/ them, prevent them
-            if(user1.FriendRequests.findIndex(FrenReq => {
-            FrenReq.ID === user2.ID }) !== -1){
-                return false;
-            }
+
+        //If the user already has a friend request w/ them, prevent them
+        } else if (user1.FriendRequests.findIndex( FrenReq => 
+            FrenReq.ID === user2.ID ) !== -1){
+            return false;
         }
 
         let saveItem = {
