@@ -85,16 +85,14 @@ const Home = (props) => {
             eventKey={p.ID}>
               {p.PartyName} <br/>
               Host: {p.HostUsername} <br/>
-              Location: {p.PartyLocation.hasOwnProperty("Name") ? 
-              p.PartyLocation.Name 
-              : p.PartyLocation} <br/>
+              Location: {p.PartyLocation.hasOwnProperty("Name") ? p.PartyLocation.Name : p.PartyLocation} <br/>
               Date: {p.PartyTime} <br/>
             </Accordion.Toggle>
             <Accordion.Collapse eventKey={p.ID}>
               <Card.Body>
                 <ViewParty 
                 party = {p}
-                location={p.Location} 
+                location={p.PartyLocation} 
                 name={p.Name}
                 host={p.HostUsername}
                 hostID = {p.Host}

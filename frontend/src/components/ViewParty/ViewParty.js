@@ -18,6 +18,12 @@ const ViewParty=(props)=>{
   const [party, setParty] = useState(props.party);
   const [attendees, setAttendees] = useState(props.party.Attendees);
 
+  const ageGate=() =>{
+    if (window.confirm("By joining this party, you agree that you meet the minimum age requirement and that you won't sue us over anything.")){
+      joinParty();
+   }
+}
+
   const joinParty=() =>{
     const headers = {
       headers: {
@@ -34,8 +40,7 @@ const ViewParty=(props)=>{
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res);
-      let current = attendees.concat(res.data.Attributes.Attendees.reverse()[0]);
-      setAttendees(current);
+      setAttendees(res.data.Attributes.Attendees);
     })
     .catch((error) => console.log(error));
   }
@@ -60,6 +65,27 @@ const ViewParty=(props)=>{
       })
       .catch((error) => console.log(error));    
   }
+
+  const removeMember=() =>{
+    const headers = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+  const Link = `${process.env.REACT_APP_URL}Party/${party.ID}`;
+  const payload={
+    Attendees: {
+      Remove: this.user.ID
+    }
+  }
+  axios
+  .patch(Link, payload, headers)
+    .then((res) => {
+      console.log("patch res: ", res);
+      setAttendees(res.data.Attributes.Attendees);
+    })
+    .catch((error) => console.log(error));    
+}
 
   
   return(
@@ -97,7 +123,7 @@ const ViewParty=(props)=>{
           ? user.ID === props.hostID //if host, then can't leave party
             ? <Button variant="danger" onClick={leaveParty} disabled>Leave Party</Button>
             : <Button variant="danger" onClick={leaveParty}>Leave Party</Button>
-          : <Button variant="success" onClick={joinParty}>Join Party</Button>
+          : <Button variant="success" onClick={ageGate}>Join Party</Button>
         : <Button onClick={props.toLogin}>Login to join</Button>
       } 
     </div>
