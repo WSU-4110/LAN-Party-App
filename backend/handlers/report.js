@@ -42,10 +42,6 @@ module.exports = {
         if(!exists2)
           return responseUtil.Build(500, { Message: "Invalid ID for the reported user!" });
 
-        // check to make sure that this ID is not already used
-        // while(ReportAPI.Get(request.ID))
-        //   request.ID = shortid.generate();
-
         let report = await ReportAPI.Create(request);
 
         if (report) {

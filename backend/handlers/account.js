@@ -222,46 +222,68 @@ module.exports = {
             if (!event)
                 throw new Error("No information was sent");
     
-            // get the event
             let request = JSON.parse(event.body);
-            request.AccountID = event.pathParameters.ID;
 
-            // check that the user ID is valid            
-            if (!(await AccountAPI.Get(request.AccountID))) // if the user doesn't exist, throw an error
+            // add the IDs
+            request.AccountID = event.pathParameters.ID;
+            request.ID = request.AccountID;
+            
+            // check that the user ID is valid
+            let account = await AccountAPI.Get(request.AccountID);
+
+            if (!account) // if the user doesn't exist, throw an error
                 throw new Error("Invalid user!");
             
-            // ADDING A GAME ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            if (request.Add) {
-                
-                // check that it is a valid game
-                if(!(await GameAPI.Get(request.Add)))
-                    throw new Error("Game ID invalid!");
-
-                let updateExpression = "SET Games = :g";
-                let updateValues = { ':g': request.Add };
-
-                let UpdatedAccount = await AccountAPI.Update(request.AccountID, updateValues, updateExpression);
-
-                if(!UpdatedAccount)
-                    throw new Error("Could not update account game list");
-            }
+            if(!account.hasOwnProperty("Games"))
+                account.Games = [];
             
-            // TO DO: REMOVING A GAME ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // if (request.Remove) {
+            let NewGamesArray = account.Games; // this is an array that will hold all the IDs of each game as a string
 
-            //     let updateExpression = "REMOVE Games = :g"; 
-            //     let updateValues = { ':g': request.Remove };
+            // ADDING A GAME ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if(request.Add) {
+                
+                // make sure the game exists
+                if (!(await GameAPI.Get(request.Add))) // if the game doesn't exist, throw an error
+                    throw new Error("Invalid game!");
 
-            //     let UpdatedAccount = await AccountAPI.Update(request.AccountID, updateValues, updateExpression);
+                let i = NewGamesArray.length;
 
-            //     if(!UpdatedAccount)
-            //         throw new Error("Could not update account game list");
-            // }
+                // check that it isn't in the list already
+                while (i--) {
+                    if(account.Games[i] === request.Add)
+                        throw new Error("Game already added to account!");
+                }
 
-            let result = await AccountAPI.Get(request.AccountID);
+                // if we get here then we can add it to the list
+                NewGamesArray.push(request.Add);
+            }
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            return responseUtil.Build(200, result);
+            // REMOVING A GAME ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if (request.Remove) {
+                let j = NewGamesArray.length;
 
+                if (j !== 0) { // do nothing if the array is already empty
+                    while(j--) { // loop through the array
+                        if (account.Games[j] === request.Remove) // if we find it then we can delete it
+                            NewGamesArray.splice(j, 1);
+                    }
+                } else throw new Error("The account doesn't have any games so you can't delete this game!");
+            }
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+            // update the expressions before submitting
+            let UpdateExpression = "SET Games = :g";
+            let UpdateValues = {};
+            UpdateValues[':g'] = NewGamesArray;
+
+            // update via the API
+            let UpdatedAccount = await AccountAPI.Update(request, UpdateValues, UpdateExpression);
+            if(!UpdatedAccount)
+                throw new Error("Could not update account game list");
+            
+            // return the updated account
+            return responseUtil.Build(200, await AccountAPI.Get(request.AccountID));
         } catch (err) {
             console.log(err);
             return responseUtil.Build(500, { Message: err.message });
