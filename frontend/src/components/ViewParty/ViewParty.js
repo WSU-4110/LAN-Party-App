@@ -66,7 +66,7 @@ const ViewParty=(props)=>{
       .catch((error) => console.log(error));    
   }
 
-  const removeMember=() =>{
+  const removeMember=(attendeeID) =>{
     const headers = {
       headers: {
         "Content-Type": "application/json",
@@ -75,7 +75,7 @@ const ViewParty=(props)=>{
   const Link = `${process.env.REACT_APP_URL}Party/${party.ID}`;
   const payload={
     Attendees: {
-      Remove: this.user.ID
+      Remove: attendeeID
     }
   }
   axios
@@ -106,6 +106,14 @@ const ViewParty=(props)=>{
           <tr>
             <th>#</th>
             <th>Participants</th>
+            {cookies.get("Token") //if logged in
+              ? attendees.some(att => att.ID.includes(props.user.ID)) //if in the party
+                ? user.ID === props.hostID //if host, then can't leave party
+                  ? <th>Remove</th>
+                  : null
+                : null
+              : null
+            }
           </tr>
         </thead>
         <tbody>
@@ -113,6 +121,14 @@ const ViewParty=(props)=>{
             <tr>
               <td>{index+1}</td>
               <td>{attendee.Username}</td>
+              {cookies.get("Token") //if logged in
+              ? attendees.some(att => att.ID.includes(props.user.ID)) //if in the party
+                ? user.ID === props.hostID //if host, then can't leave party
+                  ? <Button variant="danger" disabled={attendee.ID === props.hostID ? true : false} onClick={() => removeMember(attendee.ID)}>Remove</Button>
+                  : null
+                : null
+              : null
+            }
             </tr>
           ))}
         </tbody>
