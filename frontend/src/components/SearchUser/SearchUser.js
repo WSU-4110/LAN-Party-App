@@ -13,7 +13,7 @@ const SearchUser=(props)=>{
   const { REACT_APP_URL } = process.env;
   const [user, setUser] = useContext(UserContext);
   const [allUsers, setAllUsers] = useState([]);
-  const [homeRender, setHomeRender] = useContext(HomeRenderContext);
+  const [render, setRender] = useState(false);
   const [search, setSearch] = useState('');
   const [friendReqSent, setfriendReqSent] = useState([]);
   const [userIsFriend, setuserIsFriend] = useState([]);
@@ -37,8 +37,10 @@ const SearchUser=(props)=>{
   console.log(friendReqSent);
   console.log(user);
 
+  //don't delete this useEffect it's the only thing keeping it from crashing!
   useEffect(()=>{
-    setfriendReqSent(user.FriendRequests);
+    if(user.FriendRequests)  
+      setfriendReqSent(user.FriendRequests);
   }, [user])
 
   useEffect(() => {
@@ -89,6 +91,7 @@ const SearchUser=(props)=>{
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res.data);
+      setRender(!render);
     })
     .catch((error) => console.log(error));
   }
@@ -103,6 +106,7 @@ const SearchUser=(props)=>{
     const payload={
         Confirm: ID
     }
+    console.log(payload);
     axios
     .patch(Link, payload, headers)
     .then((res) => {
@@ -155,11 +159,14 @@ const SearchUser=(props)=>{
         else
           return <Button variant="outline-success" onClick={() => confirmFriend(pid)} >Accept Request</Button>
       }
-      else
-        return <Button variant="outline-primary" onClick={() => addFriend(pid)}>Add Friend</Button>
+      else if (userIsFriend) {
+        if (userIsFriend.some(att => att.ID.includes(pid))) {
+          return <Button variant="outline-primary" onClick={() => removeFriend(pid)}>Remove Friend</Button>
+        }
+        else
+          return <Button variant="outline-primary" onClick={() => addFriend(pid)}>Add Friend</Button>
+      }
     }
-    else if (userIsFriend)
-      return <Button variant="outline-primary" onClick={() => removeFriend(pid)}>Remove Friend</Button>
     else 
       return <p>uh, this shouldn't be here, oh god, oh jeez</p>
   }
@@ -171,14 +178,9 @@ const SearchUser=(props)=>{
       return <p></p>
   }
   
-
   useEffect(() => {
     getAllUsers();
   }, [])
-
-  useEffect(()=>{
-    getAllUsers();
-  } , [homeRender])
 
   const filteredUsers = allUsers.filter( users => {
     return users.Username.toLowerCase().includes( search.toLowerCase() )
@@ -209,6 +211,7 @@ const SearchUser=(props)=>{
                     <div class="divider"/>
                     <Button variant="outline-secondary">Block</Button>{' '}
                     <div class="divider"/>
+                    {render}
                     {renderButtons(p.ID, p.Username)}
                     <div class="divider"/>
                     {renderEXButton(p.ID, p.Username)}
