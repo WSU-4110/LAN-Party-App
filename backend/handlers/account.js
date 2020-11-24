@@ -309,9 +309,11 @@ module.exports = {
             if (requested === false){
                 return responseUtil.Build(403, "Requested ID not valid!");
             }
+            //Sender has the sender val true, requested as false
+            senderVals = [true, false];
 
             //Initialize the update function
-            updateFunction = async function (user1, user2){
+            updateFunction = async function (user1, user2, isSender){
                 const updateExpression = 'set Friends = :f, FriendRequests = :r';
 
                 //Remove the user2 from the user1's friend request
@@ -322,7 +324,7 @@ module.exports = {
                     return responseUtil.Build(403, "User not in " + user1.Username + "'s Friend Requests");
                 
                 //If the user1 of this request also sent the friend request
-                } else if (updatedFriendReqs.deleted.sender === true){
+                } else if (updatedFriendReqs.deleted.Sender === isSender){
                     return responseUtil.Build(403, 'Cannot confirm request you sent!');
 
                 //Set the value to the new friend request array
@@ -448,7 +450,7 @@ module.exports = {
 
         //Initialize the users as the sender and the requested
         users = [sender, requested];
-        
+
         //Send the request to update both users
         response = await generalUtils.mutualUpdate(users, updateFunction, senderVals);
 
