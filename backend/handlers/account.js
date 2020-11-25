@@ -2,6 +2,7 @@
 
 // Imports
 const AccountAPI = require("../services/AccountAPI");
+const GameAPI = require("../services/GameAPI");
 const moment = require("moment-timezone");
 const responseUtil = require("../utilities/response");
 const crypto = require("crypto");
@@ -219,6 +220,81 @@ module.exports = {
         }
     },
 
+    // ADD OR REMOVE A GAME FROM ACCOUNT'S GAME LIST //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    UpdateGames: async function (event) {
+        try {
+            if (!event)
+                throw new Error("No information was sent");
+    
+            let request = JSON.parse(event.body);
+
+            // add the IDs
+            request.AccountID = event.pathParameters.ID;
+            request.ID = request.AccountID;
+            
+            // check that the user ID is valid
+            let account = await AccountAPI.Get(request.AccountID);
+
+            if (!account) // if the user doesn't exist, throw an error
+                throw new Error("Invalid user!");
+            
+            if(!account.hasOwnProperty("Games"))
+                account.Games = [];
+            
+            let NewGamesArray = account.Games; // this is an array that will hold all the IDs of each game as a string
+
+            // ADDING A GAME ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if(request.Add) {
+                
+                // make sure the game exists
+                if (!(await GameAPI.Get(request.Add))) // if the game doesn't exist, throw an error
+                    throw new Error("Invalid game!");
+
+                let i = NewGamesArray.length;
+
+                // check that it isn't in the list already
+                while (i--) {
+                    if(account.Games[i] === request.Add)
+                        throw new Error("Game already added to account!");
+                }
+
+                // if we get here then we can add it to the list
+                NewGamesArray.push(request.Add);
+            }
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            // REMOVING A GAME ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if (request.Remove) {
+                let j = NewGamesArray.length;
+
+                if (j !== 0) { // do nothing if the array is already empty
+                    while(j--) { // loop through the array
+                        if (account.Games[j] === request.Remove) // if we find it then we can delete it
+                            NewGamesArray.splice(j, 1);
+                    }
+                } else throw new Error("The account doesn't have any games so you can't delete this game!");
+            }
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+            // update the expressions before submitting
+            let UpdateExpression = "SET Games = :g";
+            let UpdateValues = {};
+            UpdateValues[':g'] = NewGamesArray;
+
+            // update via the API
+            let UpdatedAccount = await AccountAPI.Update(request, UpdateValues, UpdateExpression);
+            if(!UpdatedAccount)
+                throw new Error("Could not update account game list");
+            
+            // return the updated account
+            return responseUtil.Build(200, await AccountAPI.Get(request.AccountID));
+        } catch (err) {
+            console.log(err);
+            return responseUtil.Build(500, { Message: err.message });
+        }
+    },
+
+    // UPDATE FRIENDS LIST //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     UpdateFriends: async function(events) {
         if(!events){
             return responseUtil.Build(204, "No information was sent");
@@ -293,8 +369,8 @@ module.exports = {
                 } 
                 return true;
             }
-        } 
-        
+        }
+
         else if (request.hasOwnProperty("Confirm")){ 
 
             if(sender.ID === request.Confirm)
