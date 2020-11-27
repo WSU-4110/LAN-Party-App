@@ -16,11 +16,22 @@ const ViewParty=(props)=>{
   // const [user, setUser] = useContext(UserContext);
   const [party, setParty] = useState(props.party);
   const [attendees, setAttendees] = useState(props.party.Attendees);
+  // const [locationChange, setLocationChange] = useState(party.RequestLocationChange ? true : false);
   
   // Modal functions
   const [showModal, setShowModal] = useState(false);
   const openModal = () => setShowModal(true);
   const closeModal = () => setShowModal(false);
+
+  // const handleLocationChange = () => setLocationChange(!locationChange);
+
+  const getParty = () => {
+    const link = `${process.env.REACT_APP_URL}Party/${party.ID}`;
+    axios
+      .get(link)
+      .then(res => {console.log(res); setParty(res.data.Party);})
+      .catch(err => console.log(err));
+  }
 
   const ageGate=() =>{
     if (window.confirm("By joining this party, you agree that you meet the minimum age requirement and that you won't sue us over anything.")){
@@ -91,7 +102,7 @@ const ViewParty=(props)=>{
       .catch((error) => console.log(error));
   }
 
-  const confirmLocationRequest = () => {
+  const confirmLocationRequest = (address, lat, lng) => {
     const headers = {
       headers: {
         "Content-Type": "application/json",
@@ -99,15 +110,41 @@ const ViewParty=(props)=>{
     };
     const link = `${process.env.REACT_APP_URL}Party/${party.ID}`;
     const payload={
-      Attendees: {
+      PartyLocation: {
+        Name: address,
+        Latitude: lat,
+        Longitude: lng
       }
     }
+    axios
+    .patch(link, payload, headers)
+      .then((res) => {
+        console.log("patch res: ", res);
+      })
+      .catch((error) => console.log(error));
+    console.log("location request confirmed");
+  }
 
+  const denyLocationRequest = () => {
+    const headers = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const link = `${process.env.REACT_APP_URL}Party/${party.ID}`;
+    const payload = {
+      RequestLocationChange: "void"
+    }
+    axios
+    .patch(link, payload, headers)
+      .then((res) => {
+        console.log("patch res: ", res);
+        getParty();
+      })
+      .catch((error) => console.log(error));
     console.log("location request confirmed");
   }
   
-  
-
   
   return(
     <div>
@@ -138,46 +175,50 @@ const ViewParty=(props)=>{
           ))}
         </tbody>
       </Table>
-
-      {
-        cookies.get("Token")
-         ? party.RequestLocationChange
-          ?
-            <div 
-              className="mb-2 mt-2"
-              style={{
-                backgroundColor:"#2C2F33",
-                padding:"5px 10px",
-                borderRadius:"3px"
-              }}
-            >
-              <span className="font-italic text-center">Location Request Pending</span> <br/>
-              <Row>
-                <Col xs={9}>
-                  <span><strong>Title </strong></span>
-                  <span className="font-weight-light">{party.RequestLocationChange ? party.RequestLocationChange.Title : null}</span> <br/>
-                  <span className=""><strong>Location </strong></span>
-                  <span className="font-weight-light">{party.RequestLocationChange ? party.RequestLocationChange.RequestLocation.Name : null}</span> <br/>
-                </Col>
+      
+      {cookies.get("Token") // if logged in
+        ? attendees.some(att => att.ID.includes(props.user.ID)) //if in the party
+          ? party.RequestLocationChange // if theres a request
+            ? // show the request
+              <div className="mb-2 mt-2"
+                style={{
+                  backgroundColor:"#2C2F33",
+                  padding:"5px 10px",
+                  borderRadius:"3px"
+                }}>
+                <span className="font-italic text-center">Location Request Pending</span> <br/>
+                <span><strong>Title </strong></span>
+                <span className="font-weight-light">{party.RequestLocationChange ? party.RequestLocationChange.Title : null}</span> <br/>
+                <span className=""><strong>Location </strong></span>
+                <span className="font-weight-light">{party.RequestLocationChange ? party.RequestLocationChange.RequestLocation.Name : null}</span> <br/>
+                <div className="ml-2">
+                  <span className="font-weight-bolder"><strong>" </strong></span>
+                  <span>{party.RequestLocationChange ? party.RequestLocationChange.Body : null}</span>
+                  <span className="font-weight-bolder"><strong> "</strong></span>
+                </div>
                 {party.Host === props.user.ID //if host
-                  ?
-                    <Col xs={3}>
-                      <Button variant="success" size="sm">Confirm</Button>
-                    </Col>
-                  :
-                    <Col xs={3}>
-                      <Button variant="success" size="sm" onClick={confirmLocationRequest}>Confirm</Button>
-                    </Col>
+                  ? // show the confirm button, probably need a deny button somewhere
+                    <div className="mt-1">
+                      <Button 
+                        variant="success" 
+                        onClick={() => 
+                          confirmLocationRequest(party.RequestLocationChange.RequestLocation.Name, party.RequestLocationChange.RequestLocation.Latitude, party.RequestLocationChange.RequestLocation.Longitude)
+                        }>
+                        Confirm
+                      </Button>
+                      <Button className="ml-1" variant="danger" onClick={denyLocationRequest}>Deny</Button>
+                    </div>
+                  : // this will be null in the final version, the button exists for testing only
+                    // <div className="mt-1">
+                    //   <Button variant="success" onClick={confirmLocationRequest}>Confirm</Button>
+                    //   <Button className="ml-1" variant="danger">Deny</Button>
+                    // </div>
+                    null
                 }
-              </Row>
-              <div className="ml-2">
-                <span className="font-weight-bolder"><strong>" </strong></span>
-                <span>{party.RequestLocationChange ? party.RequestLocationChange.Body : null}</span>
-                <span className="font-weight-bolder"><strong> "</strong></span>
               </div>
-            </div>
-          : null
-         : <div className="mt-2"></div>
+            : null // if there isn't a request
+          : null // if not in the party
+        : null // it not logged in
       }
       
       <div className="mt-2">
@@ -204,7 +245,12 @@ const ViewParty=(props)=>{
       </div>
 
       {/* MODAL */}
-      <NewLocationModal partyID={party.ID} userID={props.user.ID} show={showModal} onHide={closeModal} />
+      <NewLocationModal 
+        partyID={party.ID} 
+        userID={props.user.ID} 
+        show={showModal} 
+        onHide={closeModal}
+        getParty={getParty} />
     </div>
   )
 }

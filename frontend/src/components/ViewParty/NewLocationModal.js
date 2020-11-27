@@ -91,15 +91,16 @@ const NewLocationModal = (props) => {
       Body: e.target.requestBody.value ? e.target.requestBody.value : "",
       User: props.userID,
       RequestLocation: {
-        Name: { address },
-        Latitude: { lat },
-        Longitude: { lng },
+        Name: address,
+        Latitude: lat,
+        Longitude: lng,
       },
     };
     axios
       .patch(link, payload, headers)
       .then(res => {
         console.log(res);
+        props.getParty();
       })
       .catch(err => {
         console.log("Error: ", err);
