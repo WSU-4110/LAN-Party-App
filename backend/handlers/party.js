@@ -4,7 +4,7 @@
 const PartyAPI = require("../services/PartyAPI");
 const AccountAPI = require("../services/AccountAPI");
 const responseUtil = require("../utilities/response");
-const PartyUtil = require("../utilities/PartyCheck");
+const PartyUtil = require("../utilities/PartyUtils");
 const shortid = require("shortid");
 const moment = require("moment-timezone");
 
