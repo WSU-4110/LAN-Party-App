@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import { Table, Button, Accordion, Card } from 'react-bootstrap';
+import { Table, Button, Accordion, Card, Col, Row } from 'react-bootstrap';
 import cookies from 'js-cookie';
 import './ViewParty.css'
 import { UserContext } from '../../context/UserContext'
@@ -13,8 +13,7 @@ import axios from 'axios';
 
 const ViewParty=(props)=>{
   const { REACT_APP_URL } = process.env;
-  const [user, setUser] = useContext(UserContext);
-  const [homeRender, setHomeRender] = useContext(HomeRenderContext);
+  // const [user, setUser] = useContext(UserContext);
   const [party, setParty] = useState(props.party);
   const [attendees, setAttendees] = useState(props.party.Attendees);
   
@@ -91,22 +90,23 @@ const ViewParty=(props)=>{
       })
       .catch((error) => console.log(error));
   }
-  
-  const requestNewLocation = () => {
+
+  const confirmLocationRequest = () => {
     const headers = {
       headers: {
         "Content-Type": "application/json",
       },
     };
-    const link = `${process.env.REACT_APP_URL}Party/RequestLocation/${party.ID}`;
-    const payload = {
-      Name: '',
-      Latitude: '',
-      Longitude: ''
+    const link = `${process.env.REACT_APP_URL}Party/${party.ID}`;
+    const payload={
+      Attendees: {
+      }
     }
 
-    console.log("location request called")    
+    console.log("location request confirmed");
   }
+  
+  
 
   
   return(
@@ -122,7 +122,7 @@ const ViewParty=(props)=>{
         <p>Notes from Host: {props.notes}</p>
       </div>
       
-      <Table striped bordered hover variant="dark">
+      <Table striped bordered hover variant="dark" className="mb-0">
         <thead>
           <tr>
             <th>#</th>
@@ -139,28 +139,72 @@ const ViewParty=(props)=>{
         </tbody>
       </Table>
 
-      {cookies.get("Token") //if logged in
-        ? attendees.some(att => att.ID.includes(props.user.ID)) //if in the party
-          ? user.ID === props.hostID //if host, then can't leave party
-            ? <Button variant="danger" onClick={leaveParty} disabled>Leave Party</Button>
-            : <Button variant="danger" onClick={leaveParty}>Leave Party</Button>
-          : <Button variant="success" onClick={ageGate}>Join Party</Button>
-        : <Button onClick={props.toLogin}>Login to join</Button>
+      {
+        cookies.get("Token")
+         ? party.RequestLocationChange
+          ?
+            <div 
+              className="mb-2 mt-2"
+              style={{
+                backgroundColor:"#2C2F33",
+                padding:"5px 10px",
+                borderRadius:"3px"
+              }}
+            >
+              <span className="font-italic text-center">Location Request Pending</span> <br/>
+              <Row>
+                <Col xs={9}>
+                  <span><strong>Title </strong></span>
+                  <span className="font-weight-light">{party.RequestLocationChange ? party.RequestLocationChange.Title : null}</span> <br/>
+                  <span className=""><strong>Location </strong></span>
+                  <span className="font-weight-light">{party.RequestLocationChange ? party.RequestLocationChange.RequestLocation.Name : null}</span> <br/>
+                </Col>
+                {party.Host === props.user.ID //if host
+                  ?
+                    <Col xs={3}>
+                      <Button variant="success" size="sm">Confirm</Button>
+                    </Col>
+                  :
+                    <Col xs={3}>
+                      <Button variant="success" size="sm" onClick={confirmLocationRequest}>Confirm</Button>
+                    </Col>
+                }
+              </Row>
+              <div className="ml-2">
+                <span className="font-weight-bolder"><strong>" </strong></span>
+                <span>{party.RequestLocationChange ? party.RequestLocationChange.Body : null}</span>
+                <span className="font-weight-bolder"><strong> "</strong></span>
+              </div>
+            </div>
+          : null
+         : <div className="mt-2"></div>
       }
-      {/* 1. logged in */}
-      {/* 2. is a part of party */}
-      {/* 3. is not party leader */}
-      {cookies.get("Token") //if logged in
-        ? attendees.some(att => att.ID.includes(props.user.ID)) //if in party
-          ? party.Host !== props.user.ID //and you're not the host
-            ? <Button className="ml-1" variant="warning" onClick={openModal}>Request New Location</Button>
-            : <p>you're the host</p>
-          : <p>not in party</p>
-        : <p>not logged in</p>
-      }
+      
+      <div className="mt-2">
+        {cookies.get("Token") //if logged in
+          ? attendees.some(att => att.ID.includes(props.user.ID)) //if in the party
+            ? props.user.ID === props.hostID //if host, then can't leave party
+              ? <Button variant="danger" onClick={leaveParty} disabled>Leave Party</Button>
+              : <Button variant="danger" onClick={leaveParty}>Leave Party</Button>
+            : <Button variant="success" onClick={ageGate}>Join Party</Button>
+          : <Button onClick={props.toLogin}>Login to join</Button>
+        }
+
+        {/* 1. logged in */}
+        {/* 2. is a part of party */}
+        {/* 3. is not party leader */}
+        {cookies.get("Token") //if logged in
+          ? attendees.some(att => att.ID.includes(props.user.ID)) //if in party
+            ? party.Host !== props.user.ID //and you're not the host
+              ? <Button className="ml-1" variant="warning" onClick={openModal}>Request New Location</Button>
+              : <p>you're the host</p>
+            : <p>not in party</p>
+          : <p>not logged in</p>
+        }
+      </div>
 
       {/* MODAL */}
-      <NewLocationModal show={showModal} onHide={closeModal} />
+      <NewLocationModal partyID={party.ID} userID={props.user.ID} show={showModal} onHide={closeModal} />
     </div>
   )
 }
