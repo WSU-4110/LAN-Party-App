@@ -1,9 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { Modal, Button, Container, Row, Col } from 'react-bootstrap';
 import axios from 'axios';
-import { UserContext } from '../../context/UserContext'
+import { UserContext } from '../../context/UserContext';
+import { PartiesContext } from '../../context/PartiesContext';
 
 const InviteFriendModal = (props) => {
+  const [parties, setParties] = useContext(PartiesContext);
+
+  const getParties = () => {
+    const link = `${process.env.REACT_APP_URL}Parties`;
+    axios
+      .get(link)
+      .then((res) => {
+        console.log("parties", res);
+        setParties(res.data.Parties);
+      })
+      .catch((error) => console.log(error))
+  }
 
   const inviteFriend = (friend) =>{
     const headers = {
@@ -23,6 +36,7 @@ const InviteFriendModal = (props) => {
     .then((res) => {
       // console.log("patch res: ", res.data.Attributes);
       props.changeArray(res.data.Attributes.Attendees);
+      getParties();
     })
     .catch((error) => console.log(error));
   }
