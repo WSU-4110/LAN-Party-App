@@ -259,12 +259,7 @@ const ViewParty = (props) => {
                       </Button>
                       <Button className="ml-1" variant="danger" onClick={denyLocationRequest}>Deny</Button>
                     </div>
-                  : // this will be null in the final version, the button exists for testing only
-                    // <div className="mt-1">
-                    //   <Button variant="success" onClick={confirmLocationRequest}>Confirm</Button>
-                    //   <Button className="ml-1" variant="danger">Deny</Button>
-                    // </div>
-                    null
+                  : null
                 }
               </div>
             : null // if there isn't a request
@@ -295,9 +290,9 @@ const ViewParty = (props) => {
           ? attendees.some(att => att.ID.includes(props.user.ID)) //if in party
             ? party.Host !== props.user.ID //and you're not the host
               ? <Button className="ml-1" variant="warning" onClick={openModal}>Request New Location</Button>
-              : <p>you're the host</p>
-            : <p>not in party</p>
-          : <p>not logged in</p>
+              : null
+            : null
+          : null
         }
       </div>
 
