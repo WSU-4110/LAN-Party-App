@@ -14,7 +14,7 @@ const InviteFriendModal = (props) => {
     const Link = `${process.env.REACT_APP_URL}Party/${props.partyID}`;
     const payload={
       Attendees: {
-        Add: friend.id
+        Add: friend.ID
       }
     }
     console.log("payload", payload)
@@ -27,25 +27,30 @@ const InviteFriendModal = (props) => {
     .catch((error) => console.log(error));
   }
 
-  const renderFriends = () => (
-    // when inviting a friend to a party, don't show friends who are already in the party
-    // if the friend.id is in the party attendee array, filter them out of the final array
-    props.user.Friends.filter(friend => !props.attendees.some(att => att.ID.includes(friend.id)))
-    .map((filterFriend => (
-      <>
-        <Col className="mb-2" xs={8}>
-          <img src={filterFriend.avatar} style={{width:"50px",height:"50px",borderRadius:"50%"}} />
-          <span className="ml-2">{filterFriend.username}</span>
-        </Col>
-        <Col xs={4}>
-          <Button 
-          variant="success" 
-          onClick={() => inviteFriend(filterFriend)}
-          >Invite</Button>
-        </Col>
-      </>
-    )))
-  );
+  const renderFriends = () => {
+    if (props.user.Friends) {
+      return (
+        props.user.Friends.filter(friend => !props.attendees.some(att => att.ID.includes(friend.ID)))
+        .map((filterFriend => (
+          <>
+            <Col className="mb-2" xs={8}>
+              <img src={filterFriend.Avatar} style={{width:"50px",height:"50px",borderRadius:"50%"}} />
+              <span className="ml-2">{filterFriend.Username}</span>
+            </Col>
+            <Col xs={4}>
+              <Button 
+              variant="success" 
+              onClick={() => inviteFriend(filterFriend)}
+              >Invite</Button>
+            </Col>
+          </>
+        )))
+      )
+    }
+    return (
+      <></>
+    )
+  }
 
   return (
     <Modal
