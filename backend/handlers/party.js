@@ -17,7 +17,15 @@ module.exports = {
       return responseUtil.Build(204, "Event is empty");
 
     let request = JSON.parse(events.body);
-
+    if(request.hasOwnProperty('PartyLocation') 
+      && typeof(request.PartyLocation) === 'string'){
+        let name = request.PartyLocation;
+        request.PartyLocation = {
+          Name: name,
+          Longitude: request.Longitude,
+          Latitude: request.Latitude
+        };
+      }
     //Create prototype party
     const required = ['PartyName', 'PartyLocation', 'Host', 'PartyTime'];
     
@@ -293,7 +301,7 @@ module.exports = {
     }
 
     //A prototype of the required fields of the required fields
-    let required = ['Title', 'Body', 'User', 'RequestLocation'];
+    const required = ['Title', 'Body', 'User', 'RequestLocation'];
 
     let badKey = false;
 
@@ -302,17 +310,17 @@ module.exports = {
     //Check if each required key is present
     for(let i = 0; i < required.length; i++){
 
-      if(request.hasOwnProperty(keys[i]) === false){
-        badKey = keys[i];
+      if(request.hasOwnProperty(required[i]) === false){
+        badKey = required[i];
         break;
       } else {
-        let validate = await PartyUtil.isValidLocationRequest(request[keys[i]]);
+        let validate = await PartyUtil.isValidLocationRequest(request[required[i]], required[i]);
         if(validate.isValid === false){
-          badKey = keys[i];
+          badKey = required[i];
           break;
         } else {
           Object.keys(validate.value).forEach(key =>{
-            party.RequestLocationChange[key] = validate[key];
+            party.RequestLocationChange[key] = validate.value[key];
           })
         }
       }
