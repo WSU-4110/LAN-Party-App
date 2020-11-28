@@ -360,7 +360,7 @@ module.exports = {
 
 
                 try {
-                    response = await AccountAPI.Update(user1.ID, updateValues, updateExpression);
+                    response = await AccountAPI.Update(user1, updateValues, updateExpression);
                 } catch (err) {
                     return responseUtil.Build(500, "Could not update friends list of " + user1.Username);
                 }
@@ -423,7 +423,7 @@ module.exports = {
                 console.log(updateValues);
 
                 try {
-                    response = await AccountAPI.Update(user1.ID, updateValues, updateExpression);
+                    response = await AccountAPI.Update(user1, updateValues, updateExpression);
                 } catch (err) {
                     return responseUtil.Build(500, "Could not add friend to " + user1.Username);
                 }
@@ -465,7 +465,7 @@ module.exports = {
                 
                 //Save to the account
                 try {
-                    response = await AccountAPI.Update(user1.ID, expressionValue, requestExpression);
+                    response = await AccountAPI.Update(user1, expressionValue, requestExpression);
                 
                 //Any errors saving to the account
                 } catch (err) {
@@ -511,7 +511,7 @@ module.exports = {
                 //Save the item
 
                 try {
-                    response = await AccountAPI.Update(user1.ID, updateValues, updateExpression);
+                    response = await AccountAPI.Update(user1, updateValues, updateExpression);
                     //If it could not save
                 } catch (err) {
                     return responseUtil.Build(500, "Could not save to " + user1.Username);

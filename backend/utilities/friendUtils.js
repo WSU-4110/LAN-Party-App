@@ -64,7 +64,7 @@ module.exports = {
         }
 
         //Insert the friend such that it's sorted by ID
-        user1.Friends = await genUtils.insertSorted(storeVal, user1.Friend);
+        user1.Friends = await genUtils.insertSorted(storeVal, user1.Friends);
 
         return user1.Friends;
     },
