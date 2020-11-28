@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { Modal, Button, Form } from "react-bootstrap";
 import axios from 'axios';
 import GooglePlacesSearch from "../GooglePlacesSearch/GooglePlacesSearch";
+import { PartiesContext } from "../../context/PartiesContext";
 import "./NewLocationModal.css";
 
 import usePlacesAutocomplete, {
@@ -18,6 +19,7 @@ import {
 import "@reach/combobox/styles.css";
 
 const NewLocationModal = (props) => {
+  const [parties, setParties] = useContext(PartiesContext);
   const [lat, setLat] = useState(0);
   const [lng, setLng] = useState(0);
   const [address, setAddress] = useState("");
@@ -77,6 +79,17 @@ const NewLocationModal = (props) => {
       );
     });
 
+  const getParties = () => {
+    const link = `${process.env.REACT_APP_URL}Parties`;
+    axios
+      .get(link)
+      .then((res) => {
+        console.log("parties", res);
+        setParties(res.data.Parties);
+      })
+      .catch((error) => console.log(error))
+  } 
+
   const requestNewLocation = (e) => {
     e.preventDefault();
     console.log("target", e.target.requestTitle.value);
@@ -101,6 +114,7 @@ const NewLocationModal = (props) => {
       .then(res => {
         console.log(res);
         props.getParty();
+        getParties();
       })
       .catch(err => {
         console.log("Error: ", err);

@@ -5,6 +5,7 @@ import DatePicker from "react-datepicker";
 import axios from "axios";
 import Geocode from "react-geocode";
 import { UserContext } from "../../context/UserContext";
+import { PartiesContext } from "../../context/PartiesContext";
 import { HomeRenderContext } from "../../context/HomeRenderContext";
 import "react-datepicker/dist/react-datepicker.css";
 import "./HostParty.css";
@@ -18,6 +19,7 @@ Geocode.enableDebug();
 const HostParty = (props) => {
   const { REACT_APP_URL } = process.env;
   const [user, setUser] = useContext(UserContext);
+  const [parties, setParties] = useContext(PartiesContext);
   const [homeRender, setHomeRender] = useContext(HomeRenderContext);
   const { register, handleSubmit, errors } = useForm();
   const [startDate, setStartDate] = useState(new Date());
@@ -30,6 +32,17 @@ const HostParty = (props) => {
     let loc = await Geocode.fromAddress(address);
     return loc.results[0].geometry.location.lng;
   };
+
+  const getParties = () => {
+    const link = `${process.env.REACT_APP_URL}Parties`;
+    axios
+      .get(link)
+      .then((res) => {
+        console.log("parties", res);
+        setParties(res.data.Parties);
+      })
+      .catch((error) => console.log(error))
+  }
 
   const onSubmit = async (data, e) => {
     let latitude = await getLatitude(e.target.placesInput.value);
@@ -59,6 +72,7 @@ const HostParty = (props) => {
       .post(link, payload, headers)
       .then((res) => {
         console.log(res);
+        getParties();
         setHomeRender({ render: !homeRender.render });
       })
       .catch((error) => console.log(error));

@@ -14,6 +14,7 @@ const IFModal = React.lazy(() =>
 const ViewParty = (props) => {
   const { REACT_APP_URL } = process.env;
   const [user, setUser] = useContext(UserContext);
+  const [parties, setParties] = useContext(PartiesContext);
   const [party, setParty] = useState(props.party);
   const [attendees, setAttendees] = useState(props.party.Attendees);
   // const [locationChange, setLocationChange] = useState(party.RequestLocationChange ? true : false);
@@ -33,6 +34,17 @@ const ViewParty = (props) => {
       .get(link)
       .then(res => {console.log(res); setParty(res.data.Party);})
       .catch(err => console.log(err));
+  }
+
+  const getParties = () => {
+    const link = `${process.env.REACT_APP_URL}Parties`;
+    axios
+      .get(link)
+      .then((res) => {
+        console.log("parties", res);
+        setParties(res.data.Parties);
+      })
+      .catch((error) => console.log(error))
   }
 
   const ageGate = () => {
@@ -93,17 +105,6 @@ const ViewParty = (props) => {
   };
   const inviteFriendOpen = () => setShow(true);
 
-  const renderButtonGroup = () => (
-    <>
-      <Button variant="danger" onClick={leaveParty} disabled>
-        Leave Party
-      </Button>
-      <Button className="ml-2" variant="success" onClick={inviteFriendOpen}>
-        Invite Friend
-      </Button>
-    </>
-  );
-
   const removeMember = (attendeeID) => {
     const headers = {
       headers: {
@@ -121,6 +122,7 @@ const ViewParty = (props) => {
       .then((res) => {
         console.log("patch res: ", res);
         setAttendees(res.data.Attributes.Attendees);
+        getParties();
       })
       .catch((error) => console.log(error));
   };
@@ -143,6 +145,8 @@ const ViewParty = (props) => {
     .patch(link, payload, headers)
       .then((res) => {
         console.log("patch res: ", res);
+        getParty();
+        getParties();
       })
       .catch((error) => console.log(error));
     console.log("location request confirmed");
@@ -163,6 +167,7 @@ const ViewParty = (props) => {
       .then((res) => {
         console.log("patch res: ", res);
         getParty();
+        getParties();
       })
       .catch((error) => console.log(error));
     console.log("location request confirmed");
