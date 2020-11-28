@@ -4,7 +4,10 @@
 const responseUtil = require("./response");
 const shortid = require("shortid");
 const AWS = require("aws-sdk");
+const dotenv = require('dotenv');
 const S3_BUCKET = "lan-party-images";
+
+dotenv.config();
 
 // Updating AWS settings
 AWS.config.update({
