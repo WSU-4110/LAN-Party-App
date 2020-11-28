@@ -159,23 +159,20 @@ module.exports = {
     },
 
     //Checks if incoming location is valid
-    isValidLocation: async function (location){
+    isValidLocation: async function (location, key = 'PartyLocation'){
         const reqs = ['Longitude', 'Latitude', 'Name'];
         
         let output = {
-            value: {
-                PartyLocation: {}
-            }
+            value: {}
         }
-        
+        output.value[key] = {};
         let missingKey = false;
-
         for(let i = 0; i < reqs.length; i++){
             if(!location.hasOwnProperty(reqs[i])){
                 missingKey = reqs[i];
                 break;
             } else {
-                output.value.PartyLocation[reqs[i]] = location[reqs[i]];
+                output.value[key][reqs[i]] = location[reqs[i]];
             }
         }
         
@@ -191,16 +188,17 @@ module.exports = {
         }
         switch(key){
             case 'Title':
-                output.value.Title = this.isValidPartyName(value);
-                output.isValid = output.value.Title !== false;
+                output.value.Title = await this.isValidPartyName(value);
+                output.isValid = (output.value.Title !== false);
                 return output;
 
             case 'RequestLocation':
-                return this.isValidLocation(value);
+                return this.isValidLocation(value, key);
 
             case 'User':
+                let user
                 try {
-                    let user = await AccountAPI.Get(value);
+                    user = await AccountAPI.Get(value);
                 } catch (err){
                     output.value = false;
                     return output;
@@ -218,8 +216,9 @@ module.exports = {
                 return output;
 
             default:
-                output.value.key = value;
+                output.value[key] = value;
                 output.isValid = (typeof(value) === 'string');
+                return output;
         }
     },
 

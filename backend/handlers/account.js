@@ -2,11 +2,14 @@
 
 // Imports
 const AccountAPI = require("../services/AccountAPI");
+const GameAPI = require("../services/GameAPI");
 const moment = require("moment-timezone");
 const responseUtil = require("../utilities/response");
 const crypto = require("crypto");
 const genUtils = require("../utilities/generalUtils");
 const { isUndefined } = require("util");
+const friendUtil = require('../utilities/friendUtils');
+const generalUtils = require("../utilities/generalUtils");
 
 module.exports = {
 
@@ -48,12 +51,12 @@ module.exports = {
                     let AccountID = request.ID ? request.ID : false;
                     await AccountAPI.Save(AccountID, request);
 
-                    let result = {
+                    let response = {
                         Message: "Account created, log in to continue!",
                         Account: request
                     };
 
-                    return responseUtil.Build(200, result);
+                    return responseUtil.Build(200, response);
                 } else throw new Error("Username Already Exists!");
             } else throw new Error("Email Already Exists!");
         } catch (err) {
@@ -112,13 +115,13 @@ module.exports = {
             // return the account information
             let account = await AccountAPI.Get(request.ID);
 
-            // if we returned with success, then create a result object
+            // if we returned with success, then create a response object
             if (account.ID) {
-                let result = {
+                let response = {
                     Message: "Returning the account!",
                     Account: account
                 };
-                return responseUtil.Build(200, result); // send the result
+                return responseUtil.Build(200, response); // send the response
             } else return responseUtil.Build(500, { Message: "No Account With That ID." }); // else, return an error
         } catch (err) {
             console.log(err);
@@ -134,7 +137,7 @@ module.exports = {
             
             // if we returned with success
             if (accounts) {
-                return responseUtil.Build(200, accounts); // then, send the result
+                return responseUtil.Build(200, accounts); // then, send the response
             } else return responseUtil.Build(500, { Message: "No Accounts Exist." }); // else, return an error
         } catch (err) {
             console.log(err);
@@ -217,6 +220,81 @@ module.exports = {
         }
     },
 
+    // ADD OR REMOVE A GAME FROM ACCOUNT'S GAME LIST //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    UpdateGames: async function (event) {
+        try {
+            if (!event)
+                throw new Error("No information was sent");
+    
+            let request = JSON.parse(event.body);
+
+            // add the IDs
+            request.AccountID = event.pathParameters.ID;
+            request.ID = request.AccountID;
+            
+            // check that the user ID is valid
+            let account = await AccountAPI.Get(request.AccountID);
+
+            if (!account) // if the user doesn't exist, throw an error
+                throw new Error("Invalid user!");
+            
+            if(!account.hasOwnProperty("Games"))
+                account.Games = [];
+            
+            let NewGamesArray = account.Games; // this is an array that will hold all the IDs of each game as a string
+
+            // ADDING A GAME ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if(request.Add) {
+                
+                // make sure the game exists
+                if (!(await GameAPI.Get(request.Add))) // if the game doesn't exist, throw an error
+                    throw new Error("Invalid game!");
+
+                let i = NewGamesArray.length;
+
+                // check that it isn't in the list already
+                while (i--) {
+                    if(account.Games[i] === request.Add)
+                        throw new Error("Game already added to account!");
+                }
+
+                // if we get here then we can add it to the list
+                NewGamesArray.push(request.Add);
+            }
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            // REMOVING A GAME ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            if (request.Remove) {
+                let j = NewGamesArray.length;
+
+                if (j !== 0) { // do nothing if the array is already empty
+                    while(j--) { // loop through the array
+                        if (account.Games[j] === request.Remove) // if we find it then we can delete it
+                            NewGamesArray.splice(j, 1);
+                    }
+                } else throw new Error("The account doesn't have any games so you can't delete this game!");
+            }
+            ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  
+            // update the expressions before submitting
+            let UpdateExpression = "SET Games = :g";
+            let UpdateValues = {};
+            UpdateValues[':g'] = NewGamesArray;
+
+            // update via the API
+            let UpdatedAccount = await AccountAPI.Update(request, UpdateValues, UpdateExpression);
+            if(!UpdatedAccount)
+                throw new Error("Could not update account game list");
+            
+            // return the updated account
+            return responseUtil.Build(200, await AccountAPI.Get(request.AccountID));
+        } catch (err) {
+            console.log(err);
+            return responseUtil.Build(500, { Message: err.message });
+        }
+    },
+
+    // UPDATE FRIENDS LIST //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     UpdateFriends: async function(events) {
         if(!events){
             return responseUtil.Build(204, "No information was sent");
@@ -226,11 +304,24 @@ module.exports = {
         let request = JSON.parse(events.body);
         request.SenderID = events.pathParameters.ID;
 
-        console.log(request.SenderID);
+        //Initialize the requested user
+        let requested;
+        //Initialize the response from dynamo
+        let response;
+        //Initialize an update function that can be applied to both users
+        let updateFunction;
+        //Initialize the array for users
+        let users;
+        //Initialize senderVals. It will be undefined unless we go into senders
+        let senderVals;
+
         //Check that the ID is valid
         try {
             var sender = await AccountAPI.Get(request.SenderID);
         } catch (err) {
+            return responseUtil.Build(403, "Sender ID not valid!");
+        }
+        if (sender === false){
             return responseUtil.Build(403, "Sender ID not valid!");
         }
 
@@ -240,182 +331,112 @@ module.exports = {
                 return responseUtil.Build(403, "Cannot friend self");
             }
             
-            //Check if the requested id is valid
-            let requested;
             try {
-                requested = await AccountAPI.Get(request.Requested);
-                if(requested === false){
-                    return responseUtil.Build(403, "Requested ID not valid!");
-                }
+                requested = await AccountAPI.Get(request.Requested);     
             } catch (err){
                 return responseUtil.Build(403, "Requested ID not valid!");
             }
+            if(requested === false){
+                return responseUtil.Build(403, "Requested ID not valid!");
+            }
+            //Sender has the sender val true, requested as false
+            senderVals = [true, false];
 
-            //Save the request to the sender's account
-            let updateExpression = 'set FriendRequests = :f';
+            //The function used to update both of the users
+            updateFunction = async function (user1, user2, sender){
+                const updateExpression = 'SET FriendRequests =:f'
 
-            //If the sender has no friends, make sure the item is at least initialized
-            if(!sender.hasOwnProperty("FriendRequests")){
-                sender.FriendRequests = [];
-            } else { //If the user already has a friend request w/ them, prevent them
-                if(sender.FriendRequests.findIndex(FrenReq => {
-                    FrenReq.ID === requested.ID
-                }) !== -1){
-                    return responseUtil.Build(403, "Already requested that friend");
+                //Get the updated friends list
+                let updatedFriendReqs = await friendUtil.addToFriendRequests(user1, user2, sender);
+                
+                if(updatedFriendReqs === false){
+                    return responseUtil.Build(403, 'Tried sending friend request to self');
                 }
+                
+                let updateValues = {
+                    ':f': updatedFriendReqs
+                };
+
+
+                try {
+                    response = await AccountAPI.Update(user1.ID, updateValues, updateExpression);
+                } catch (err) {
+                    return responseUtil.Build(500, "Could not update friends list of " + user1.Username);
+                }
+                if(!response){
+                    return responseUtil.Build(500, "Could not update friends list of " + user1.Username);
+                } 
+                return true;
             }
+        }
 
-            let saveItem = {
-                ID: requested.ID,
-                Username: requested.Username,
-                Sender: true
-            }
-
-            sender.FriendRequests = await genUtils.insertSorted(saveItem, sender.FriendRequests);
-            if(sender.FriendRequests === false){
-                return responseUtil.Build(403, "Could not add user to sender list");
-            }
-
-            let updateValues = {
-                ':f': sender.FriendRequests
-            }
-            let result;
-            
-            console.log(sender.ID);
-
-
-            try {
-                result = await AccountAPI.Update(sender.ID, updateValues, updateExpression);
-            } catch (err) {
-                return responseUtil.Build(500, "Could not update friends list");
-            }
-            if(!result){
-                return responseUtil.Build(500, "Could not update friends list");
-            }
-            
-            //Repeat for the recipient
-            if(!requested.hasOwnProperty('FriendRequests')){
-                requested.FriendRequests = [];
-            }
-
-            saveItem = {
-                ID: sender.ID,
-                Username: sender.Username,
-                Sender: false
-            }
-
-
-            requested.FriendRequests = await genUtils.insertSorted(saveItem, requested.FriendRequests);
-
-            if(requested.FriendRequests === false){
-                return responseUtil.Build(403, "Could not insert into requested list");
-            }
-
-            updateValues = {
-                ':f': requested.FriendRequests
-            };
-
-            result = await AccountAPI.Update(requested.ID, updateValues, updateExpression);
-
-            if(!result){
-                return responseUtil.Build(500, "Could not update friends list");
-            } else {
-                return responseUtil.Build(200, "Request sent");
-            }
-        
-        } 
-        
-        
         else if (request.hasOwnProperty("Confirm")){ 
 
             if(sender.ID === request.Confirm)
                 return responseUtil.Build(403, "Cannot friend self");
 
-            let updateExpression = 'set Friends = :f, FriendRequests = :r';
-
             try {
-                var requested = await AccountAPI.Get(request.Confirm);
-                if(requested === false){
-                    return responseUtil.Build(403, "Requested ID not valid!");
-                }
+                requested = await AccountAPI.Get(request.Confirm);
+                
             } catch (err) {
                 return responseUtil.Build(403, "Requested ID invalid");
             }
-
-            let friendReqInd = await genUtils.isInSortedList(requested, sender.FriendRequests);
-            if(friendReqInd === false){
-                return responseUtil.Build(403, "Requested user not in sender's FriendRequests");
+            if (requested === false){
+                return responseUtil.Build(403, "Requested ID not valid!");
             }
+            //Sender has the sender val true, requested as false
+            senderVals = [true, false];
 
-            sender.FriendRequests.splice(friendReqInd, 1);
+            //Initialize the update function
+            updateFunction = async function (user1, user2, isSender){
+                const updateExpression = 'set Friends = :f, FriendRequests = :r';
 
-            //Values to store in the sender's table.
-            let storeVal = {
-                ID: requested.ID,
-                Username: requested.Username,
-                Avatar: requested.Avatar
-            }
-            //Insert the friend such that it's sorted by ID
-            sender.Friends = await genUtils.insertSorted(storeVal, sender.FriendRequests);
+                //Remove the user2 from the user1's friend request
+                let updatedFriendReqs = await friendUtil.removeFromFriendRequests(user1, user2);
 
-            let updateValues = {
-                ':f' : sender.Friends,
-                ':r' : sender.FriendRequests
-            }
-            
-            let response;
-
-            try {
-                response = await AccountAPI.Update(sender.ID, updateValues, updateExpression);
-            } catch (err) {
-                return responseUtil.Build(500, "Could not add friend");
-            }
-            if(response === false){
-                return responseUtil.Build(500, "Could not add friend");
-            } else {
-                console.log(requested);
-
-                friendReqInd = await genUtils.isInSortedList(sender, requested.FriendRequests);
-                if(friendReqInd === false){
-                    return (403, "Sender not in requested friend requests array");
-                }
-
-                requested.FriendRequests.splice(friendReqInd, 1);
-                    
-                let storeVal = {
-                    ID: sender.ID,
-                    Username: sender.Username,
-                    Avatar: sender.Avatar
-                }
-
-                console.log('Post-splice')
-                console.log(requested);
-
-                console.log(storeVal);
-
-                requested.Friends = await genUtils.insertSorted(storeVal, requested.Friends);
-
-                console.log(requested);
-
-
-                updateValues = {
-                    ':f' : requested.Friends,
-                    ':r' : requested.FriendRequests
-                }
-
-                response = await AccountAPI.Update(requested.ID, updateValues, updateExpression);
-                if(response === false){
-                    return responseUtil.Build(500, "Could not add friend");
-                } else {
-                    return responseUtil.Build(200, "Friend added!");
-                }
+                //If the item wasn't in there
+                if(updatedFriendReqs === false){
+                    return responseUtil.Build(403, "User not in " + user1.Username + "'s Friend Requests");
                 
+                //If the user1 of this request also sent the friend request
+                } else if (updatedFriendReqs.deleted.Sender === isSender){
+                    return responseUtil.Build(403, 'Cannot confirm request you sent!');
+
+                //Set the value to the new friend request array
+                } else {
+                    updatedFriendReqs = updatedFriendReqs.FriendRequests;
+                }
+
+                //Update the friend request array
+                let updatedFriends = await friendUtil.AddToFriends(user1, user2);
+
+                if(updatedFriends === false){
+                    return responseUtil.Build(403, "User already in "+ user1.Username + "'s friends!")
+                }
+
+                let updateValues = {
+                    ':f' : updatedFriends,
+                    ':r' : updatedFriendReqs
+                }
+
+                console.log(updateValues);
+
+                try {
+                    response = await AccountAPI.Update(user1.ID, updateValues, updateExpression);
+                } catch (err) {
+                    return responseUtil.Build(500, "Could not add friend to " + user1.Username);
+                }
+                if(response === false){
+                    return responseUtil.Build(500, "Could not add friend to " + user1.Username);
+                } 
+
+                return true;
             }
-            
+
         } else if (request.hasOwnProperty("Remove")){
-            let requested
+            
             try {
-            requested = await AccountAPI.Get(request.Remove);
+                requested = await AccountAPI.Get(request.Remove);
             } catch (err){
                 return responseUtil.Build(403, "Requested Account does not exist");
             }
@@ -424,123 +445,96 @@ module.exports = {
                 return responseUtil.Build(403, "Requested Account does not exist");
             }
 
-            //If the requested user is not in the sender's friends, 403
-            let friendLoc = await genUtils.isInSortedList(requested, sender.Friends);
+            //Initialize the update function
+            updateFunction = async function (user1, user2){
+                //Set the request statement
+                const requestExpression = 'Set Friends = :f'
 
-            if(friendLoc === false){
-                return responseUtil.Build(403, "User not in Sender's friend array");
+                //Get the updated friends list
+                let updatedFriends = await friendUtil.RemoveFromFriends(user1, user2);
+                //If the user2 was not in the list
+                if(updatedFriends === false){
+                    return responseUtil.Build(403, "User not in " + user1.Username + "'s friend array");
+                }
+                console.log(updatedFriends);
+                //Set the expression value
+                let expressionValue = {
+                    ':f': updatedFriends
+                }
+                
+                //Save to the account
+                try {
+                    response = await AccountAPI.Update(user1.ID, expressionValue, requestExpression);
+                
+                //Any errors saving to the account
+                } catch (err) {
+                    return responseUtil.Build(500, "Error saving to " + user1.Username)
+                }
+                if(response === false){
+                    return responseUtil.Build(500, "Error saving to " + user1.Username)
+                }
+
+                return true;
             }
-
-            //Remove the user from the sender's friends
-            sender.Friends.splice(friendLoc, 1);
-            //Set the request statement
-            let requestExpression = 'Set Friends = :f'
-            //Set the expression value
-            let expressionValue = {
-                ':f': sender.Friends
-            }
-
-            let response;
-            
-            //Save to the account
-            try {
-                response = await AccountAPI.Update(sender.ID, expressionValue, requestExpression);
-            
-            //Any errors saving to the account
-            } catch (err) {
-                return responseUtil.Build(500, "Error saving to the sender")
-            }
-            if(response === false){
-                return responseUtil.Build(500, "Error saving to the sender")
-            }
-
-            //Set up for removing from the other account
-            friendLoc = genUtils.isInSortedList(sender, requested.Friends);
-
-            if(friendLoc === false){
-                return responseUtil.Build(403, "Sender not in requested friends");
-            }
-
-            //Remove the item
-            requested.Friends.splice(friendLoc, 1);
-
-            //Update the values
-            expressionValue[':f'] = requested.Friends;
-            //Save to the account
-            try {
-                response = await AccountAPI.Update(requested.ID, expressionValue, requestExpression);
-
-            //Any errors saving to the account
-            } catch (err) {
-                return responseUtil.Build(500, "Error saving to the requested")
-            }
-            if(response === false){
-                return responseUtil.Build(500, "Error saving to the requested")
-            }
-
-            return responseUtil.Build(200, "Friend removed");
-        
         
         } else if (request.hasOwnProperty("RemoveRequest")){
+            
             const updateExpression = "Set FriendRequests=:r"
-            //Get the requested user
-            let requested
+            
             try {
                 requested = await AccountAPI.Get(request.RemoveRequest);
             } catch (err){
                 return responseUtil.Build(403, "Requested user does not exist");
             }
-
-            //splice the requested out of the friend request list
-            let reqIndex = sender.FriendRequests.findIndex(sentReq => sentReq.ID === requested.ID);
-            if(reqIndex === -1){
-                return responseUtil.Build(403, "Requested not in sender's friend requests");
+            if(requested === false){
+                return responseUtil.Build(403, "Requested Account does not exist");
             }
 
-            sender.FriendRequests.splice(reqIndex, 1);
+            //Initialize the update function
+            updateFunction = async function (user1, user2){
+                //Remove the friendRequest from the user2's array
+                let updatedFriendReqs = await friendUtil.removeFromFriendRequests(user1, user2);
 
-            //Update the values
-            let updateValues = {
-                ':r': sender.FriendRequests
-            };
+                if (updatedFriendReqs === false){
+                    return responseUtil.Build(403, "User not in " + user1.Username +"'s friend request array");
+                }
 
-            //Save the item
-            let response
-            try {
-                response = await AccountAPI.Update(sender.ID, updateValues, updateExpression);
-                //If it could not save
-            } catch (err) {
-                return responseUtil.Build(500, "Could not save to sender");
+                //Set the updated friend requests to the Friend requests array
+                updatedFriendReqs = updatedFriendReqs.FriendRequests;
+
+                //Update the values
+                let updateValues = {
+                    ':r': updatedFriendReqs
+                };
+
+                //Save the item
+
+                try {
+                    response = await AccountAPI.Update(user1.ID, updateValues, updateExpression);
+                    //If it could not save
+                } catch (err) {
+                    return responseUtil.Build(500, "Could not save to " + user1.Username);
+                }
+                if (response === false){
+                    return responseUtil.Build(500, "Could not save to " + user1.Username);
+                }
+
+                return true;
             }
-            if (response === false){
-                return responseUtil.Build(500, "Could not save to sender");
-            }
-
-            //Repeat on the other user
-            reqIndex = requested.FriendRequests.findIndex(i => i.ID === sender.ID);
-
-            if(reqIndex === -1){
-                return responseUtil.Build (403, "Sender not in requested friend requests");
-            }
-            
-            requested.FriendRequests.splice(reqIndex, 1);
-
-            //Update the values
-            updateValues = {
-                ':r': requested.FriendRequests
-            };
-
-            //Try to save it
-            try {
-                response = await AccountAPI.Update(requested.ID, updateValues, updateExpression);
-            } catch (err) {
-                return responseUtil.Build(500, "Cannot save to requested");
-            }
-            if (response === false){
-                return responseUtil.Build(500, "Cannot save to requested");
-            }
-
-            return responseUtil.Build(200, "Friend requests removed");
         }
+
+        //Initialize the users as the sender and the requested
+        users = [sender, requested];
+
+        //Send the request to update both users
+        response = await generalUtils.mutualUpdate(users, updateFunction, senderVals);
+
+        //If the response is not true, the request was returned already
+        if(response !== true){
+            return response;
+        } else {
+            return responseUtil.Build(200, "Request completed!");
+        }
+    
     }
 };
