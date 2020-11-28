@@ -17,7 +17,9 @@ module.exports = {
                 return output;
 
             case 'PartyLocation':
-                return this.isValidLocation(value);
+                output = await this.isValidLocation(value);
+                output.value.RequestLocationChange = null;
+                return output;
 
             case 'Host':
                 let account;
