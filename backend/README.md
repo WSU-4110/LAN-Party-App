@@ -33,12 +33,22 @@ Back end: https://github.com/WSU-4110/LAN-party-backend
 Email:
 Password:
 Username:
+Invites:
 }
 ## Party
 {
-}
-## Friend
-{
+PartyName:
+PartyLocation:
+Host:
+HostUsername:
+PartyTime:
+HardwareRequirements:
+Games:
+AgeGate:
+Intent:
+RequestLocationChange:
+Attendees:
+Invited:
 }
 ## Game
 {
