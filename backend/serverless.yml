@@ -19,6 +19,9 @@ provider:
   versionFunctions: false
   runtime: nodejs12.x
   region: us-east-2
+  apiGateway:
+    shouldStartNameWithService: true
+  
   # enviroment:
   #   S3_ACCESS_ID: ${ssm:only-lans-s3-id~true}
   #   S3_ACCESS_SECRET: ${ssm:only-lans-s3-secret~true}
@@ -97,6 +100,14 @@ functions:
           path: /Account/{ID}
           cors: true
 
+  UpdateGames:
+    handler: handlers/account.UpdateGames
+    events:
+      - http:
+          method: PATCH
+          path: /UpdateGames/Account/{ID}
+          cors: true
+
   # game functions
   ViewGame:
     handler: handlers/game.ViewGame
@@ -115,13 +126,38 @@ functions:
           cors: true
 
   CreateGame:
-    handler: handlers/game.Create
+    handler: handlers/game.CreateGame
     events:
       - http:
-          method: GET
+          method: POST
           path: /CreateGame
           cors: true
 
+  # reports functions
+  ReportAccount:
+    handler: handlers/report.NewReport
+    events: 
+      - http:
+          method: POST
+          path: /ReportAccount
+          cors: true
+
+  ViewReport:
+    handler: handlers/report.ViewReport
+    events:
+      - http:
+          method: GET
+          path: /Report/{ID}
+          cors: true
+
+  ViewAllReports:
+    handler: handlers/report.ViewAll
+    events:
+      - http:
+          method: GET
+          path: /Reports
+          cors: true
+  
   # party functions
   CreateParty:
     handler: handlers/party.Create
@@ -153,6 +189,22 @@ functions:
       - http:
           method: PATCH
           path: /Party/{ID}
+          cors: true
+  
+  InviteToParty:
+    handler: handlers/party.Invite
+    events:
+      - http:
+          method: PATCH
+          path: Invite/Party/{ID}
+          cors: true
+  
+  RequestLocationChange:
+    handler: handlers/party.RequestLocationChange
+    events:
+      - http:
+          method: PATCH
+          path: Party/RequestLocation/{ID}
           cors: true
 
   # image functions
@@ -226,6 +278,28 @@ resources:
               ProjectionType: ALL
         BillingMode: PAY_PER_REQUEST
 
+    # reports table
+    reports:
+      Type: "AWS::DynamoDB::Table"
+      Properties:
+        TableName: REPORTS-LAN
+        AttributeDefinitions:
+          - AttributeName: ID
+            AttributeType: S
+          - AttributeName: AccountID
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ID
+            KeyType: HASH
+        GlobalSecondaryIndexes:
+          - IndexName: AccountID
+            KeySchema:
+              - AttributeName: AccountID
+                KeyType: HASH
+            Projection:
+              ProjectionType: ALL
+        BillingMode: PAY_PER_REQUEST
+
     # parties table
     parties:
       Type: "AWS::DynamoDB::Table"
@@ -249,12 +323,6 @@ resources:
           - IndexName: PartyName
             KeySchema:
               - AttributeName: PartyName
-                KeyType: HASH
-            Projection:
-              ProjectionType: ALL
-          - IndexName: PartyLocation
-            KeySchema:
-              - AttributeName: PartyLocation
                 KeyType: HASH
             Projection:
               ProjectionType: ALL
