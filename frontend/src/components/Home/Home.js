@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext, FormControl } from 'react';
-import { NavLink } from 'react-router-dom';
 import Map from '../GoogleMap/GoogleMap';
 import cookies from 'js-cookie';
 import {Button, Accordion, Card} from 'react-bootstrap';
@@ -47,7 +46,6 @@ const Home = (props) => {
   const filteredParties = parties.filter( parties => {
     return parties.PartyName.toLowerCase().includes( search.toLowerCase() )
   } )
-  
   return(
     <div>
       <Map />
