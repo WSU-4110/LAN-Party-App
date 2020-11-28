@@ -339,7 +339,6 @@ module.exports = {
             if(requested === false){
                 return responseUtil.Build(403, "Requested ID not valid!");
             }
-
             //Sender has the sender val true, requested as false
             senderVals = [true, false];
 
