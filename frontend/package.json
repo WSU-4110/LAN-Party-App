@@ -12,6 +12,7 @@
     "bootstrap": "^4.5.2",
     "crypto-js": "^4.0.0",
     "crypto.js": "^2.0.2",
+    "jest": "^26.6.3",
     "js-cookie": "^2.2.1",
     "material-ui-icons": "^1.0.0-beta.36",
     "moment": "^2.29.1",
@@ -31,7 +32,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "jest",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {

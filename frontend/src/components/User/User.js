@@ -184,7 +184,7 @@ const User = (props) => {
     // PATCH URL
     const Link = `${REACT_APP_URL}Account/${user.ID}`;
     const payload = {
-      NewAbout: data.about
+      NewAbout: data.newabout
     }
 
     console.log("about payload", data.about);
