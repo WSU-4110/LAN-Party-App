@@ -37,61 +37,62 @@ module.exports = {
     // False probably indicates an item with the same value at sortKey
     //================================================================================
     insertSorted: async function (insertItem, list, sortKey = "ID"){
-        //Make sure that the list isn't empty
-        console.log(list);
         if(list === undefined || !Array.isArray(list) ||list.length === 0){
             list = [insertItem];
             return list;
         }
         
         //If the first item is greater than the new item, put the item in the front
-        else if(list[0][sortKey] > insertItem[sortKey]){
+        if(list[0][sortKey] > insertItem[sortKey]){
             list.unshift(insertItem);
             return list;
         } 
         
         //If the last item is less than the new item, put the item in the back
-        else if(list[list.length - 1][sortKey] < insertItem[sortKey]){
+        if(list[list.length - 1][sortKey] < insertItem[sortKey]){
             list.push(insertItem);
             return list;
         }
 
-        //It's somewhere in the middle
-        else {
-            let left = 0;
-            let right = list.length - 1;
-            while(left < right){
-                let middle = Math.round((left + right) / 2);
-
-                //If the current middle is greater
-                if(list[middle][sortKey] > insertItem[sortKey]){
-                    //If the one below is lesser, insert between
-                    if(list[middle - 1][sortKey] < insertItem[sortKey]){
-                        list.splice(middle, 0, insertItem);
-                        return list;
-                    }
-                    
-                    //Otherwise, move earlier in the list
-                    else {
-                        right = middle - 1;
-                    }
+        //It's somewhere in the middle        
+        let left = 0;
+        let right = list.length - 1;
+        while(left < right){
+            let middle = Math.round((left + right) / 2);
+            //If the current middle is greater
+            if(list[middle][sortKey] > insertItem[sortKey]){
+                //If the one below is lesser, insert between
+                if(list[middle - 1][sortKey] < insertItem[sortKey]){
+                    list.splice(middle, 0, insertItem);
+                    return list;
                 }
-
-                //If the current middle is lesser
+                
+                //Otherwise, move earlier in the list
                 else {
-                    //If the next item is greater, insert between
-                    if(list[middle + 1][sortKey] > insertItem[sortKey]){
-                        list.splice(middle + 1, 0, insertItem);
-                        return list;
-                    }
-
-                    //Otherwise, move to later in the list
-                    else {
-                        left = middle + 1;
-                    }
+                    right = middle - 1;
                 }
             }
+
+            //If the current middle is lesser
+            else if (list[middle][sortKey] < insertItem[sortKey]) {
+                //If the next item is greater, insert between
+                if(list[middle + 1][sortKey] > insertItem[sortKey]){
+                    list.splice(middle + 1, 0, insertItem);
+                    return list;
+                }
+
+                //Otherwise, move to later in the list
+                else {
+                    left = middle + 1;
+                }
+            }
+
+            //If it's equal, cannot insert. 
+            else {
+                return false;
+            }
         }
+    
         //If it couldn't be inserted, return false
         return false;
     },
