@@ -4,6 +4,7 @@ package-lock.json
 
 # serverless directories
 .serverless
+coverage/
 
 # enviroment variables
 .env

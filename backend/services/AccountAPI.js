@@ -4,7 +4,6 @@
 const crypto = require("crypto");
 const shortid = require("shortid");
 const AWS = require("aws-sdk");
-const { exception } = require("console");
 
 // Updating AWS settings
 AWS.config.update({ region: "us-east-2" }); // region
