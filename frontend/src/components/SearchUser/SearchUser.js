@@ -78,6 +78,8 @@ const SearchUser=(props)=>{
   }
 
   const addFriend=(ID) =>{
+    console.log("FriendReqSent", friendReqSent)
+    
     const headers = {
       headers: {
         "Content-Type": "application/json",
@@ -147,28 +149,35 @@ const SearchUser=(props)=>{
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res.data);
+      setRender(false);
     })
     .catch((error) => console.log(error));
   }
 
   const renderButtons = (pid, username) => {
-    if (friendReqSent) {
-      if (friendReqSent.some(att => att.ID.includes(pid))) {
-        if (friendReqSent.some(att => shallowEqual(att, {ID:pid, Sender:true, Username:username})))
-          return <Button variant="outline-success" onClick={() => undoFriend(pid)}>Request Sent</Button>
-        else
-          return <Button variant="outline-success" onClick={() => confirmFriend(pid)} >Accept Request</Button>
-      }
-      else if (userIsFriend) {
-        if (userIsFriend.some(att => att.ID.includes(pid))) {
-          return <Button variant="outline-primary" onClick={() => removeFriend(pid)}>Remove Friend</Button>
-        }
-        else
-          return <Button variant="outline-primary" onClick={() => addFriend(pid)}>Add Friend</Button>
-      }
+    //If the current user has the attribute related to FriendRequests
+    //And the other user is in the friend request array
+    if (friendReqSent && friendReqSent.some(att => att.ID ===(pid))) {
+      //Get the location in the array where the other user's ID matches the current
+      let friendReqLoc = friendReqSent.findIndex(att => att.ID ===(pid));
+
+      //If they're the sender, tell them the request was sent
+      if (friendReqSent[friendReqLoc].Sender)
+        return <Button variant="outline-success" onClick={() => undoFriend(pid)}>Undo Request</Button>
+      //If they're not the sender, offer the option to accept. Reject is somewhere else.
+      else
+        return <Button variant="outline-success" onClick={() => confirmFriend(pid)} >Accept Request</Button>
     }
-    else 
-      return <p>uh, this shouldn't be here, oh god, oh jeez</p>
+
+    //If the user has a friends list and the other user is in it
+    else if (userIsFriend && userIsFriend.some(att => att.ID.includes(pid))) {
+      return <Button variant="outline-primary" onClick={() => removeFriend(pid)}>Remove Friend</Button>
+    }
+    
+    //The current user that is logged in either has neither of the attributes,
+    //Or the person they're looking at is in neither.
+    else
+      return <Button variant="outline-primary" onClick={() => addFriend(pid)}>Add Friend</Button>
   }
 
   const renderEXButton = (pid, username) => {
