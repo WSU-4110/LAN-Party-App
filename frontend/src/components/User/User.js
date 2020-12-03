@@ -173,7 +173,7 @@ const User = (props) => {
     * CHANGE ABOUT
     * 
     */
-  /* const changeAbout = (data, e) => {
+   const changeAbout = (data, e) => {
     e.preventDefault();
 
     if (data.about.toLowerCase() === user.About.toLowerCase()) {
@@ -210,8 +210,8 @@ const User = (props) => {
 
     setEditAbout(false);
   }
-*/
-  /**
+ /*
+   *
    * 
    * CHANGE PASSWORD
    * 
@@ -298,7 +298,7 @@ const User = (props) => {
     )
   }
 
-/*
+
   const renderEditAbout = () => {
     // if in edit mode
     if (editAbout) {
@@ -334,7 +334,7 @@ const User = (props) => {
       <Button size="sm" onClick={() => setEditAbout(true)} >Edit About</Button>
     )
   }
-*/
+
 
   const renderEditPassword = () => {
     if (editPassword) {
@@ -432,7 +432,7 @@ const User = (props) => {
       <div className="desc-section">
        
         {user.About}
-       
+        {renderEditAbout()}
       </div>
 
       <Accordion defaultActiveKey="0">
