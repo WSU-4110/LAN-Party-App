@@ -174,6 +174,13 @@ const User = (props) => {
    const changeAbout = (data, e) => {
     e.preventDefault();
 
+    /*if (data.about.toLowerCase() === user.About.toLowerCase()) {
+      alert("New about must be different");
+      console.log("New and old about can't be the same");
+      setEditAbout(false);
+      return;
+    }*/
+
     const headers = {
       headers: {
         "Content-Type": "application/json"
@@ -201,8 +208,8 @@ const User = (props) => {
 
     setEditAbout(false);
   }
-
-  /**
+ /*
+   *
    * 
    * CHANGE PASSWORD
    * 
