@@ -322,7 +322,7 @@ const User = (props) => {
     }
     // regular mode
     return (
-      <Button size="sm" onClick={() => setEditAbout(true)} >Edit About</Button>
+      <Button size="sm" onClick={() => setEditAbout(true)}>Edit About</Button>
     )
   }
 
@@ -419,7 +419,7 @@ const User = (props) => {
       </div>
       {/* THIS IS THE ABOUT SECTION */}
       <div className="desc-section">
-        {user.About}
+        {user.About ? user.About : <p className="font-italic">No about set</p>}
         {renderEditAbout()}
       </div>
 
@@ -427,7 +427,7 @@ const User = (props) => {
       <Accordion defaultActiveKey="0">
         <Card>
           <Accordion.Toggle className="friends-header" as={Card.Header} eventKey="0">
-            <span className="h3">FRIENDS</span>
+            <span className="h4">FRIENDS</span>
           </Accordion.Toggle>
           <Accordion.Collapse eventKey="0">
             <Card.Body className="friends-body">
@@ -436,7 +436,7 @@ const User = (props) => {
               {user.Friends && user.Friends.map(friend => (
                 <li className="mb-2">
                   <img src={friend.Avatar} style={{width:"80px",height:"80px",borderRadius:"50%"}} />
-                  <span className="ml-4 h4">{friend.Username}</span>
+                  <span className="ml-4 h5">{friend.Username}</span>
                 </li>
               ))}
             </ul>
@@ -445,74 +445,27 @@ const User = (props) => {
         </Card>
       </Accordion>
 
-      {/* <Accordion defaultActiveKey="0">
+      {/* PENDING FRIEND REQUESTS */}
+      <Accordion defaultActiveKey="0">
         <Card>
-          <Accordion.Toggle as={Card.Header} eventKey="0">
-            Local 
+          <Accordion.Toggle className="friends-header" as={Card.Header} eventKey="0">
+            <span className="h4">PENDING REQUESTS</span>
           </Accordion.Toggle>
           <Accordion.Collapse eventKey="0">
-            <Table striped bordered hover variant="dark">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Local Rank</th>
-                  <th>Game</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>35</td>
-                  <td>Tekken 7</td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>50</td>
-                  <td>Street Fighter V</td>
-                </tr>
-                <tr>
-                  <td>3</td>
-                  <td>300</td>
-                  <td>Smash Bros. Melee</td>
-                </tr>
-              </tbody>
-            </Table>
+            <Card.Body className="friends-body">
+            <ul className="list-unstyled">
+              {/* This will be the friends loop */}
+              {user.FriendRequests && user.FriendRequests.map(friend => (
+                <li className="mb-2">
+                  <img src={friend.Avatar} style={{width:"80px",height:"80px",borderRadius:"50%"}} />
+                  <span className="ml-4 h5">{friend.Username}</span>
+                </li>
+              ))}
+            </ul>
+            </Card.Body>
           </Accordion.Collapse>
         </Card>
-        <Card>
-          <Accordion.Toggle as={Card.Header} eventKey="1">
-            Global
-          </Accordion.Toggle>
-          <Accordion.Collapse eventKey="1">
-            <Table striped bordered hover variant="dark">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Global Rank</th>
-                  <th>Game</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>1</td>
-                  <td>35</td>
-                  <td>Tekken 7</td>
-                </tr>
-                <tr>
-                  <td>2</td>
-                  <td>50</td>
-                  <td>Street Fighter V</td>
-                </tr>
-                <tr>
-                  <td>3</td>
-                  <td>300</td>
-                  <td>Smash Bros. Melee</td>
-                </tr>
-              </tbody>
-            </Table>
-          </Accordion.Collapse>
-        </Card>
-      </Accordion> */}
+      </Accordion>
 
       {/* GONNA TAKE "FRIENDS" OUT OF THIS */}
       <div className="userpage-buttons">
