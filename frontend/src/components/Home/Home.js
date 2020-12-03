@@ -39,10 +39,6 @@ const Home = (props) => {
     getParties();
   }, [])
 
-  useEffect(()=>{
-    getParties();
-  } , [homeRender])
-
   const filteredParties = parties.filter( parties => {
     return parties.PartyName.toLowerCase().includes( search.toLowerCase() )
   } )
@@ -72,7 +68,7 @@ const Home = (props) => {
 
       <Accordion>
         {filteredParties.map((p, i) => (
-          <Card>
+          <Card key={p.ID}>
             <Accordion.Toggle 
             style={{
               padding: "10px 10px 5px",
@@ -90,7 +86,8 @@ const Home = (props) => {
             </Accordion.Toggle>
             <Accordion.Collapse eventKey={p.ID}>
               <Card.Body>
-                <ViewParty 
+                <ViewParty
+                key={p.ID}
                 party = {p}
                 location={p.PartyLocation} 
                 name={p.Name}

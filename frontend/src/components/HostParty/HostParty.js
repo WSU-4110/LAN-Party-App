@@ -73,7 +73,7 @@ const HostParty = (props) => {
       .then((res) => {
         console.log(res);
         getParties();
-        setHomeRender({ render: !homeRender.render });
+        // setHomeRender({ render: !homeRender.render });
       })
       .catch((error) => console.log(error));
 
