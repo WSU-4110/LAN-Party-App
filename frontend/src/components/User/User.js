@@ -173,7 +173,7 @@ const User = (props) => {
     * CHANGE ABOUT
     * 
     */
-   const changeAbout = (data, e) => {
+  /* const changeAbout = (data, e) => {
     e.preventDefault();
 
     if (data.about.toLowerCase() === user.About.toLowerCase()) {
@@ -210,7 +210,7 @@ const User = (props) => {
 
     setEditAbout(false);
   }
-
+*/
   /**
    * 
    * CHANGE PASSWORD
