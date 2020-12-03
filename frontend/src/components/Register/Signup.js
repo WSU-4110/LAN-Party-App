@@ -98,7 +98,7 @@ const Signup = (props) => {
             <Form.Label>About you</Form.Label>
             <Form.Control 
               type="text" 
-              placeholder="A little bit about yourself"
+              placeholder="In 255 characters or less, tell us a little bit about yourself. Note: This will be displayed publicly."
               name="about"
               aria-describedby="passwordReq"
               ref={register({ required: false, maxLength: 255 })} />
