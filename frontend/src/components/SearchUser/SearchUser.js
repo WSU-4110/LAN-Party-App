@@ -206,7 +206,7 @@ const SearchUser=(props)=>{
             <Accordion.Collapse eventKey={p.ID}>
               <Card.Body>
               <b>"{p.About}"</b>
-              {p.About}
+             
               <div className="searchUser-buttons">
                   <div className="settings-accordian-buttons">
                     <Button variant="outline-danger">Report</Button>{' '}
