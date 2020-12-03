@@ -22,9 +22,7 @@ const User = (props) => {
 
   /**
    * 
-   * 
    * IMAGE UPLOAD
-   * 
    * 
    */
 
@@ -176,6 +174,13 @@ const User = (props) => {
    const changeAbout = (data, e) => {
     e.preventDefault();
 
+    /*if (data.about.toLowerCase() === user.About.toLowerCase()) {
+      alert("New about must be different");
+      console.log("New and old about can't be the same");
+      setEditAbout(false);
+      return;
+    }*/
+
     const headers = {
       headers: {
         "Content-Type": "application/json"
@@ -203,8 +208,8 @@ const User = (props) => {
 
     setEditAbout(false);
   }
-
-  /**
+ /*
+   *
    * 
    * CHANGE PASSWORD
    * 
@@ -324,7 +329,7 @@ const User = (props) => {
     }
     // regular mode
     return (
-      <Button size="sm" onClick={() => setEditAbout(true)} >Edit About</Button>
+      <Button size="sm" onClick={() => setEditAbout(true)}>Edit About</Button>
     )
   }
 
@@ -358,30 +363,30 @@ const User = (props) => {
     )
   }
 
-  return(
+  return (
     <div style={{backgroundColor: ""}}>
       <div className="userHeader">
         <div className="avatar-section">
           <div className='imageContainer'>
             <img className="avatar" src={user.Avatar} />
           </div>
-            <div className="editButtonGroup">
-              {editMode
-                ?
-                  <Form.Group className="choose-image-form" controlId="file-upload">
-                    <Form.Label className="filelabel">{chosenImage}</Form.Label>
-                    <Form.Control
-                      id="file-upload"
-                      type="file" 
-                      name="fileInput"
-                      onChange={handleChange}
-                      // aria-describedby="emailReq"
-                      ref={(ref) => {
-                        uploadInput = ref;
-                      }} />
-                  </Form.Group>
-                : null
-              }
+          <div className="editButtonGroup">
+            {editMode
+              ?
+                <Form.Group className="choose-image-form" controlId="file-upload">
+                  <Form.Label className="filelabel">{chosenImage}</Form.Label>
+                  <Form.Control
+                    id="file-upload"
+                    type="file" 
+                    name="fileInput"
+                    onChange={handleChange}
+                    // aria-describedby="emailReq"
+                    ref={(ref) => {
+                      uploadInput = ref;
+                    }} />
+                </Form.Group>
+              : null
+            }
             {/* <input
               id="file-upload"
               name="file"
@@ -402,101 +407,74 @@ const User = (props) => {
               : null
             }
             {chosenImage !== 'Choose Image'
-            ?
-              <Button
-                style={{marginTop:"-10px", marginBottom:"10px"}}
-                size="sm"
-                onClick={handleUpload} >
-                Confirm
-              </Button>
-            : null
+              ?
+                <Button
+                  style={{marginTop:"-10px", marginBottom:"10px"}}
+                  size="sm"
+                  onClick={handleUpload} >
+                  Confirm
+                </Button>
+              : null
             }
           </div>
         </div>
-      
         <div className="desc-section">
           {user.Username}
           {renderEditEmail()}
           {renderEditPassword()}
         </div>
-
       </div>
-      
+      {/* THIS IS THE ABOUT SECTION */}
       <div className="desc-section">
-        {user.About}
+        {user.About ? user.About : <p className="font-italic">No about me set</p>}
         {renderEditAbout()}
       </div>
 
+      {/* THIS WILL BE THE FRIENDS SECTION */}
       <Accordion defaultActiveKey="0">
-  <Card>
-    <Accordion.Toggle as={Card.Header} eventKey="0">
-      Local 
-    </Accordion.Toggle>
-    <Accordion.Collapse eventKey="0">
-      <Table striped bordered hover variant="dark">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Local Rank</th>
-            <th>Game</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td>35</td>
-            <td>Tekken 7</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>50</td>
-            <td>Street Fighter V</td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>300</td>
-            <td>Smash Bros. Melee</td>
-          </tr>
-        </tbody>
-      </Table>
-    </Accordion.Collapse>
-  </Card>
-  <Card>
-    <Accordion.Toggle as={Card.Header} eventKey="1">
-      Global
-    </Accordion.Toggle>
-    <Accordion.Collapse eventKey="1">
-      <Table striped bordered hover variant="dark">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Global Rank</th>
-            <th>Game</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>1</td>
-            <td>35</td>
-            <td>Tekken 7</td>
-          </tr>
-          <tr>
-            <td>2</td>
-            <td>50</td>
-            <td>Street Fighter V</td>
-          </tr>
-          <tr>
-            <td>3</td>
-            <td>300</td>
-            <td>Smash Bros. Melee</td>
-          </tr>
-        </tbody>
-      </Table>
-
-      </Accordion.Collapse>
-  </Card>
+        <Card>
+          <Accordion.Toggle className="friends-header" as={Card.Header} eventKey="0">
+            <span className="h4">FRIENDS</span>
+          </Accordion.Toggle>
+          <Accordion.Collapse eventKey="0">
+            <Card.Body className="friends-body">
+            <ul className="list-unstyled">
+              {/* This will be the friends loop */}
+              {user.Friends && user.Friends.map(friend => (
+                <li className="mb-2">
+                  <img src={friend.Avatar} style={{width:"60px",height:"60px",borderRadius:"50%"}} />
+                  <span className="ml-4 h5">{friend.Username}</span>
+                </li>
+              ))}
+            </ul>
+            </Card.Body>
+          </Accordion.Collapse>
+        </Card>
       </Accordion>
 
+      {/* PENDING FRIEND REQUESTS */}
+      <Accordion defaultActiveKey="0">
+        <Card>
+          <Accordion.Toggle className="friends-header" as={Card.Header} eventKey="0">
+            <span className="h4">PENDING REQUESTS</span>
+          </Accordion.Toggle>
+          <Accordion.Collapse eventKey="0">
+            <Card.Body className="friends-body">
+            <ul className="list-unstyled">
+              {/* This will be the friends loop */}
+              {user.FriendRequests && user.FriendRequests.map(friend => (
+                <li className="mb-2">
+                  <img src={friend.Avatar} style={{width:"60px",height:"60px",borderRadius:"50%"}} />
+                  <span className="ml-4 h5">{friend.Username}</span>
+                </li>
+              ))}
+            </ul>
+            </Card.Body>
+          </Accordion.Collapse>
+        </Card>
+      </Accordion>
+
+      {/* GONNA TAKE "FRIENDS" OUT OF THIS */}
       <div className="userpage-buttons">
         <div className="settings-button-section">
           <Button 
@@ -505,13 +483,13 @@ const User = (props) => {
               Settings
           </Button>
         </div>
-        <div className="settings-button-section">
+        {/* <div className="settings-button-section">
           <Button 
             variant="outline-success"
             style={{width: "90vw"}}>
               Friends
           </Button>
-        </div>
+        </div> */}
         <div className="settings-button-section">
           <Button 
             variant="outline-danger"
