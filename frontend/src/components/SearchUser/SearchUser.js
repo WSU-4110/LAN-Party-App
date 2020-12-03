@@ -93,7 +93,13 @@ const SearchUser=(props)=>{
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res.data);
-      setRender(!render);
+      user.FriendRequests.push({
+        ID: ID,
+        Sender: true
+      })
+      setfriendReqSent(user.FriendRequests);
+
+        console.log("FRIEND REQ SENT: ", friendReqSent )
     })
     .catch((error) => console.log(error));
   }
@@ -136,6 +142,7 @@ const SearchUser=(props)=>{
   }
   
   const undoFriend=(ID) =>{
+    console.log("friendReqSent: ", [...friendReqSent])
     const headers = {
       headers: {
         "Content-Type": "application/json",
@@ -149,7 +156,11 @@ const SearchUser=(props)=>{
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res.data);
-      setRender(false);
+      user.FriendRequests.splice(
+        user.FriendRequests.findIndex(removed => removed.ID === ID), 1
+      )
+      console.log("user.FriendRequests: ",user.FriendRequests)
+      setfriendReqSent(user.FriendRequests)
     })
     .catch((error) => console.log(error));
   }
@@ -161,6 +172,7 @@ const SearchUser=(props)=>{
       //Get the location in the array where the other user's ID matches the current
       let friendReqLoc = friendReqSent.findIndex(att => att.ID ===(pid));
 
+      console.log("IN BUTTON FUNCTION: ", friendReqSent)
       //If they're the sender, tell them the request was sent
       if (friendReqSent[friendReqLoc].Sender)
         return <Button variant="outline-success" onClick={() => undoFriend(pid)}>Undo Request</Button>
