@@ -118,6 +118,6 @@ module.exports = {
             response = await updateFunction(updateItems[1], updateItems[0]);
         }
 
-        return true;
+        return response;
     }
 }
