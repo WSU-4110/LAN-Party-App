@@ -98,10 +98,13 @@ const Signup = (props) => {
             <Form.Label>About you</Form.Label>
             <Form.Control 
               type="text" 
-              placeholder="In 255 characters or less, tell us a little bit about yourself. Note: This will be displayed publicly."
+              placeholder="In 255 characters or less, tell us a little bit about yourself."
               name="about"
               aria-describedby="passwordReq"
               ref={register({ required: false, maxLength: 255 })} />
+              <Form.Text className="text-muted">
+              Note: This will be displayed publicly.
+              </Form.Text>
               </Form.Group>
 
           <div style={{textAlign:"center"}}>
