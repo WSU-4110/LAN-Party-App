@@ -1,89 +1,67 @@
-import React, {useState, useEffect, useContext} from 'react';
-import { useForm } from "react-hook-form";
-import Map from '../GoogleMap/GoogleMap';
-import {Button, Accordion, Card} from 'react-bootstrap';
+import React, { useState, useEffect, useContext } from "react";
+import { Button } from "react-bootstrap";
+import axios from "axios";
+import './SearchUser.css'
+
 import { UserContext } from '../../context/UserContext';
-import { HomeRenderContext } from '../../context/HomeRenderContext'
-import axios from 'axios';
-import cookies from 'js-cookie';
-import './SearchUser.css';
 
+function shallowEqual(object1, object2) {
+  const keys1 = Object.keys(object1);
+  const keys2 = Object.keys(object2);
 
-const SearchUser=(props)=>{
-  const { REACT_APP_URL } = process.env;
-  const [user, setUser] = useContext(UserContext);
-  const [allUsers, setAllUsers] = useState([]);
-  const [render, setRender] = useState(false);
-  const [search, setSearch] = useState('');
-  const [friendReqSent, setfriendReqSent] = useState([]);
-  const [userIsFriend, setuserIsFriend] = useState([]);
+  if (keys1.length !== keys2.length) {
+    return false;
+  }
 
-  function shallowEqual(object1, object2) {
-    const keys1 = Object.keys(object1);
-    const keys2 = Object.keys(object2);
-  
-    if (keys1.length !== keys2.length) {
+  for (let key of keys1) {
+    if (object1[key] !== object2[key]) {
       return false;
     }
-  
-    for (let key of keys1) {
-      if (object1[key] !== object2[key]) {
-        return false;
+  }
+  return true;
+}
+
+const UserSnippet = (props) => {
+  const [user, setUser] = useContext(UserContext);
+  // show/hide buttons
+  const [showAddFriend, setShowAddFriend] = useState(false);
+  const [showRemoveFriend, setShowRemoveFriend] = useState(false); //this is a new one i made
+  const [showFriendRequestSent, setShowFriendRequestSent] = useState(false);
+  const [showAcceptFriendRequest, setShowAcceptFriendRequest] = useState(false);
+  const [showDeclineFriendRequest, setShowDeclineFriendRequest] = useState(
+    false
+  );
+
+  const updateFriends = () => {
+    // call get user
+    // take what's returned
+    // props.user.Friends = res.data.Account.Friends
+    const headers = {
+      headers: {
+        "Content-Type": "application/json"
       }
     }
-    return true;
-  }
-  
-  console.log(friendReqSent);
-  console.log(user);
-
-  //don't delete this useEffect it's the only thing keeping it from crashing!
-  useEffect(()=>{
-    if(user.FriendRequests)  
-      setfriendReqSent(user.FriendRequests);
-  }, [user])
-
-  useEffect(() => {
-    if (!cookies.get("Token"))
-      props.history.push("/login");
-    getAllUsers();
-    if (user.ID !== "") {
-      setfriendReqSent(user.FriendRequests);
-    }
-  }, [])
-
-  useEffect(()=>{
-    setuserIsFriend(user.Friends);
-  }, [user])
-
-  useEffect(() => {
-    if (!cookies.get("Token"))
-      props.history.push("/login");
-    getAllUsers();
-    if (user.ID !== "") {
-      setuserIsFriend(user.Friends);
-    }
-  }, [])
-  
-  
-  const getAllUsers = () => {
-    const link = `${REACT_APP_URL}Accounts`;
+    const link = `${process.env.REACT_APP_URL}Account/${props.userID}`;
     axios
-      .get(link)
+      .get(link, headers)
       .then((res) => {
-        console.log("allUsers", res);
-        setAllUsers(res.data.Items);
+        console.log("account info", res.data)
+        setUser({
+          ...user,
+          Friends: res.data.Account.Friends,
+          FriendRequests: res.data.Account.FriendRequests
+        })
       })
       .catch((error) => console.log(error))
   }
 
-  const addFriend=(ID) =>{
+  const addFriend = (ID) =>{
     const headers = {
       headers: {
         "Content-Type": "application/json",
       },
     };
-    const Link = `${process.env.REACT_APP_URL}AddFriend/Account/${user.ID}`;
+    const Link = `${process.env.REACT_APP_URL}AddFriend/Account/${props.userID}`;
     const payload={
         Requested: ID
     }
@@ -91,18 +69,42 @@ const SearchUser=(props)=>{
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res.data);
-      setRender(!render);
+      updateFriends();
+      updateFriends();
+      setShowAddFriend(!showAddFriend);
+      setShowFriendRequestSent(true);
     })
     .catch((error) => console.log(error));
   }
 
-  const confirmFriend=(ID) =>{
+  const removeFriend=(ID) =>{
     const headers = {
       headers: {
         "Content-Type": "application/json",
       },
     };
-    const Link = `${process.env.REACT_APP_URL}AddFriend/Account/${user.ID}`;
+    const Link = `${process.env.REACT_APP_URL}AddFriend/Account/${props.userID}`;
+    const payload={
+        Remove: ID
+    }
+    axios
+    .patch(Link, payload, headers)
+    .then((res) => {
+      console.log("patch res: ", res.data);
+      updateFriends();
+      setShowRemoveFriend(!showRemoveFriend);
+      setShowAddFriend(true);
+    })
+    .catch((error) => console.log(error));
+  }
+
+  const confirmFriend = (ID) =>{
+    const headers = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const Link = `${process.env.REACT_APP_URL}AddFriend/Account/${props.userID}`;
     const payload={
         Confirm: ID
     }
@@ -111,35 +113,21 @@ const SearchUser=(props)=>{
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res.data);
+      updateFriends();
+      setShowAcceptFriendRequest(!showAcceptFriendRequest);
+      setShowDeclineFriendRequest(!showDeclineFriendRequest);
+      setShowRemoveFriend(true);
     })
     .catch((error) => console.log(error));
   }
-  
-  const removeFriend=(ID) =>{
+
+  const rejectFriend =(ID) =>{
     const headers = {
       headers: {
         "Content-Type": "application/json",
       },
     };
-    const Link = `${process.env.REACT_APP_URL}AddFriend/Account/${user.ID}`;
-    const payload={
-        Remove: ID
-    }
-    axios
-    .patch(Link, payload, headers)
-    .then((res) => {
-      console.log("patch res: ", res.data);
-    })
-    .catch((error) => console.log(error));
-  }
-  
-  const undoFriend=(ID) =>{
-    const headers = {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    };
-    const Link = `${process.env.REACT_APP_URL}AddFriend/Account/${user.ID}`;
+    const Link = `${process.env.REACT_APP_URL}AddFriend/Account/${props.userID}`;
     const payload={
         RemoveRequest: ID
     }
@@ -147,84 +135,130 @@ const SearchUser=(props)=>{
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res.data);
+      updateFriends();
+      setShowAcceptFriendRequest(false);
+      setShowDeclineFriendRequest(false);
+      setShowAddFriend(true);
     })
     .catch((error) => console.log(error));
   }
 
-  const renderButtons = (pid, username) => {
-    if (friendReqSent) {
-      if (friendReqSent.some(att => att.ID.includes(pid))) {
-        if (friendReqSent.some(att => shallowEqual(att, {ID:pid, Sender:true, Username:username})))
-          return <Button variant="outline-success" onClick={() => undoFriend(pid)}>Request Sent</Button>
-        else
-          return <Button variant="outline-success" onClick={() => confirmFriend(pid)} >Accept Request</Button>
-      }
-      else if (userIsFriend) {
-        if (userIsFriend.some(att => att.ID.includes(pid))) {
-          return <Button variant="outline-primary" onClick={() => removeFriend(pid)}>Remove Friend</Button>
+  const undoFriend=(ID) =>{
+    const headers = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const Link = `${process.env.REACT_APP_URL}AddFriend/Account/${props.userID}`;
+    const payload={
+        RemoveRequest: ID
+    }
+    axios
+    .patch(Link, payload, headers)
+    .then((res) => {
+      console.log("patch res: ", res.data);
+      updateFriends();
+      setShowFriendRequestSent(!showFriendRequestSent);
+      setShowAddFriend(true);
+    })
+    .catch((error) => console.log(error));
+  }
+
+  useEffect(() => {
+    console.log("friend requests sent", props.friendReqSent);
+    // if you're already friends with this person
+    if (props.friends.some((friend) => friend.ID.includes(props.ID))) {
+      setShowRemoveFriend(true);
+    } else {
+      // if a friend request was already sent
+      if (props.friendReqSent.some((att) => att.ID.includes(props.ID))) {
+        if (
+          props.friendReqSent.some((att) =>
+            shallowEqual(att, {
+              ID: props.ID,
+              Sender: true,
+              Username: props.Username,
+            })
+          )
+        ) {
+          setShowFriendRequestSent(true);
+          setShowAddFriend(false);
         }
-        else
-          return <Button variant="outline-primary" onClick={() => addFriend(pid)}>Add Friend</Button>
+        else {
+          // if they sent you a request and it's pending
+          setShowAddFriend(false);
+          setShowAcceptFriendRequest(true);
+          setShowDeclineFriendRequest(true);
+        }
+      } else {
+        // no request was ever sent or received
+        setShowAddFriend(true);
       }
     }
-    else 
-      return <p>uh, this shouldn't be here, oh god, oh jeez</p>
-  }
+  }, [props.friendReqSent]);
 
-  const renderEXButton = (pid, username) => {
-     if (friendReqSent.some(att => shallowEqual(att, {ID:pid, Sender:false, Username:username})))
-      return <Button variant="outline-success" onClick={() => undoFriend(pid)} >Reject Request</Button> 
-    else
-      return <p></p>
-  }
-  
-  useEffect(() => {
-    getAllUsers();
-  }, [])
+  return (
+    <>
+      <div className="mt-0 mb-4 text-center">
+        <b>"{props.about}"</b>
+      </div>
+      <div className="searchUser-buttons">
+        <div className="settings-accordian-buttons">
+          <Button className="su-button" variant="outline-warning">Report</Button>
+          <Button className="ml-2 su-button" variant="outline-secondary">Block</Button>
+          {showAddFriend && (
+            <Button
+              className="ml-2 su-button"
+              variant="outline-primary"
+              onClick={() => addFriend(props.ID)}
+            >
+              Add Friend
+            </Button>
+          )}
+          {showRemoveFriend && (
+            <Button
+              className="ml-2 su-button"
+              variant="outline-danger"
+              onClick={() => removeFriend(props.ID)}
+            >
+              Remove Friend
+            </Button>
+          )}
+          {showFriendRequestSent && (
+            <Button
+              className="ml-2 su-button"
+              variant="outline-success"
+              onClick={() => undoFriend(props.ID)}
+            >
+              Undo Request
+            </Button>
+          )}
+          {showAcceptFriendRequest && (
+            <Button
+              className="ml-2 su-button"
+              variant="outline-success"
+              onClick={() =>
+                confirmFriend(props.ID)
+              }
+            >
+              Accept Request
+            </Button>
+          )}
+          {showDeclineFriendRequest && (
+            <Button
+              className="ml-2 su-button"
+              variant="outline-danger"
+              onClick={() =>
+                rejectFriend(props.ID)
+              }
+            >
+              Reject Request
+            </Button>
+          )}
+        </div>
+      </div>
+    </>
+  );
+};
 
-  const filteredUsers = allUsers.filter( users => {
-    return users.Username.toLowerCase().includes( search.toLowerCase() )
-  } )
-
-  return(
-    <div>
-    <input type= "text" placeholder = "search users" onChange = { e => setSearch(e.target.value)} />
-      <Accordion>
-        {filteredUsers.map((p, i) => (
-          <Card>
-            <Accordion.Toggle 
-            style={{
-              padding: "10px 10px 5px",
-              borderBottom:"2px solid #0C0C0D",
-              backgroundColor: "#35373D"
-            }} 
-            as={Card.Header} 
-            eventKey={p.ID}>
-              <img className='searchAvatar'src= {p.Avatar}></img>
-              {p.Username} <br/>
-            </Accordion.Toggle>
-            <Accordion.Collapse eventKey={p.ID}>
-              <Card.Body>
-              <b>About {p.Username}:</b> "{p.About}"
-             
-              <div className="searchUser-buttons">
-                  <div className="settings-accordian-buttons">
-                    <Button variant="outline-danger">Report</Button>{' '}
-                    <div class="divider"/>
-                    <Button variant="outline-secondary">Block</Button>{' '}
-                    <div class="divider"/>
-                    {render}
-                    {renderButtons(p.ID, p.Username)}
-                    <div class="divider"/>
-                    {renderEXButton(p.ID, p.Username)}
-                  </div>
-                </div>
-              </Card.Body>
-            </Accordion.Collapse>
-          </Card>
-        ))}
-        </Accordion>
-    </div>
-  )
-}
-export default SearchUser;
+export default UserSnippet;
