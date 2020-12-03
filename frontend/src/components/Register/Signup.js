@@ -14,7 +14,7 @@ const Signup = (props) => {
       Username: data.username,
       Password: data.password,
       Email: data.email,
-      About: data.about, //RW
+      About: data.about,
       Avatar: "https://images.unsplash.com/photo-1602254872083-22caf4166bd7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
     };
 
@@ -98,10 +98,13 @@ const Signup = (props) => {
             <Form.Label>About you</Form.Label>
             <Form.Control 
               type="text" 
-              placeholder="A little bit about yourself"
+              placeholder="In 255 characters or less, tell us a little bit about yourself."
               name="about"
               aria-describedby="passwordReq"
               ref={register({ required: false, maxLength: 255 })} />
+              <Form.Text className="text-muted">
+              Note: This will be displayed publicly.
+              </Form.Text>
               </Form.Group>
 
           <div style={{textAlign:"center"}}>
