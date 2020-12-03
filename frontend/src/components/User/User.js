@@ -298,7 +298,7 @@ const User = (props) => {
     )
   }
 
-
+/*
   const renderEditAbout = () => {
     // if in edit mode
     if (editAbout) {
@@ -334,7 +334,7 @@ const User = (props) => {
       <Button size="sm" onClick={() => setEditAbout(true)} >Edit About</Button>
     )
   }
-
+*/
 
   const renderEditPassword = () => {
     if (editPassword) {
@@ -432,7 +432,7 @@ const User = (props) => {
       <div className="desc-section">
         About me:<br></br>
         "{user.About}"
-        {renderEditAbout()}
+       
       </div>
 
       <Accordion defaultActiveKey="0">
