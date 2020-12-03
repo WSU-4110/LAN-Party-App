@@ -419,7 +419,7 @@ const User = (props) => {
       </div>
       {/* THIS IS THE ABOUT SECTION */}
       <div className="desc-section">
-        {user.About ? user.About : <p className="font-italic">No about set</p>}
+        {user.About ? user.About : <p className="font-italic">No about me set</p>}
         {renderEditAbout()}
       </div>
 
@@ -435,7 +435,7 @@ const User = (props) => {
               {/* This will be the friends loop */}
               {user.Friends && user.Friends.map(friend => (
                 <li className="mb-2">
-                  <img src={friend.Avatar} style={{width:"80px",height:"80px",borderRadius:"50%"}} />
+                  <img src={friend.Avatar} style={{width:"60px",height:"60px",borderRadius:"50%"}} />
                   <span className="ml-4 h5">{friend.Username}</span>
                 </li>
               ))}
@@ -457,7 +457,7 @@ const User = (props) => {
               {/* This will be the friends loop */}
               {user.FriendRequests && user.FriendRequests.map(friend => (
                 <li className="mb-2">
-                  <img src={friend.Avatar} style={{width:"80px",height:"80px",borderRadius:"50%"}} />
+                  <img src={friend.Avatar} style={{width:"60px",height:"60px",borderRadius:"50%"}} />
                   <span className="ml-4 h5">{friend.Username}</span>
                 </li>
               ))}
