@@ -1,12 +1,10 @@
 import React, {useState, useEffect, useContext} from 'react';
-import { useForm } from "react-hook-form";
-import Map from '../GoogleMap/GoogleMap';
 import {Button, Accordion, Card} from 'react-bootstrap';
 import { UserContext } from '../../context/UserContext';
-import { HomeRenderContext } from '../../context/HomeRenderContext'
 import axios from 'axios';
 import cookies from 'js-cookie';
 import './SearchUser.css';
+import UserSnippet from './UserSnippet';
 
 
 const SearchUser=(props)=>{
@@ -17,25 +15,9 @@ const SearchUser=(props)=>{
   const [search, setSearch] = useState('');
   const [friendReqSent, setfriendReqSent] = useState([]);
   const [userIsFriend, setuserIsFriend] = useState([]);
-
-  function shallowEqual(object1, object2) {
-    const keys1 = Object.keys(object1);
-    const keys2 = Object.keys(object2);
   
-    if (keys1.length !== keys2.length) {
-      return false;
-    }
-  
-    for (let key of keys1) {
-      if (object1[key] !== object2[key]) {
-        return false;
-      }
-    }
-    return true;
-  }
-  
-  console.log(friendReqSent);
-  console.log(user);
+  // console.log(friendReqSent);
+  // console.log(user);
 
   //don't delete this useEffect it's the only thing keeping it from crashing!
   useEffect(()=>{
@@ -150,33 +132,6 @@ const SearchUser=(props)=>{
     })
     .catch((error) => console.log(error));
   }
-
-  const renderButtons = (pid, username) => {
-    if (friendReqSent) {
-      if (friendReqSent.some(att => att.ID.includes(pid))) {
-        if (friendReqSent.some(att => shallowEqual(att, {ID:pid, Sender:true, Username:username})))
-          return <Button variant="outline-success" onClick={() => undoFriend(pid)}>Request Sent</Button>
-        else
-          return <Button variant="outline-success" onClick={() => confirmFriend(pid)} >Accept Request</Button>
-      }
-      else if (userIsFriend) {
-        if (userIsFriend.some(att => att.ID.includes(pid))) {
-          return <Button variant="outline-primary" onClick={() => removeFriend(pid)}>Remove Friend</Button>
-        }
-        else
-          return <Button variant="outline-primary" onClick={() => addFriend(pid)}>Add Friend</Button>
-      }
-    }
-    else 
-      return <p>uh, this shouldn't be here, oh god, oh jeez</p>
-  }
-
-  const renderEXButton = (pid, username) => {
-     if (friendReqSent.some(att => shallowEqual(att, {ID:pid, Sender:false, Username:username})))
-      return <Button variant="outline-success" onClick={() => undoFriend(pid)} >Reject Request</Button> 
-    else
-      return <p></p>
-  }
   
   useEffect(() => {
     getAllUsers();
@@ -205,20 +160,13 @@ const SearchUser=(props)=>{
             </Accordion.Toggle>
             <Accordion.Collapse eventKey={p.ID}>
               <Card.Body>
-              <b>About {p.Username}:</b> "{p.About}"
-             
-              <div className="searchUser-buttons">
-                  <div className="settings-accordian-buttons">
-                    <Button variant="outline-danger">Report</Button>{' '}
-                    <div class="divider"/>
-                    <Button variant="outline-secondary">Block</Button>{' '}
-                    <div class="divider"/>
-                    {render}
-                    {renderButtons(p.ID, p.Username)}
-                    <div class="divider"/>
-                    {renderEXButton(p.ID, p.Username)}
-                  </div>
-                </div>
+                <UserSnippet
+                  userID={user.ID}
+                  friends={user.Friends ? user.Friends : []}
+                  about={p.About}
+                  friendReqSent={friendReqSent}
+                  ID={p.ID}
+                  Username={p.Username} />
               </Card.Body>
             </Accordion.Collapse>
           </Card>
