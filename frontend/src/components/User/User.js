@@ -430,8 +430,8 @@ const User = (props) => {
       </div>
       
       <div className="desc-section">
-        About me:<br></br>
-        "{user.About}"
+       
+        {user.About}
        
       </div>
 
