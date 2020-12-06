@@ -162,21 +162,23 @@ module.exports = {
 
     //Checks if incoming location is valid
     isValidLocation: async function (location, key = 'PartyLocation'){
-        const reqs = ['Longitude', 'Latitude', 'Name'];
+        const reqs = {
+            'Longitude': "number", 
+            'Latitude': "number", 
+            'Name': "string"}
         
         let output = {
             value: {}
         }
         output.value[key] = {};
         let missingKey = false;
-        for(let i = 0; i < reqs.length; i++){
-            if(!location.hasOwnProperty(reqs[i])){
-                missingKey = reqs[i];
-                break;
+        (Object.keys(reqs)).forEach(curKey => {
+            if(!location.hasOwnProperty(curKey) || typeof location[curKey] !== reqs[curKey]){
+                missingKey = curKey;
             } else {
-                output.value[key][reqs[i]] = location[reqs[i]];
+                output.value[key][curKey] = location[curKey]
             }
-        }
+        });
         
         //Valid if there was no missing key
         output.isValid = (missingKey === false);

@@ -167,22 +167,21 @@ const UserSnippet = (props) => {
   useEffect(() => {
     console.log("friend requests sent", props.friendReqSent);
     // if you're already friends with this person
+    console.log("User: " , props);
     if (props.friends.some((friend) => friend.ID.includes(props.ID))) {
       setShowRemoveFriend(true);
     } else {
       // if a friend request was already sent
       if (props.friendReqSent.some((att) => att.ID.includes(props.ID))) {
-        if (
-          props.friendReqSent.some((att) =>
-            shallowEqual(att, {
-              ID: props.ID,
-              Sender: true,
-              Username: props.Username,
-            })
-          )
-        ) {
+        console.log("IN HERE!")
+        //Location of the friend request
+        let friendReqLoc = props.friendReqSent.findIndex(att => att.ID === props.ID);
+        //If you sent the friend request
+        if (props.friendReqSent[friendReqLoc].Sender === true) {
           setShowFriendRequestSent(true);
           setShowAddFriend(false);
+          setShowAcceptFriendRequest(false);
+          setShowDeclineFriendRequest(false);
         }
         else {
           // if they sent you a request and it's pending

@@ -22,6 +22,7 @@ module.exports = {
         let saveItem = {
             ID: user2.ID,
             Username: user2.Username,
+            Avatar: user2.Avatar,
             Sender: sender
         }
 
