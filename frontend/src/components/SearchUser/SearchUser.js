@@ -1,12 +1,10 @@
 import React, {useState, useEffect, useContext} from 'react';
-import { useForm } from "react-hook-form";
-import Map from '../GoogleMap/GoogleMap';
 import {Button, Accordion, Card} from 'react-bootstrap';
 import { UserContext } from '../../context/UserContext';
-import { HomeRenderContext } from '../../context/HomeRenderContext'
 import axios from 'axios';
 import cookies from 'js-cookie';
 import './SearchUser.css';
+import UserSnippet from './UserSnippet';
 
 
 const SearchUser=(props)=>{
@@ -17,25 +15,9 @@ const SearchUser=(props)=>{
   const [search, setSearch] = useState('');
   const [friendReqSent, setfriendReqSent] = useState([]);
   const [userIsFriend, setuserIsFriend] = useState([]);
-
-  function shallowEqual(object1, object2) {
-    const keys1 = Object.keys(object1);
-    const keys2 = Object.keys(object2);
   
-    if (keys1.length !== keys2.length) {
-      return false;
-    }
-  
-    for (let key of keys1) {
-      if (object1[key] !== object2[key]) {
-        return false;
-      }
-    }
-    return true;
-  }
-  
-  console.log(friendReqSent);
-  console.log(user);
+  // console.log(friendReqSent);
+  // console.log(user);
 
   //don't delete this useEffect it's the only thing keeping it from crashing!
   useEffect(()=>{
@@ -164,40 +146,6 @@ const SearchUser=(props)=>{
     })
     .catch((error) => console.log(error));
   }
-
-  const renderButtons = (pid, username) => {
-    //If the current user has the attribute related to FriendRequests
-    //And the other user is in the friend request array
-    if (friendReqSent && friendReqSent.some(att => att.ID ===(pid))) {
-      //Get the location in the array where the other user's ID matches the current
-      let friendReqLoc = friendReqSent.findIndex(att => att.ID ===(pid));
-
-      console.log("IN BUTTON FUNCTION: ", friendReqSent)
-      //If they're the sender, tell them the request was sent
-      if (friendReqSent[friendReqLoc].Sender)
-        return <Button variant="outline-success" onClick={() => undoFriend(pid)}>Undo Request</Button>
-      //If they're not the sender, offer the option to accept. Reject is somewhere else.
-      else
-        return <Button variant="outline-success" onClick={() => confirmFriend(pid)} >Accept Request</Button>
-    }
-
-    //If the user has a friends list and the other user is in it
-    else if (userIsFriend && userIsFriend.some(att => att.ID.includes(pid))) {
-      return <Button variant="outline-primary" onClick={() => removeFriend(pid)}>Remove Friend</Button>
-    }
-    
-    //The current user that is logged in either has neither of the attributes,
-    //Or the person they're looking at is in neither.
-    else
-      return <Button variant="outline-primary" onClick={() => addFriend(pid)}>Add Friend</Button>
-  }
-
-  const renderEXButton = (pid, username) => {
-     if (friendReqSent.some(att => shallowEqual(att, {ID:pid, Sender:false, Username:username})))
-      return <Button variant="outline-success" onClick={() => undoFriend(pid)} >Reject Request</Button> 
-    else
-      return <p></p>
-  }
   
   useEffect(() => {
     getAllUsers();
@@ -226,20 +174,13 @@ const SearchUser=(props)=>{
             </Accordion.Toggle>
             <Accordion.Collapse eventKey={p.ID}>
               <Card.Body>
-              <b>About {p.Username}:</b> "{p.About}"
-             
-              <div className="searchUser-buttons">
-                  <div className="settings-accordian-buttons">
-                    <Button variant="outline-danger">Report</Button>{' '}
-                    <div class="divider"/>
-                    <Button variant="outline-secondary">Block</Button>{' '}
-                    <div class="divider"/>
-                    {render}
-                    {renderButtons(p.ID, p.Username)}
-                    <div class="divider"/>
-                    {renderEXButton(p.ID, p.Username)}
-                  </div>
-                </div>
+                <UserSnippet
+                  userID={user.ID}
+                  friends={user.Friends ? user.Friends : []}
+                  about={p.About}
+                  friendReqSent={friendReqSent}
+                  ID={p.ID}
+                  Username={p.Username} />
               </Card.Body>
             </Accordion.Collapse>
           </Card>
