@@ -204,7 +204,7 @@ const UserSnippet = (props) => {
       <div className="searchUser-buttons">
         <div className="settings-accordian-buttons">
           <Button className="su-button" variant="outline-warning">Report</Button>
-          <Button className="ml-2 su-button" variant="outline-secondary">Block</Button>
+          
           {showAddFriend && (
             <Button
               className="ml-2 su-button"
