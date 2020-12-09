@@ -203,7 +203,6 @@ const UserSnippet = (props) => {
       </div>
       <div className="searchUser-buttons">
         <div className="settings-accordian-buttons">
-          <Button className="su-button" variant="outline-warning">Report</Button>
           
           {showAddFriend && (
             <Button
@@ -254,6 +253,7 @@ const UserSnippet = (props) => {
               Reject Request
             </Button>
           )}
+          <Button className="ml-2 su-button" variant="outline-warning">Report</Button>
         </div>
       </div>
     </>
