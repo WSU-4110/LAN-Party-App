@@ -38,7 +38,7 @@ const UserSnippet = (props) => {
         "Are you sure that you want to report this user?"
       )
     ) {
-      
+      window.location.href = "mailto:admin@onlylans.com?cc=THEBANHAMMER@onlylans.com&subject=I'd%20like%20to%20report%20an%20OnlyLANs%20user&body=Please fill out this form entirely to help us get to the root of the issue. We appreciate you reaching out to us.%0d%0d%0dThe user that you're reporting: %0d%0dWhat happened: %0d%0dWhen: %0d%0dYour email: %0d%0d%0d";
     }
   };
 
