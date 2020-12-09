@@ -32,6 +32,16 @@ const UserSnippet = (props) => {
     false
   );
 
+  const reportUser = () => {
+    if (
+      window.confirm(
+        "Are you sure that you want to report this user?"
+      )
+    ) {
+      
+    }
+  };
+
   const updateFriends = () => {
     // call get user
     // take what's returned
@@ -253,7 +263,7 @@ const UserSnippet = (props) => {
               Reject Request
             </Button>
           )}
-          <Button className="ml-2 su-button" variant="outline-warning">Report</Button>
+          <Button className="ml-2 su-button" variant="outline-warning" onClick={reportUser}>Report</Button>
         </div>
       </div>
     </>
