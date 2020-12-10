@@ -1,0 +1,11 @@
+@media(max-width: 767px){
+    .mapBox{
+        height: 400px;
+    }
+}
+
+@media(min-width: 768px){
+    .mapBox{
+        height: 92%;
+    }
+}

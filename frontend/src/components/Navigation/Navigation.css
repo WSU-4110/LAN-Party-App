@@ -6,3 +6,17 @@
   border-radius: 3px !important;
   padding: 2px 10px !important;
 }
+
+/* margin-top when in xs-sm view */
+.xs-mt {margin-top: 0.5rem !important;}
+@media (min-width: 768px) {
+  .xs-mt {margin-top: 0rem !important}
+}
+
+.nav-link-button {
+  text-align: right !important;
+  margin-right: 11px !important;
+}
+@media (min-width: 768px) {
+  .xs-mt {margin-top: 0rem !important}
+}

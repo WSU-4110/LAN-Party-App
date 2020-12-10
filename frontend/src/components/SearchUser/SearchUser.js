@@ -60,6 +60,8 @@ const SearchUser=(props)=>{
   }
 
   const addFriend=(ID) =>{
+    console.log("FriendReqSent", friendReqSent)
+    
     const headers = {
       headers: {
         "Content-Type": "application/json",
@@ -73,7 +75,13 @@ const SearchUser=(props)=>{
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res.data);
-      setRender(!render);
+      user.FriendRequests.push({
+        ID: ID,
+        Sender: true
+      })
+      setfriendReqSent(user.FriendRequests);
+
+        console.log("FRIEND REQ SENT: ", friendReqSent )
     })
     .catch((error) => console.log(error));
   }
@@ -116,6 +124,7 @@ const SearchUser=(props)=>{
   }
   
   const undoFriend=(ID) =>{
+    console.log("friendReqSent: ", [...friendReqSent])
     const headers = {
       headers: {
         "Content-Type": "application/json",
@@ -129,6 +138,11 @@ const SearchUser=(props)=>{
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res.data);
+      user.FriendRequests.splice(
+        user.FriendRequests.findIndex(removed => removed.ID === ID), 1
+      )
+      console.log("user.FriendRequests: ",user.FriendRequests)
+      setfriendReqSent(user.FriendRequests)
     })
     .catch((error) => console.log(error));
   }
@@ -143,7 +157,11 @@ const SearchUser=(props)=>{
 
   return(
     <div>
-    <input type= "text" placeholder = "search users" onChange = { e => setSearch(e.target.value)} />
+    <input style={{
+      marginBottom: "15px",
+      marginLeft: "10px",
+      paddingLeft: "10px"
+    }}type= "text" placeholder = "Search users" onChange = { e => setSearch(e.target.value)} />
       <Accordion>
         {filteredUsers.map((p, i) => (
           <Card>

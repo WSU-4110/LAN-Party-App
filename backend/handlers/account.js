@@ -198,6 +198,16 @@ module.exports = {
                 curExpressions = curExpressions.concat("Avatar = :a"); 
             }
 
+            //If we are updating the about, make sure that its a string and set it
+            if(request.NewAbout) {
+                if(typeof request.NewAbout !== 'string') {
+                    return responseUtil.Build(403, "About must be a string");
+                }
+
+                updateValues[':b'] = request.NewAbout;
+                curExpressions = curExpressions.concat("About = :b");
+            }
+
             // update the UpdateDate
             updateValues[":d"] = moment().toISOString(); // let's take note of when we updated this account
             curExpressions = curExpressions.concat("UpdateDate = :d");
@@ -419,14 +429,15 @@ module.exports = {
                     ':r' : updatedFriendReqs
                 }
 
-                console.log(updateValues);
+                console.log("Update Values: ", updateValues);
 
                 try {
                     response = await AccountAPI.Update(user1, updateValues, updateExpression);
                 } catch (err) {
-                    return responseUtil.Build(500, "Could not add friend to " + user1.Username);
+                    response = false;
                 }
                 if(response === false){
+                    console.log("Could not add friend to " + user1.Username);
                     return responseUtil.Build(500, "Could not add friend to " + user1.Username);
                 } 
 

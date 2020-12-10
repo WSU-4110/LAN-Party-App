@@ -32,6 +32,16 @@ const UserSnippet = (props) => {
     false
   );
 
+  const reportUser = () => {
+    if (
+      window.confirm(
+        "Are you sure that you want to report this user?"
+      )
+    ) {
+      window.location.href = "mailto:admin@onlylans.com?cc=THEBANHAMMER@onlylans.com&subject=I'd%20like%20to%20report%20an%20OnlyLANs%20user&body=Please fill out this form entirely to help us get to the root of the issue. We appreciate you reaching out to us.%0d%0d%0dThe user that you're reporting: %0d%0dWhat happened: %0d%0dWhen: %0d%0dYour email: %0d%0d%0d";
+    }
+  };
+
   const updateFriends = () => {
     // call get user
     // take what's returned
@@ -65,16 +75,19 @@ const UserSnippet = (props) => {
     const payload={
         Requested: ID
     }
+    setShowAddFriend(!showAddFriend);
     axios
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res.data);
       updateFriends();
       updateFriends();
-      setShowAddFriend(!showAddFriend);
       setShowFriendRequestSent(true);
     })
-    .catch((error) => console.log(error));
+    .catch((error) => {
+      console.log(error);
+      setShowAddFriend(!showAddFriend);
+    });
   }
 
   const removeFriend=(ID) =>{
@@ -87,15 +100,18 @@ const UserSnippet = (props) => {
     const payload={
         Remove: ID
     }
+    setShowRemoveFriend(!showRemoveFriend);
     axios
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res.data);
       updateFriends();
-      setShowRemoveFriend(!showRemoveFriend);
       setShowAddFriend(true);
     })
-    .catch((error) => console.log(error));
+    .catch((error) => {
+      console.log(error)
+      setShowRemoveFriend(!showRemoveFriend);
+    });
   }
 
   const confirmFriend = (ID) =>{
@@ -108,17 +124,22 @@ const UserSnippet = (props) => {
     const payload={
         Confirm: ID
     }
+    setShowAcceptFriendRequest(!showAcceptFriendRequest);
+    setShowDeclineFriendRequest(!showDeclineFriendRequest);
+
     console.log(payload);
     axios
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res.data);
       updateFriends();
-      setShowAcceptFriendRequest(!showAcceptFriendRequest);
-      setShowDeclineFriendRequest(!showDeclineFriendRequest);
       setShowRemoveFriend(true);
     })
-    .catch((error) => console.log(error));
+    .catch((error) => {
+      console.log(error)
+      setShowAcceptFriendRequest(!showAcceptFriendRequest);
+      setShowDeclineFriendRequest(!showDeclineFriendRequest);
+    });
   }
 
   const rejectFriend =(ID) =>{
@@ -131,13 +152,15 @@ const UserSnippet = (props) => {
     const payload={
         RemoveRequest: ID
     }
+
+    setShowAcceptFriendRequest(!showAcceptFriendRequest);
+    setShowDeclineFriendRequest(!showDeclineFriendRequest);
+
     axios
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res.data);
       updateFriends();
-      setShowAcceptFriendRequest(false);
-      setShowDeclineFriendRequest(false);
       setShowAddFriend(true);
     })
     .catch((error) => console.log(error));
@@ -153,36 +176,40 @@ const UserSnippet = (props) => {
     const payload={
         RemoveRequest: ID
     }
+    setShowFriendRequestSent(!showFriendRequestSent);
+
     axios
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res.data);
       updateFriends();
-      setShowFriendRequestSent(!showFriendRequestSent);
+      
       setShowAddFriend(true);
     })
-    .catch((error) => console.log(error));
+    .catch((error) =>{ 
+      console.log(error)
+      setShowFriendRequestSent(!showFriendRequestSent);
+    });
   }
 
   useEffect(() => {
     console.log("friend requests sent", props.friendReqSent);
     // if you're already friends with this person
+    console.log("User: " , props);
     if (props.friends.some((friend) => friend.ID.includes(props.ID))) {
       setShowRemoveFriend(true);
     } else {
       // if a friend request was already sent
       if (props.friendReqSent.some((att) => att.ID.includes(props.ID))) {
-        if (
-          props.friendReqSent.some((att) =>
-            shallowEqual(att, {
-              ID: props.ID,
-              Sender: true,
-              Username: props.Username,
-            })
-          )
-        ) {
+        console.log("IN HERE!")
+        //Location of the friend request
+        let friendReqLoc = props.friendReqSent.findIndex(att => att.ID === props.ID);
+        //If you sent the friend request
+        if (props.friendReqSent[friendReqLoc].Sender === true) {
           setShowFriendRequestSent(true);
           setShowAddFriend(false);
+          setShowAcceptFriendRequest(false);
+          setShowDeclineFriendRequest(false);
         }
         else {
           // if they sent you a request and it's pending
@@ -204,8 +231,7 @@ const UserSnippet = (props) => {
       </div>
       <div className="searchUser-buttons">
         <div className="settings-accordian-buttons">
-          <Button className="su-button" variant="outline-warning">Report</Button>
-          <Button className="ml-2 su-button" variant="outline-secondary">Block</Button>
+          
           {showAddFriend && (
             <Button
               className="ml-2 su-button"
@@ -255,6 +281,7 @@ const UserSnippet = (props) => {
               Reject Request
             </Button>
           )}
+          <Button className="ml-2 su-button" variant="outline-warning" onClick={reportUser}>Report</Button>
         </div>
       </div>
     </>
