@@ -1,10 +1,12 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { useForm } from "react-hook-form";
-import { Table, Button, Accordion, Card, Form, Col, Badge, FormControl, InputGroup } from 'react-bootstrap';
+import { Table, Button, Accordion, Card, Form, Col, Row, Badge, FormControl, InputGroup, ButtonGroup } from 'react-bootstrap';
 import cookies from 'js-cookie';
 import axios from 'axios';
 import './User.css';
-import { UserContext } from '../../context/UserContext'
+import { UserContext } from '../../context/UserContext';
+import { shallowEqual } from '../../ShallowEqual';
+
 
 const User = (props) => {
   const { REACT_APP_URL } = process.env;
@@ -17,6 +19,90 @@ const User = (props) => {
   const [editEmail, setEditEmail] = useState(false);
   const [editPassword, setEditPassword] = useState(false);
   const [editAbout, setEditAbout] = useState(false);
+
+  const updateFriends = () => {
+    // call get user
+    // take what's returned
+    // props.user.Friends = res.data.Account.Friends
+    const headers = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const link = `${process.env.REACT_APP_URL}Account/${user.ID}`;
+    axios
+      .get(link, headers)
+      .then((res) => {
+        console.log("account info", res.data);
+        setUser({
+          ...user,
+          Friends: res.data.Account.Friends,
+          FriendRequests: res.data.Account.FriendRequests,
+        });
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const confirmFriend = (ID) => {
+    const headers = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const Link = `${process.env.REACT_APP_URL}AddFriend/Account/${user.ID}`;
+    const payload = {
+      Confirm: ID,
+    };
+    console.log(payload);
+    axios
+      .patch(Link, payload, headers)
+      .then((res) => {
+        console.log("patch res: ", res.data);
+        updateFriends();
+      })
+      .catch((error) => console.log(error));
+  };
+
+  const removeFriend = (ID) =>{
+    const headers = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const Link = `${process.env.REACT_APP_URL}AddFriend/Account/${user.ID}`;
+    const payload={
+        Remove: ID
+    }
+    axios
+    .patch(Link, payload, headers)
+    .then((res) => {
+      console.log("patch res: ", res.data);
+      updateFriends();
+    })
+    .catch((error) => console.log(error));
+  };
+
+  const rejectFriend = (ID) => {
+    const headers = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+    const Link = `${process.env.REACT_APP_URL}AddFriend/Account/${user.ID}`;
+    const payload = {
+      RemoveRequest: ID,
+    };
+    axios
+      .patch(Link, payload, headers)
+      .then((res) => {
+        console.log("patch res: ", res.data);
+        updateFriends();
+      })
+      .catch((error) => console.log(error));
+  };
+
+
+
 
   const [chosenImage, setChosenImage] = useState('Choose Image');
 
@@ -363,6 +449,54 @@ const User = (props) => {
     )
   }
 
+  const renderAcceptDeclineUndoButtons = (pId, pAvatar, pUsername) => {
+    // if the logged in user sent the request
+    if (
+      user.FriendRequests.some((att) =>
+        shallowEqual(att, {
+          ID: pId,
+          Avatar: pAvatar,
+          Sender: true,
+          Username: pUsername,
+        })
+      )
+    ) {
+      return (
+        <div className="user-list-buttons">
+          <Button
+            className="mt-1"
+            variant="danger"
+            size="sm"
+            onClick={() => rejectFriend(pId)}
+          >
+            Undo
+          </Button>
+        </div>
+      );
+    } else {
+      return (
+        <div className="user-list-buttons">
+          <ButtonGroup className="mt-1">
+            <Button
+              size="sm"
+              variant="success"
+              onClick={() => confirmFriend(pId)}
+            >
+              Accept
+            </Button>
+            <Button
+              size="sm"
+              variant="danger"
+              onClick={() => rejectFriend(pId)}
+            >
+              Decline
+            </Button>
+          </ButtonGroup>
+        </div>
+      );
+    }
+  }
+
   return (
     <div style={{backgroundColor: ""}}>
       <div className="userHeader">
@@ -442,8 +576,28 @@ const User = (props) => {
               {/* This will be the friends loop */}
               {user.Friends && user.Friends.map(friend => (
                 <li className="mb-2">
-                  <img src={friend.Avatar} style={{width:"60px",height:"60px",borderRadius:"50%"}} />
-                  <span className="ml-4 h5">{friend.Username}</span>
+                  <div className="container">
+                        <Row>
+                          <Col xs={12} sm={6}>
+                            <img
+                              className="user-list-avatar"
+                              src={friend.Avatar}
+                            />
+                            <span className="ml-2">{friend.Username}</span>
+                          </Col>
+                          <Col xs={12} sm={6}>
+                            <div className = 'user-list-buttons'>
+                            <Button
+                                size="sm"
+                                variant="danger"
+                                onClick={() => removeFriend(friend.ID)}
+                              >
+                                Remove
+                              </Button>
+                              </div>
+                          </Col>
+                        </Row>
+                      </div>
                 </li>
               ))}
             </ul>
@@ -464,8 +618,26 @@ const User = (props) => {
               {/* This will be the friends loop */}
               {user.FriendRequests && user.FriendRequests.map(friend => (
                 <li className="mb-2">
-                  <img src={friend.Avatar} style={{width:"60px",height:"60px",borderRadius:"50%"}} />
-                  <span className="ml-4 h5">{friend.Username}</span>
+                  <div className="container">
+                        <Row>
+                          <Col xs={12} sm={6}>
+                            <img
+                              className="user-list-avatar"
+                              src={friend.Avatar}
+                            />
+                            <span className="ml-2">{friend.Username}</span>
+                          </Col>
+                          <Col xs={12} sm={6}>
+                            <div className="user-list-buttons">
+                            {renderAcceptDeclineUndoButtons(
+                              friend.ID,
+                              friend.Avatar,
+                              friend.Username
+                            )}
+                            </div>
+                          </Col>
+                        </Row>
+                      </div>
                 </li>
               ))}
             </ul>
