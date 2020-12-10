@@ -1,0 +1,30 @@
+/* Anything wider than a phone in landscape mode, use the desktop setup*/
+@media (min-width: 768px){
+    .cols{
+        width: 50%;
+        box-sizing: border-box;
+        height: inherit;
+    }
+
+    #left{
+        float: left;
+        padding-left: 10px;
+        padding-right: 10px;
+        overflow: hidden;
+    }
+
+    #right{
+        float: right;
+        overflow-y: auto;
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+}
+
+
+/* Make sure the party search always has padding below it */
+#partySearch{
+    margin-bottom: 10px;
+    width: 100%;
+    padding-left: 1%
+}

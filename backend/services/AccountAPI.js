@@ -27,7 +27,7 @@ module.exports = {
         NewAccount.Password = hash; // assign the has to the password
       }
 
-      NewAccount.Friends = {}; // initialize every new account with an empty friends list
+      NewAccount.Friends = []; // initialize every new account with an empty friends list
       NewAccount.Games = []; // initialize every new account with an empty games list
 
       // we will be sending this file to the database
