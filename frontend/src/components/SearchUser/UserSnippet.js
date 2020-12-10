@@ -32,6 +32,16 @@ const UserSnippet = (props) => {
     false
   );
 
+  const reportUser = () => {
+    if (
+      window.confirm(
+        "Are you sure that you want to report this user?"
+      )
+    ) {
+      window.location.href = "mailto:admin@onlylans.com?cc=THEBANHAMMER@onlylans.com&subject=I'd%20like%20to%20report%20an%20OnlyLANs%20user&body=Please fill out this form entirely to help us get to the root of the issue. We appreciate you reaching out to us.%0d%0d%0dThe user that you're reporting: %0d%0dWhat happened: %0d%0dWhen: %0d%0dYour email: %0d%0d%0d";
+    }
+  };
+
   const updateFriends = () => {
     // call get user
     // take what's returned
@@ -203,8 +213,7 @@ const UserSnippet = (props) => {
       </div>
       <div className="searchUser-buttons">
         <div className="settings-accordian-buttons">
-          <Button className="su-button" variant="outline-warning">Report</Button>
-          <Button className="ml-2 su-button" variant="outline-secondary">Block</Button>
+          
           {showAddFriend && (
             <Button
               className="ml-2 su-button"
@@ -254,6 +263,7 @@ const UserSnippet = (props) => {
               Reject Request
             </Button>
           )}
+          <Button className="ml-2 su-button" variant="outline-warning" onClick={reportUser}>Report</Button>
         </div>
       </div>
     </>
