@@ -7,7 +7,7 @@ https://github.com/WSU-4110/LAN-party-frontend
 For more detailed repos, refer to each readme in the /backend and /frontend folders!
 
 ### Developers
-- Thadd G, 
+- Thadd G
 - Logan N
 - Jarred C
 - Randall W
