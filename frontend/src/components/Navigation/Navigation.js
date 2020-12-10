@@ -26,7 +26,7 @@ const Navigation = (props) => {
   }
 
   const renderUserNavButton = () => (
-    <Nav.Link className="user-nav-button">
+    <Nav.Link className="xs-mt user-nav-button">
       <NavLink to="/user" style={{textDecoration:"none",color:"#fff"}}>
         <span><img style={{width:"35px",height:"35px",borderRadius:"50%"}} src={user.Avatar}/></span>
         <span style={{marginLeft:"10px"}}>{user.Username}</span>
@@ -37,7 +37,7 @@ const Navigation = (props) => {
   return(
     <Navbar
       className = 'navbar-dark'
-      expand="lg" 
+      expand="md" 
       style={{
         backgroundColor: "#000", 
         boxShadow: "0 2px 4px -1px rgba(0,0,0,0.25)",
@@ -45,21 +45,18 @@ const Navigation = (props) => {
       }}>
       <Navbar.Brand>
         <NavLink to="/" style={{color:"#fff", textDecoration:"none"}}>LANParty</NavLink>
-        {user.LoggedIn===true
-          ? renderUserNavButton()
-          : null
-        }
+        {/* {user.LoggedIn && renderUserNavButton()} */}
       </Navbar.Brand>
       <Navbar.Toggle aria-controls="basic-navbar-nav" style ={{color:"#fff"}} />
       <Navbar.Collapse id="basic-navbar-nav">
-        <Nav className="mr-auto">
+        <Nav className="ml-auto">
           {user.LoggedIn === true ? null
             :
               <>
-                <Nav.Link>
+                <Nav.Link className="nav-link-button">
                   <NavLink to="/signup"style={{color:"#fff"}}>Signup</NavLink>
                 </Nav.Link>
-                <Nav.Link>
+                <Nav.Link className="nav-link-button">
                   <NavLink to="/login"style={{color:"#fff"}}>Login</NavLink>
                 </Nav.Link>
               </>
@@ -67,15 +64,16 @@ const Navigation = (props) => {
           {user.LoggedIn === true 
             ?
               <>
-                <Nav.Link>
+                {renderUserNavButton()}
+                {/* <Nav.Link className="nav-link-button">
                   <NavLink to="/user"style={{color:"#fff"}}>User</NavLink>
-                </Nav.Link>
-                <Nav.Link>
+                </Nav.Link> */}
+                <Nav.Link className="nav-link-button">
                   <NavLink to="/login" style={{color:"#fff"}} onClick={logout}>
                     Logout
                   </NavLink>
                 </Nav.Link>
-                <Nav.Link>
+                <Nav.Link className="nav-link-button">
                   <NavLink to="/SearchUser"style={{color:"#fff"}}>SearchUser</NavLink>
                 </Nav.Link>
               </>
