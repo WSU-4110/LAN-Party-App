@@ -329,7 +329,7 @@ const User = (props) => {
     }
     // regular mode
     return (
-      <Button size="sm" onClick={() => setEditAbout(true)}>Edit About</Button>
+      <Button style={{marginTop: '5px'}} size="sm" onClick={() => setEditAbout(true)}>Edit About</Button>
     )
   }
 
@@ -431,7 +431,7 @@ const User = (props) => {
       </div>
 
       {/* THIS WILL BE THE FRIENDS SECTION */}
-      <Accordion defaultActiveKey="0">
+      <Accordion id="left" className="cols" defaultActiveKey="0">
         <Card>
           <Accordion.Toggle className="friends-header" as={Card.Header} eventKey="0">
             <span className="h4">FRIENDS</span>
@@ -453,7 +453,7 @@ const User = (props) => {
       </Accordion>
 
       {/* PENDING FRIEND REQUESTS */}
-      <Accordion defaultActiveKey="0">
+      <Accordion id="left" className="cols" defaultActiveKey="0">
         <Card>
           <Accordion.Toggle className="friends-header" as={Card.Header} eventKey="0">
             <span className="h4">PENDING REQUESTS</span>

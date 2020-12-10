@@ -157,7 +157,11 @@ const SearchUser=(props)=>{
 
   return(
     <div>
-    <input type= "text" placeholder = "search users" onChange = { e => setSearch(e.target.value)} />
+    <input style={{
+      marginBottom: "15px",
+      marginLeft: "10px",
+      paddingLeft: "10px"
+    }}type= "text" placeholder = "Search users" onChange = { e => setSearch(e.target.value)} />
       <Accordion>
         {filteredUsers.map((p, i) => (
           <Card>
