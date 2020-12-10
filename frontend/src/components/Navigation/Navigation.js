@@ -7,6 +7,7 @@ import {
   Button } from 'react-bootstrap';
 import {UserContext} from '../../context/UserContext';
 import '../Navigation/Navigation.css'
+import logo from './imgs/onlyLansLogo.png'
 
 const Navigation = (props) => {
   const [user, setUser] = useContext(UserContext);
@@ -41,45 +42,38 @@ const Navigation = (props) => {
       style={{
         backgroundColor: "#000", 
         boxShadow: "0 2px 4px -1px rgba(0,0,0,0.25)",
+        height: "60px",
         // filter: "brightness(0.6)"
+        zIndex:"3"
       }}>
       <Navbar.Brand>
-        <NavLink to="/" style={{color:"#fff", textDecoration:"none"}}>LANParty</NavLink>
-        {user.LoggedIn===true
-          ? renderUserNavButton()
-          : null
-        }
+        <NavLink to="/" style={{color:"#fff", textDecoration:"none"}}>LAN Party</NavLink>
       </Navbar.Brand>
-      <Navbar.Toggle aria-controls="basic-navbar-nav" style ={{color:"#fff"}} />
-      <Navbar.Collapse id="basic-navbar-nav">
-        <Nav className="mr-auto">
-          {user.LoggedIn === true ? null
-            :
+      <Navbar.Toggle aria-controls="basic-navbar-nav" style ={{zIndex:"3", color:"#fff", float:"right"}} />
+      <Navbar.Collapse id="basic-navbar-nav" style={{zIndex:"3"}}>
+        <Nav className="ml-auto" style={{backgroundColor: "#000", zIndex:"3"}}>
+          {user.LoggedIn === true ? 
+              
               <>
-                <Nav.Link>
-                  <NavLink to="/signup"style={{color:"#fff"}}>Signup</NavLink>
-                </Nav.Link>
-                <Nav.Link>
-                  <NavLink to="/login"style={{color:"#fff"}}>Login</NavLink>
-                </Nav.Link>
-              </>
-          }
-          {user.LoggedIn === true 
-            ?
-              <>
-                <Nav.Link>
-                  <NavLink to="/user"style={{color:"#fff"}}>User</NavLink>
-                </Nav.Link>
-                <Nav.Link>
-                  <NavLink to="/login" style={{color:"#fff"}} onClick={logout}>
+                {renderUserNavButton()}
+                <Nav.Link className="navbarLinks">
+                  <NavLink to="/login" style={{color:"#fff", float:"right"}} onClick={logout}>
                     Logout
                   </NavLink>
                 </Nav.Link>
-                <Nav.Link>
-                  <NavLink to="/SearchUser"style={{color:"#fff"}}>SearchUser</NavLink>
+                <Nav.Link className="navbarLinks">
+                  <NavLink to="/SearchUser"style={{color:"#fff", float:"right"}}>SearchUser</NavLink>
                 </Nav.Link>
               </>
-            : null
+            :
+              <>
+                <Nav.Link className="navbarLinks">
+                  <NavLink to="/signup"style={{color:"#fff", float:"right"}}>Signup</NavLink>
+                </Nav.Link>
+                <Nav.Link className="navbarLinks">
+                  <NavLink to="/login"style={{color:"#fff", float:"right"}}>Login</NavLink>
+                </Nav.Link>
+              </>
           }
         </Nav>
       </Navbar.Collapse>

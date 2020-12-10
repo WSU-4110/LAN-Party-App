@@ -75,16 +75,19 @@ const UserSnippet = (props) => {
     const payload={
         Requested: ID
     }
+    setShowAddFriend(!showAddFriend);
     axios
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res.data);
       updateFriends();
       updateFriends();
-      setShowAddFriend(!showAddFriend);
       setShowFriendRequestSent(true);
     })
-    .catch((error) => console.log(error));
+    .catch((error) => {
+      console.log(error);
+      setShowAddFriend(!showAddFriend);
+    });
   }
 
   const removeFriend=(ID) =>{
@@ -97,15 +100,18 @@ const UserSnippet = (props) => {
     const payload={
         Remove: ID
     }
+    setShowRemoveFriend(!showRemoveFriend);
     axios
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res.data);
       updateFriends();
-      setShowRemoveFriend(!showRemoveFriend);
       setShowAddFriend(true);
     })
-    .catch((error) => console.log(error));
+    .catch((error) => {
+      console.log(error)
+      setShowRemoveFriend(!showRemoveFriend);
+    });
   }
 
   const confirmFriend = (ID) =>{
@@ -118,17 +124,22 @@ const UserSnippet = (props) => {
     const payload={
         Confirm: ID
     }
+    setShowAcceptFriendRequest(!showAcceptFriendRequest);
+    setShowDeclineFriendRequest(!showDeclineFriendRequest);
+
     console.log(payload);
     axios
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res.data);
       updateFriends();
-      setShowAcceptFriendRequest(!showAcceptFriendRequest);
-      setShowDeclineFriendRequest(!showDeclineFriendRequest);
       setShowRemoveFriend(true);
     })
-    .catch((error) => console.log(error));
+    .catch((error) => {
+      console.log(error)
+      setShowAcceptFriendRequest(!showAcceptFriendRequest);
+      setShowDeclineFriendRequest(!showDeclineFriendRequest);
+    });
   }
 
   const rejectFriend =(ID) =>{
@@ -141,13 +152,15 @@ const UserSnippet = (props) => {
     const payload={
         RemoveRequest: ID
     }
+
+    setShowAcceptFriendRequest(!showAcceptFriendRequest);
+    setShowDeclineFriendRequest(!showDeclineFriendRequest);
+
     axios
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res.data);
       updateFriends();
-      setShowAcceptFriendRequest(false);
-      setShowDeclineFriendRequest(false);
       setShowAddFriend(true);
     })
     .catch((error) => console.log(error));
@@ -163,15 +176,20 @@ const UserSnippet = (props) => {
     const payload={
         RemoveRequest: ID
     }
+    setShowFriendRequestSent(!showFriendRequestSent);
+
     axios
     .patch(Link, payload, headers)
     .then((res) => {
       console.log("patch res: ", res.data);
       updateFriends();
-      setShowFriendRequestSent(!showFriendRequestSent);
+      
       setShowAddFriend(true);
     })
-    .catch((error) => console.log(error));
+    .catch((error) =>{ 
+      console.log(error)
+      setShowFriendRequestSent(!showFriendRequestSent);
+    });
   }
 
   useEffect(() => {
