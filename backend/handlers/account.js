@@ -198,16 +198,6 @@ module.exports = {
                 curExpressions = curExpressions.concat("Avatar = :a"); 
             }
 
-            //If we are updating the about, make sure that its a string and set it
-            if(request.NewAbout) {
-                if(typeof request.NewAbout !== 'string') {
-                    return responseUtil.Build(403, "About must be a string");
-                }
-
-                updateValues[':b'] = request.NewAbout;
-                curExpressions = curExpressions.concat("About = :b");
-            }
-
             // update the UpdateDate
             updateValues[":d"] = moment().toISOString(); // let's take note of when we updated this account
             curExpressions = curExpressions.concat("UpdateDate = :d");
@@ -353,31 +343,7 @@ module.exports = {
             senderVals = [true, false];
 
             //The function used to update both of the users
-            updateFunction = async function (user1, user2, sender){
-                const updateExpression = 'SET FriendRequests =:f'
-
-                //Get the updated friends list
-                let updatedFriendReqs = await friendUtil.addToFriendRequests(user1, user2, sender);
-                
-                if(updatedFriendReqs === false){
-                    return responseUtil.Build(403, 'Tried sending friend request to self');
-                }
-                
-                let updateValues = {
-                    ':f': updatedFriendReqs
-                };
-
-
-                try {
-                    response = await AccountAPI.Update(user1, updateValues, updateExpression);
-                } catch (err) {
-                    return responseUtil.Build(500, "Could not update friends list of " + user1.Username);
-                }
-                if(!response){
-                    return responseUtil.Build(500, "Could not update friends list of " + user1.Username);
-                } 
-                return true;
-            }
+            updateFunction = friendUtil.RequestFriendCallback;
         }
 
         else if (request.hasOwnProperty("Confirm")){ 
@@ -398,54 +364,9 @@ module.exports = {
             senderVals = [true, false];
 
             //Initialize the update function
-            updateFunction = async function (user1, user2, isSender){
-                const updateExpression = 'set Friends = :f, FriendRequests = :r';
-
-                //Remove the user2 from the user1's friend request
-                let updatedFriendReqs = await friendUtil.removeFromFriendRequests(user1, user2);
-
-                //If the item wasn't in there
-                if(updatedFriendReqs === false){
-                    return responseUtil.Build(403, "User not in " + user1.Username + "'s Friend Requests");
-                
-                //If the user1 of this request also sent the friend request
-                } else if (updatedFriendReqs.deleted.Sender === isSender){
-                    return responseUtil.Build(403, 'Cannot confirm request you sent!');
-
-                //Set the value to the new friend request array
-                } else {
-                    updatedFriendReqs = updatedFriendReqs.FriendRequests;
-                }
-
-                //Update the friend request array
-                let updatedFriends = await friendUtil.AddToFriends(user1, user2);
-
-                if(updatedFriends === false){
-                    return responseUtil.Build(403, "User already in "+ user1.Username + "'s friends!")
-                }
-
-                let updateValues = {
-                    ':f' : updatedFriends,
-                    ':r' : updatedFriendReqs
-                }
-
-                console.log("Update Values: ", updateValues);
-
-                try {
-                    response = await AccountAPI.Update(user1, updateValues, updateExpression);
-                } catch (err) {
-                    response = false;
-                }
-                if(response === false){
-                    console.log("Could not add friend to " + user1.Username);
-                    return responseUtil.Build(500, "Could not add friend to " + user1.Username);
-                } 
-
-                return true;
-            }
+            updateFunction = friendUtil.ConfirmFriendCallback
 
         } else if (request.hasOwnProperty("Remove")){
-            
             try {
                 requested = await AccountAPI.Get(request.Remove);
             } catch (err){
@@ -457,41 +378,9 @@ module.exports = {
             }
 
             //Initialize the update function
-            updateFunction = async function (user1, user2){
-                //Set the request statement
-                const requestExpression = 'Set Friends = :f'
-
-                //Get the updated friends list
-                let updatedFriends = await friendUtil.RemoveFromFriends(user1, user2);
-                //If the user2 was not in the list
-                if(updatedFriends === false){
-                    return responseUtil.Build(403, "User not in " + user1.Username + "'s friend array");
-                }
-                console.log(updatedFriends);
-                //Set the expression value
-                let expressionValue = {
-                    ':f': updatedFriends
-                }
-                
-                //Save to the account
-                try {
-                    response = await AccountAPI.Update(user1, expressionValue, requestExpression);
-                
-                //Any errors saving to the account
-                } catch (err) {
-                    return responseUtil.Build(500, "Error saving to " + user1.Username)
-                }
-                if(response === false){
-                    return responseUtil.Build(500, "Error saving to " + user1.Username)
-                }
-
-                return true;
-            }
+            updateFunction = friendUtil.RemoveFriendsCallback
         
         } else if (request.hasOwnProperty("RemoveRequest")){
-            
-            const updateExpression = "Set FriendRequests=:r"
-            
             try {
                 requested = await AccountAPI.Get(request.RemoveRequest);
             } catch (err){
@@ -502,36 +391,7 @@ module.exports = {
             }
 
             //Initialize the update function
-            updateFunction = async function (user1, user2){
-                //Remove the friendRequest from the user2's array
-                let updatedFriendReqs = await friendUtil.removeFromFriendRequests(user1, user2);
-
-                if (updatedFriendReqs === false){
-                    return responseUtil.Build(403, "User not in " + user1.Username +"'s friend request array");
-                }
-
-                //Set the updated friend requests to the Friend requests array
-                updatedFriendReqs = updatedFriendReqs.FriendRequests;
-
-                //Update the values
-                let updateValues = {
-                    ':r': updatedFriendReqs
-                };
-
-                //Save the item
-
-                try {
-                    response = await AccountAPI.Update(user1, updateValues, updateExpression);
-                    //If it could not save
-                } catch (err) {
-                    return responseUtil.Build(500, "Could not save to " + user1.Username);
-                }
-                if (response === false){
-                    return responseUtil.Build(500, "Could not save to " + user1.Username);
-                }
-
-                return true;
-            }
+            updateFunction = friendUtil.RemoveFriendRequestCallback;
         }
 
         //Initialize the users as the sender and the requested

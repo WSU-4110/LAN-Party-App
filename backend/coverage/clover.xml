@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1607890383779" clover="3.2.0">
-  <project timestamp="1607890383780" name="All files">
+<coverage generated="1607893074510" clover="3.2.0">
+  <project timestamp="1607893074510" name="All files">
     <metrics statements="171" coveredstatements="48" conditionals="82" coveredconditionals="16" methods="9" coveredmethods="5" elements="262" coveredelements="69" complexity="0" loc="171" ncloc="171" packages="1" files="2" classes="2"/>
     <file name="PartyUtils.js" path="C:\Users\Work\Documents\GitHub\LAN-Party-App\backend\utilities\PartyUtils.js">
       <metrics statements="121" coveredstatements="47" conditionals="48" coveredconditionals="16" methods="6" coveredmethods="5"/>
