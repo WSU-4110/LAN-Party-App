@@ -1,0 +1,2 @@
+import changePassword from "../changePassword";
+
