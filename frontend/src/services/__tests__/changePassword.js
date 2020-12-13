@@ -1,2 +1,0 @@
-import changePassword from "../changePassword";
-

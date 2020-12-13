@@ -1,2 +1,0 @@
-import changeAbout from "../changeAbout";
-
