@@ -294,6 +294,21 @@ describe('Testing isValidPartyKey function ', () => {
             }
         });
 
-        
+    // LOGAN'S TESTS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // test a valid username
+    test('testing to see if a username is okay', () => {
+        expect(
+        PartyUtil.isValidUserName("david98")
+        ).toEqual(true);
+    });
+  
+    // test a invalid username
+    test('testing to see if a username is NOT okay', () => {
+        expect(
+        PartyUtil.isValidUserName("awesome user90")
+        ).not.toEqual(true);
+    });
+
+    // END OF LOGAN'S TESTS ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 })
