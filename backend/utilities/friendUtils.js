@@ -92,7 +92,7 @@ module.exports = {
     RemoveFriendRequestCallback: async function(user1, user2){
         const updateExpression = "Set FriendRequests=:r"
         //Remove the friendRequest from the user2's array
-        let updatedFriendReqs = await friendUtil.removeFromFriendRequests(user1, user2);
+        let updatedFriendReqs = await this.removeFromFriendRequests(user1, user2);
 
         if (updatedFriendReqs === false){
             return responseUtil.Build(403, "User not in " + user1.Username +"'s friend request array");
@@ -125,7 +125,7 @@ module.exports = {
         const requestExpression = 'Set Friends = :f'
 
         //Get the updated friends list
-        let updatedFriends = await friendUtil.RemoveFromFriends(user1, user2);
+        let updatedFriends = await this.RemoveFromFriends(user1, user2);
         //If the user2 was not in the list
         if(updatedFriends === false){
             return responseUtil.Build(403, "User not in " + user1.Username + "'s friend array");
@@ -155,7 +155,7 @@ module.exports = {
         const updateExpression = 'set Friends = :f, FriendRequests = :r';
 
         //Remove the user2 from the user1's friend request
-        let updatedFriendReqs = await friendUtil.removeFromFriendRequests(user1, user2);
+        let updatedFriendReqs = await this.removeFromFriendRequests(user1, user2);
 
         //If the item wasn't in there
         if(updatedFriendReqs === false){
@@ -171,7 +171,7 @@ module.exports = {
         }
 
         //Update the friend request array
-        let updatedFriends = await friendUtil.AddToFriends(user1, user2);
+        let updatedFriends = await this.AddToFriends(user1, user2);
 
         if(updatedFriends === false){
             return responseUtil.Build(403, "User already in "+ user1.Username + "'s friends!")
@@ -200,7 +200,7 @@ module.exports = {
         const updateExpression = 'SET FriendRequests =:f'
 
         //Get the updated friends list
-        let updatedFriendReqs = await friendUtil.addToFriendRequests(user1, user2, sender);
+        let updatedFriendReqs = await this.addToFriendRequests(user1, user2, sender);
         
         if(updatedFriendReqs === false){
             return responseUtil.Build(403, 'Tried sending friend request to self');
