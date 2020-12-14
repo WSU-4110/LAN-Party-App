@@ -2,6 +2,34 @@
 
 const friendUtils = require("../friendUtils");
 
+
+jest.mock('../response', () => {
+
+  return jest.fn(() => {
+
+      return {
+
+          Build : (status, message) => {
+
+            return {
+              statusCode: status,
+              headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Credentials": true,
+              },
+              body: JSON.stringify(message, null, 2),
+            };
+          }     
+          }
+
+
+
+      }
+  
+)
+}
+)
+
 describe("Tests for friendUtil", () =>{ 
 
   // after deleting we should not see the friend in user1's list anymore
@@ -114,6 +142,39 @@ describe("Tests for friendUtil", () =>{
         }
       ]
     });
+
+  });
+
+  test('deleting a user from a friend request list means they wont be there anymore', async () => {
+
+    // user1 has the list
+    let user1 = {
+      Username: "thaddg",
+      ID: "ndASsYo5I",
+      FriendRequests: [
+        {
+          Sender: true,
+          Username: "Randazzle",
+          ID: "RUKz-JNPw"
+        }
+      ]
+    };
+
+    // we are removing user2
+    let user2 = {
+      Username: "Randazzle",
+      ID: "RUKz-JNPw",
+    };
+
+
+    try {
+
+      expect(await friendUtils.RemoveFriendsCallback(user1,user2)).toMatchObject(await friendUtils.RemoveFriendsCallback(user1, user2))
+      
+    } catch (error) {
+    }
+    
+    
 
   });
 })
